@@ -6,6 +6,7 @@ using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.ActionDiscovery;
 using UIPilot.Editor.Modules.Binding;
 using UIPilot.Editor.Modules.UIGenerator;
+using UIPilot.Editor.Modules.Validation;
 
 namespace UIPilot.Editor
 {
@@ -17,6 +18,10 @@ namespace UIPilot.Editor
         // ── Discover state ───────────────────────────────────────────────────
         private List<DiscoveredAction> _discoveredActions;
         private Vector2                _discoverScrollPos;
+
+        // ── Validate state ───────────────────────────────────────────────────
+        private List<ValidationResult> _validationResults;
+        private Vector2                _validateScrollPos;
 
         // ── Wire state ───────────────────────────────────────────────────────
         private List<Button>            _wiredButtons;
@@ -32,8 +37,9 @@ namespace UIPilot.Editor
         private static readonly GUIContent ContentClearSet    = new GUIContent(UIPilotLabels.Generate.ClearSettings,  UIPilotLabels.Generate.TooltipClearPanel);
         private static readonly GUIContent ContentScan        = new GUIContent(UIPilotLabels.Discover.ScanButton,     UIPilotLabels.Discover.TooltipScan);
         private static readonly GUIContent ContentRefresh     = new GUIContent(UIPilotLabels.Wire.RefreshButton,      UIPilotLabels.Wire.TooltipRefresh);
-        private static readonly GUIContent ContentApply       = new GUIContent(UIPilotLabels.Wire.ApplyButton,        UIPilotLabels.Wire.TooltipApply);
-        // ContentValidate will be wired in Module 4 (ValidationModule).
+        private static readonly GUIContent ContentApply        = new GUIContent(UIPilotLabels.Wire.ApplyButton,         UIPilotLabels.Wire.TooltipApply);
+        private static readonly GUIContent ContentRunValidate  = new GUIContent(UIPilotLabels.Validate.RunButton,       UIPilotLabels.Validate.TooltipValidate);
+        private static readonly GUIContent ContentFix          = new GUIContent(UIPilotLabels.Validate.FixButton,       UIPilotLabels.Validate.TooltipFix);
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -187,17 +193,79 @@ namespace UIPilot.Editor
             }
         }
 
-        // ── Section: Validate (placeholder) ─────────────────────────────────
+        // ── Section: Validate ────────────────────────────────────────────────
 
-        private static void DrawValidateSection()
+        private void DrawValidateSection()
         {
             EditorGUILayout.Space(6f);
             EditorGUILayout.LabelField(UIPilotLabels.Sections.Validate, EditorStyles.boldLabel);
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                EditorGUILayout.LabelField(UIPilotLabels.Sections.Placeholder,
-                    EditorStyles.centeredGreyMiniLabel);
-                EditorGUILayout.Space(2f);
+                if (GUILayout.Button(ContentRunValidate))
+                    _validationResults = ValidationModule.Validate();
+
+                if (_validationResults == null) return;
+
+                EditorGUILayout.Space(4f);
+
+                var hasIssues = false;
+                foreach (var r in _validationResults)
+                    if (r.Severity == ValidationSeverity.Error || r.Severity == ValidationSeverity.Warning)
+                    { hasIssues = true; break; }
+
+                if (!hasIssues)
+                {
+                    EditorGUILayout.LabelField(UIPilotLabels.Validate.AllClear,
+                        EditorStyles.centeredGreyMiniLabel);
+                    return;
+                }
+
+                _validateScrollPos = EditorGUILayout.BeginScrollView(
+                    _validateScrollPos, GUILayout.Height(150f));
+
+                foreach (var result in _validationResults)
+                    DrawValidationRow(result);
+
+                EditorGUILayout.EndScrollView();
+            }
+        }
+
+        private void DrawValidationRow(ValidationResult result)
+        {
+            Color rowColor;
+            string icon;
+
+            switch (result.Severity)
+            {
+                case ValidationSeverity.Error:
+                    rowColor = new Color(1f, 0.35f, 0.35f);
+                    icon     = "✖ ";
+                    break;
+                case ValidationSeverity.Warning:
+                    rowColor = new Color(1f, 0.75f, 0.2f);
+                    icon     = "⚠ ";
+                    break;
+                default:
+                    rowColor = new Color(0.6f, 0.6f, 0.6f);
+                    icon     = "● ";
+                    break;
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                var prev = GUI.color;
+                GUI.color = rowColor;
+                EditorGUILayout.LabelField(icon + result.Message);
+                GUI.color = prev;
+
+                if (result.AutoFix != null)
+                {
+                    if (GUILayout.Button(ContentFix, GUILayout.Width(38f)))
+                    {
+                        ValidationModule.RunAutoFix(result);
+                        _validationResults = ValidationModule.Validate();
+                    }
+                }
             }
         }
 

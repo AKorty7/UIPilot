@@ -70,8 +70,14 @@ namespace UIPilot.Editor.Core
 
         internal static class Validate
         {
+            internal const string RunButton   = "Run Validation";
+            internal const string FixButton   = "Fix";
+            internal const string AllClear    = "✓ No errors or warnings found.";
+
             internal const string TooltipValidate =
                 "Checks your scene for common UI setup mistakes";
+            internal const string TooltipFix =
+                "Automatically fix this issue";
         }
     }
 }
