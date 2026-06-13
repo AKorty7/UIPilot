@@ -1,11 +1,14 @@
 using UnityEditor;
 using UnityEngine;
 using UIPilot.Editor.Core;
+using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor
 {
     public sealed class UIPilotWindow : EditorWindow
     {
+        private MenuType _selectedMenuType;
+
         // ── Lifecycle ────────────────────────────────────────────────────────
 
         [MenuItem(UIPilotLabels.Menu.WindowPath)]
@@ -25,13 +28,31 @@ namespace UIPilot.Editor
 
             EditorGUILayout.Space(8f);
 
-            DrawSection(UIPilotLabels.Sections.Generate);
+            DrawGenerateSection();
             DrawSection(UIPilotLabels.Sections.Discover);
             DrawSection(UIPilotLabels.Sections.Wire);
             DrawSection(UIPilotLabels.Sections.Validate);
         }
 
-        // ── Private helpers ──────────────────────────────────────────────────
+        // ── Section: Generate ────────────────────────────────────────────────
+
+        private void DrawGenerateSection()
+        {
+            EditorGUILayout.Space(6f);
+            EditorGUILayout.LabelField(UIPilotLabels.Sections.Generate, EditorStyles.boldLabel);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                _selectedMenuType = (MenuType)EditorGUILayout.EnumPopup(
+                    UIPilotLabels.Generate.MenuTypeLabel, _selectedMenuType);
+
+                EditorGUILayout.Space(4f);
+
+                if (GUILayout.Button(UIPilotLabels.Generate.ButtonLabel))
+                    UIGeneratorModule.Generate(_selectedMenuType);
+            }
+        }
+
+        // ── Placeholder sections ─────────────────────────────────────────────
 
         private static void DrawHeader()
         {

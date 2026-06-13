@@ -14,11 +14,17 @@ namespace UIPilot.Editor.Core
 
         internal static class Sections
         {
-            internal const string Generate   = "Generate";
-            internal const string Discover   = "Discover";
-            internal const string Wire       = "Wire";
-            internal const string Validate   = "Validate";
+            internal const string Generate    = "Generate";
+            internal const string Discover    = "Discover";
+            internal const string Wire        = "Wire";
+            internal const string Validate    = "Validate";
             internal const string Placeholder = "— not yet implemented —";
+        }
+
+        internal static class Generate
+        {
+            internal const string MenuTypeLabel = "Menu Type";
+            internal const string ButtonLabel   = "Generate UI";
         }
     }
 }
