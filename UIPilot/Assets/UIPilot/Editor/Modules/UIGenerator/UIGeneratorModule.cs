@@ -9,7 +9,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
 {
     internal static class UIGeneratorModule
     {
-        // ── Public entry point ───────────────────────────────────────────────
+        // ── Public entry points ──────────────────────────────────────────────
 
         internal static void Generate(MenuType menuType)
         {
@@ -18,10 +18,48 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             EnsureEventSystem();
 
-            var canvasGO = BuildCanvas(menuType);
-            Undo.RegisterCreatedObjectUndo(canvasGO, UIGeneratorContent.Undo.Action);
+            // Remove any pre-rename Canvas objects that contain UIPilot panels.
+            CleanUpLegacyCanvases();
+
+            var panelName = GetPanelName(menuType);
+
+            // Scene-wide search catches panels parented to any canvas.
+            if (GameObject.Find(panelName) != null)
+            {
+                Debug.LogWarning(UIGeneratorContent.Messages.PanelAlreadyExists + panelName);
+                return;
+            }
+
+            var existingCanvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
+            var canvasIsNew    = existingCanvas == null;
+            var canvasGO       = canvasIsNew ? CreateCanvas() : existingCanvas;
+
+            if (canvasIsNew)
+                Undo.RegisterCreatedObjectUndo(canvasGO, UIGeneratorContent.Undo.Action);
+
+            var panelGO = BuildMenu(canvasGO, menuType);
+
+            if (!canvasIsNew)
+                Undo.RegisterCreatedObjectUndo(panelGO, UIGeneratorContent.Undo.Action);
 
             Selection.activeGameObject = canvasGO;
+        }
+
+        internal static void ClearPanel(MenuType menuType)
+        {
+            // Search scene-wide: panel may live inside an old canvas, not just UIPilot_Canvas.
+            var panelGO = GameObject.Find(GetPanelName(menuType));
+            if (panelGO == null) return;
+
+            var parentCanvas = panelGO.transform.parent != null
+                ? panelGO.transform.parent.gameObject
+                : null;
+
+            Undo.DestroyObjectImmediate(panelGO);
+
+            // If the parent canvas is now empty of UIPilot children, destroy it too.
+            if (parentCanvas != null && !HasUIPilotChildren(parentCanvas))
+                Undo.DestroyObjectImmediate(parentCanvas);
         }
 
         // ── EventSystem ──────────────────────────────────────────────────────
@@ -38,7 +76,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         // ── Canvas ───────────────────────────────────────────────────────────
 
-        private static GameObject BuildCanvas(MenuType menuType)
+        private static GameObject CreateCanvas()
         {
             var canvasGO = new GameObject(UIGeneratorContent.GameObjects.Canvas);
             canvasGO.layer = LayerMask.NameToLayer(UIGeneratorContent.Layers.UI);
@@ -54,18 +92,16 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             canvasGO.AddComponent<GraphicRaycaster>();
 
-            BuildMenu(canvasGO, menuType);
-
             return canvasGO;
         }
 
         // ── Menu ─────────────────────────────────────────────────────────────
 
-        private static void BuildMenu(GameObject canvas, MenuType menuType)
+        private static GameObject BuildMenu(GameObject canvas, MenuType menuType)
         {
             var (title, buttons, prefix) = GetMenuConfig(menuType);
 
-            var panelGO  = CreateUIObject(prefix + UIGeneratorContent.GameObjects.PanelSuffix, canvas);
+            var panelGO   = CreateUIObject(prefix + UIGeneratorContent.GameObjects.PanelSuffix, canvas);
             var panelRect = (RectTransform)panelGO.transform;
             SetStretch(panelRect);
 
@@ -81,20 +117,22 @@ namespace UIPilot.Editor.Modules.UIGenerator
             vlg.childForceExpandWidth  = true;
             vlg.childForceExpandHeight = false;
 
-            CreateTitle(panelGO, title);
+            CreateTitle(panelGO, prefix + UIGeneratorContent.GameObjects.TitleSuffix, title);
 
             foreach (var label in buttons)
                 CreateButton(panelGO, label);
+
+            return panelGO;
         }
 
         // ── Title ────────────────────────────────────────────────────────────
 
-        private static void CreateTitle(GameObject parent, string text)
+        private static void CreateTitle(GameObject parent, string objectName, string displayText)
         {
-            var go  = CreateUIObject(UIGeneratorContent.GameObjects.TitleText, parent);
+            var go  = CreateUIObject(objectName, parent);
 
             var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text      = text;
+            tmp.text      = displayText;
             tmp.fontSize  = 64f;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontStyle = FontStyles.Bold;
@@ -124,6 +162,32 @@ namespace UIPilot.Editor.Modules.UIGenerator
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
+
+        private static void CleanUpLegacyCanvases()
+        {
+            var allCanvases = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            foreach (var canvas in allCanvases)
+            {
+                if (canvas.name == UIGeneratorContent.GameObjects.Canvas) continue;
+                if (HasUIPilotChildren(canvas.gameObject))
+                    Undo.DestroyObjectImmediate(canvas.gameObject);
+            }
+        }
+
+        private static bool HasUIPilotChildren(GameObject go)
+        {
+            foreach (Transform child in go.transform)
+                if (child.name.StartsWith(UIGeneratorContent.GameObjects.NamePrefix,
+                        System.StringComparison.Ordinal))
+                    return true;
+            return false;
+        }
+
+        private static string GetPanelName(MenuType menuType)
+        {
+            var (_, _, prefix) = GetMenuConfig(menuType);
+            return prefix + UIGeneratorContent.GameObjects.PanelSuffix;
+        }
 
         private static GameObject CreateUIObject(string name, GameObject parent)
         {

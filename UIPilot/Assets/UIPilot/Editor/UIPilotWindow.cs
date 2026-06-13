@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UIPilot.Editor.Core;
+using UIPilot.Editor.Modules.ActionDiscovery;
 using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor
 {
     public sealed class UIPilotWindow : EditorWindow
     {
-        private MenuType _selectedMenuType;
+        private MenuType                _selectedMenuType;
+        private List<DiscoveredAction>  _discoveredActions;
+        private Vector2                 _discoverScrollPos;
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -29,7 +33,7 @@ namespace UIPilot.Editor
             EditorGUILayout.Space(8f);
 
             DrawGenerateSection();
-            DrawSection(UIPilotLabels.Sections.Discover);
+            DrawDiscoverSection();
             DrawSection(UIPilotLabels.Sections.Wire);
             DrawSection(UIPilotLabels.Sections.Validate);
         }
@@ -49,6 +53,47 @@ namespace UIPilot.Editor
 
                 if (GUILayout.Button(UIPilotLabels.Generate.ButtonLabel))
                     UIGeneratorModule.Generate(_selectedMenuType);
+
+                EditorGUILayout.Space(4f);
+
+                if (GUILayout.Button(UIPilotLabels.Generate.ClearMainMenu))
+                    UIGeneratorModule.ClearPanel(MenuType.MainMenu);
+                if (GUILayout.Button(UIPilotLabels.Generate.ClearPauseMenu))
+                    UIGeneratorModule.ClearPanel(MenuType.PauseMenu);
+                if (GUILayout.Button(UIPilotLabels.Generate.ClearSettings))
+                    UIGeneratorModule.ClearPanel(MenuType.SettingsMenu);
+            }
+        }
+
+        // ── Section: Discover ────────────────────────────────────────────────
+
+        private void DrawDiscoverSection()
+        {
+            EditorGUILayout.Space(6f);
+            EditorGUILayout.LabelField(UIPilotLabels.Sections.Discover, EditorStyles.boldLabel);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                if (GUILayout.Button(UIPilotLabels.Discover.ScanButton))
+                    _discoveredActions = ActionDiscoveryModule.Scan();
+
+                if (_discoveredActions == null) return;
+
+                EditorGUILayout.Space(4f);
+
+                if (_discoveredActions.Count == 0)
+                {
+                    EditorGUILayout.LabelField(UIPilotLabels.Discover.EmptyList,
+                        EditorStyles.centeredGreyMiniLabel);
+                    return;
+                }
+
+                _discoverScrollPos = EditorGUILayout.BeginScrollView(
+                    _discoverScrollPos, GUILayout.Height(120f));
+
+                foreach (var action in _discoveredActions)
+                    EditorGUILayout.LabelField(action.FullLabel);
+
+                EditorGUILayout.EndScrollView();
             }
         }
 
@@ -69,7 +114,8 @@ namespace UIPilot.Editor
             EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                EditorGUILayout.LabelField(UIPilotLabels.Sections.Placeholder, EditorStyles.centeredGreyMiniLabel);
+                EditorGUILayout.LabelField(UIPilotLabels.Sections.Placeholder,
+                    EditorStyles.centeredGreyMiniLabel);
                 EditorGUILayout.Space(2f);
             }
         }

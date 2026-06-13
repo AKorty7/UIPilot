@@ -23,8 +23,17 @@ namespace UIPilot.Editor.Core
 
         internal static class Generate
         {
-            internal const string MenuTypeLabel = "Menu Type";
-            internal const string ButtonLabel   = "Generate UI";
+            internal const string MenuTypeLabel  = "Menu Type";
+            internal const string ButtonLabel    = "Generate UI";
+            internal const string ClearMainMenu  = "Clear Main Menu";
+            internal const string ClearPauseMenu = "Clear Pause Menu";
+            internal const string ClearSettings  = "Clear Settings";
+        }
+
+        internal static class Discover
+        {
+            internal const string ScanButton = "Scan Project";
+            internal const string EmptyList  = "No public actions found.";
         }
     }
 }
