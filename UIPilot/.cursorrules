@@ -1,0 +1,29 @@
+You are helping build UIPilot — a Unity Editor automation tool.
+
+PROJECT RULES:
+- Unity 6.3 LTS (6000.3.17f1)
+- Editor-time only, zero runtime footprint
+- UGUI output only, no custom frameworks
+- Modular architecture, no monoliths
+- Minimal code, no bloat
+- Ask before refactoring anything not requested
+
+FOLDER STRUCTURE:
+Assets/UIPilot/Editor/
+  Core/
+  Modules/UIGenerator/
+  Modules/ActionDiscovery/
+  Modules/Binding/
+  Modules/Validation/
+  UI/
+  UIPilotWindow.cs
+
+VERSIONING: v0.1.0-alpha
+ACTIVE MODULE: EditorWindow scaffold only
+
+CODE RULES:
+- No runtime MonoBehaviours
+- No hardcoded strings
+- Unity 6.3 editor APIs only
+- Single responsibility per class
+- Always compile without errors before moving on
