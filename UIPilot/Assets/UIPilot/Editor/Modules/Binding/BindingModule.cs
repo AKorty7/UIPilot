@@ -75,6 +75,13 @@ namespace UIPilot.Editor.Modules.Binding
 
                 UnityEventTools.AddPersistentListener(button.onClick, call);
 
+                var serializedButton = new SerializedObject(button);
+                var onClickProp      = serializedButton.FindProperty("m_OnClick");
+                var callsProp        = onClickProp.FindPropertyRelative("m_PersistentCalls.m_Calls");
+                var lastCall         = callsProp.GetArrayElementAtIndex(callsProp.arraySize - 1);
+                lastCall.FindPropertyRelative("m_CallState").intValue = 2;
+                serializedButton.ApplyModifiedPropertiesWithoutUndo();
+
                 EditorUtility.SetDirty(button);
             }
 
