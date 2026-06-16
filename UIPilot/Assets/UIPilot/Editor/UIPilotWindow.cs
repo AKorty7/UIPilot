@@ -50,7 +50,8 @@ namespace UIPilot.Editor
         private static readonly GUIContent ContentApply         = new GUIContent(UIPilotLabels.Wire.ApplyButton,           UIPilotLabels.Wire.TooltipApply);
         private static readonly GUIContent ContentRunValidate   = new GUIContent(UIPilotLabels.Validate.RunButton,         UIPilotLabels.Validate.TooltipValidate);
         private static readonly GUIContent ContentFix           = new GUIContent(UIPilotLabels.Validate.FixButton,         UIPilotLabels.Validate.TooltipFix);
-        private static readonly GUIContent ContentBuildUI       = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,     UIPilotLabels.QuickBuild.TooltipBuild);
+        private static readonly GUIContent ContentBuildUI        = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,  UIPilotLabels.QuickBuild.TooltipBuild);
+        private static readonly GUIContent ContentClearQuick    = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,  UIPilotLabels.QuickBuild.TooltipClear);
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -96,7 +97,36 @@ namespace UIPilot.Editor
                     if (GUILayout.Button(ContentBuildUI))
                         ExecuteQuickBuild();
                 }
+
+                if (GUILayout.Button(ContentClearQuick))
+                    ExecuteQuickClear();
             }
+        }
+
+        private static void ExecuteQuickClear()
+        {
+            var confirmed = EditorUtility.DisplayDialog(
+                UIPilotLabels.QuickBuild.DialogTitle,
+                UIPilotLabels.QuickBuild.DialogMessage,
+                UIPilotLabels.QuickBuild.DialogConfirm,
+                UIPilotLabels.QuickBuild.DialogCancel);
+
+            if (!confirmed) return;
+
+            Undo.IncrementCurrentGroup();
+            Undo.SetCurrentGroupName(UIPilotLabels.QuickBuild.ClearButton);
+
+            var canvasGO  = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
+            var managerGO = GameObject.Find(ScriptSetupContent.GameObjects.ManagerName);
+
+            if (canvasGO != null)
+                Undo.DestroyObjectImmediate(canvasGO);
+
+            if (managerGO != null)
+                Undo.DestroyObjectImmediate(managerGO);
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            Debug.Log(UIPilotLabels.QuickBuild.ConsoleCleared);
         }
 
         private void ExecuteQuickBuild()

@@ -100,6 +100,14 @@ namespace UIPilot.Editor.Core
                 "UIPilot: UIPilot_GameManager type not resolved yet — Unity may still be compiling. Try again shortly.";
             internal const string WarnGameObjectNotFound =
                 "UIPilot: UIPilot_GameManager GameObject not found in scene.";
+
+            internal const string ClearButton     = "Quick Clear";
+            internal const string TooltipClear    = "Removes UIPilot canvas and GameManager from the scene. Leaves your scripts intact.";
+            internal const string DialogTitle     = "Quick Clear";
+            internal const string DialogMessage   = "This will remove UIPilot_Canvas and UIPilot_GameManager from the scene. Your UIPilot_GameManager.cs script will not be deleted. Continue?";
+            internal const string DialogConfirm   = "Clear Scene";
+            internal const string DialogCancel    = "Cancel";
+            internal const string ConsoleCleared  = "UIPilot: Scene cleared. UIPilot_GameManager.cs left intact — delete manually if needed.";
         }
     }
 }
