@@ -96,6 +96,9 @@ namespace UIPilot.Editor.Core
                 "UIPilot: Building your UI — please wait...";
             internal const string ConsoleComplete =
                 "UIPilot: Setup complete. Your buttons are wired and ready.";
+            internal const string ConsoleSkipped =
+                "UIPilot: All selected menus already intact — nothing to regenerate.";
+
             internal const string WarnTypeNotResolved =
                 "UIPilot: UIPilot_GameManager type not resolved yet — Unity may still be compiling. Try again shortly.";
             internal const string WarnGameObjectNotFound =

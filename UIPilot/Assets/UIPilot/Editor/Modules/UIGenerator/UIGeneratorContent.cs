@@ -47,6 +47,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
         internal static class Messages
         {
             internal const string PanelAlreadyExists = "UIPilot: Panel already exists, skipping: ";
+            internal const string PanelIntact        = "UIPilot: Panel exists and is intact — skipping: ";
         }
 
         internal static class Undo

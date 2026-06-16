@@ -13,11 +13,17 @@ namespace UIPilot.Editor.Modules.ScriptSetup
 
         internal static void GenerateGameManager(MenuType[] selectedMenus)
         {
-            var labels = CollectUniqueLabels(selectedMenus);
-            var script = BuildScript(labels);
-
-            WriteScript(script);
-            CreateGameObject();
+            if (IsGameManagerIntact())
+            {
+                Debug.Log(ScriptSetupContent.Messages.GameManagerIntact);
+            }
+            else
+            {
+                var labels = CollectUniqueLabels(selectedMenus);
+                var script = BuildScript(labels);
+                WriteScript(script);
+                CreateGameObject();
+            }
         }
 
         // ── Label collection ─────────────────────────────────────────────────
@@ -51,9 +57,20 @@ namespace UIPilot.Editor.Modules.ScriptSetup
 
         // ── Script generation ────────────────────────────────────────────────
 
+        private static bool IsGameManagerIntact()
+        {
+            var fullPath = Path.Combine(
+                Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length),
+                ScriptSetupContent.Paths.OutputAssetPath);
+
+            return File.Exists(fullPath)
+                && GameObject.Find(ScriptSetupContent.GameObjects.ManagerName) != null;
+        }
+
         private static string BuildScript(List<string> labels)
         {
             var sb = new StringBuilder();
+            sb.Append(ScriptSetupContent.Script.GeneratedHeader);
             sb.Append(ScriptSetupContent.Script.Header);
 
             for (var i = 0; i < labels.Count; i++)

@@ -23,12 +23,16 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             var panelName = GetPanelName(menuType);
 
-            // Scene-wide search catches panels parented to any canvas.
-            if (GameObject.Find(panelName) != null)
+            if (IsPanelIntact(panelName))
             {
-                Debug.LogWarning(UIGeneratorContent.Messages.PanelAlreadyExists + panelName);
+                Debug.Log(UIGeneratorContent.Messages.PanelIntact + panelName);
                 return;
             }
+
+            // Panel exists but is broken (no buttons) — destroy it before regenerating.
+            var brokenPanel = GameObject.Find(panelName);
+            if (brokenPanel != null)
+                Undo.DestroyObjectImmediate(brokenPanel);
 
             var existingCanvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             var canvasIsNew    = existingCanvas == null;
@@ -162,6 +166,19 @@ namespace UIPilot.Editor.Modules.UIGenerator
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
+
+        private static bool IsPanelIntact(string panelName)
+        {
+            var panel = GameObject.Find(panelName);
+            if (panel == null) return false;
+
+            foreach (Transform child in panel.transform)
+                if (child.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix,
+                        System.StringComparison.Ordinal))
+                    return true;
+
+            return false;
+        }
 
         private static void CleanUpLegacyCanvases()
         {
