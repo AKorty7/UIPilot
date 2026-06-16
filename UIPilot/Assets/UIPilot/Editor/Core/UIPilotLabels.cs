@@ -79,5 +79,27 @@ namespace UIPilot.Editor.Core
             internal const string TooltipFix =
                 "Automatically fix this issue";
         }
+
+        internal static class QuickBuild
+        {
+            internal const string SectionLabel       = "Quick Build";
+            internal const string ManualSectionLabel = "Manual";
+            internal const string BuildButton        = "Build UI";
+            internal const string MainMenuToggle     = "Main Menu";
+            internal const string PauseMenuToggle    = "Pause Menu";
+            internal const string SettingsMenuToggle = "Settings Menu";
+
+            internal const string TooltipBuild =
+                "Generates selected menus, creates a GameManager script, and wires all buttons automatically";
+
+            internal const string ConsoleStart =
+                "UIPilot: Building your UI — please wait...";
+            internal const string ConsoleComplete =
+                "UIPilot: Setup complete. Your buttons are wired and ready.";
+            internal const string WarnTypeNotResolved =
+                "UIPilot: UIPilot_GameManager type not resolved yet — Unity may still be compiling. Try again shortly.";
+            internal const string WarnGameObjectNotFound =
+                "UIPilot: UIPilot_GameManager GameObject not found in scene.";
+        }
     }
 }

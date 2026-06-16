@@ -1,0 +1,29 @@
+﻿using UnityEngine;
+
+public class UIPilot_GameManager : MonoBehaviour
+{
+    public void OnPlayPressed()
+    {
+        // TODO: Load your game scene here
+        // Example: SceneManager.LoadScene("GameScene");
+        Debug.Log("Play pressed — add your scene load logic");
+    }
+
+    public void OnSettingsPressed()
+    {
+        // TODO: implement Settings logic
+        Debug.Log("Settings pressed — add your logic");
+    }
+
+    public void OnQuitPressed()
+    {
+        // TODO: implement Quit logic
+        Debug.Log("Quit pressed — add your logic");
+    }
+
+    public void OnResumePressed()
+    {
+        // TODO: implement Resume logic
+        Debug.Log("Resume pressed — add your logic");
+    }
+}

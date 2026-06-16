@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.ActionDiscovery;
 using UIPilot.Editor.Modules.Binding;
+using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
 using UIPilot.Editor.Modules.Validation;
 
@@ -12,6 +15,13 @@ namespace UIPilot.Editor
 {
     public sealed class UIPilotWindow : EditorWindow
     {
+        // ── Quick Build state ────────────────────────────────────────────────
+        private bool _quickBuildFoldout = true;
+        private bool _manualFoldout     = false;
+        private bool _qbMainMenu        = true;
+        private bool _qbPauseMenu       = true;
+        private bool _qbSettingsMenu    = false;
+
         // ── Generate state ───────────────────────────────────────────────────
         private MenuType _selectedMenuType;
 
@@ -30,16 +40,17 @@ namespace UIPilot.Editor
         private string[]                _actionDropdownOptions;
         private Vector2                 _wireScrollPos;
 
-        // ── Cached GUIContent (tooltips) ─────────────────────────────────────
-        private static readonly GUIContent ContentGenerate    = new GUIContent(UIPilotLabels.Generate.ButtonLabel,    UIPilotLabels.Generate.TooltipGenerate);
-        private static readonly GUIContent ContentClearMain   = new GUIContent(UIPilotLabels.Generate.ClearMainMenu,  UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentClearPause  = new GUIContent(UIPilotLabels.Generate.ClearPauseMenu, UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentClearSet    = new GUIContent(UIPilotLabels.Generate.ClearSettings,  UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentScan        = new GUIContent(UIPilotLabels.Discover.ScanButton,     UIPilotLabels.Discover.TooltipScan);
-        private static readonly GUIContent ContentRefresh     = new GUIContent(UIPilotLabels.Wire.RefreshButton,      UIPilotLabels.Wire.TooltipRefresh);
-        private static readonly GUIContent ContentApply        = new GUIContent(UIPilotLabels.Wire.ApplyButton,         UIPilotLabels.Wire.TooltipApply);
-        private static readonly GUIContent ContentRunValidate  = new GUIContent(UIPilotLabels.Validate.RunButton,       UIPilotLabels.Validate.TooltipValidate);
-        private static readonly GUIContent ContentFix          = new GUIContent(UIPilotLabels.Validate.FixButton,       UIPilotLabels.Validate.TooltipFix);
+        // ── Cached GUIContent ────────────────────────────────────────────────
+        private static readonly GUIContent ContentGenerate      = new GUIContent(UIPilotLabels.Generate.ButtonLabel,       UIPilotLabels.Generate.TooltipGenerate);
+        private static readonly GUIContent ContentClearMain     = new GUIContent(UIPilotLabels.Generate.ClearMainMenu,     UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentClearPause    = new GUIContent(UIPilotLabels.Generate.ClearPauseMenu,    UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentClearSet      = new GUIContent(UIPilotLabels.Generate.ClearSettings,     UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentScan          = new GUIContent(UIPilotLabels.Discover.ScanButton,        UIPilotLabels.Discover.TooltipScan);
+        private static readonly GUIContent ContentRefresh       = new GUIContent(UIPilotLabels.Wire.RefreshButton,         UIPilotLabels.Wire.TooltipRefresh);
+        private static readonly GUIContent ContentApply         = new GUIContent(UIPilotLabels.Wire.ApplyButton,           UIPilotLabels.Wire.TooltipApply);
+        private static readonly GUIContent ContentRunValidate   = new GUIContent(UIPilotLabels.Validate.RunButton,         UIPilotLabels.Validate.TooltipValidate);
+        private static readonly GUIContent ContentFix           = new GUIContent(UIPilotLabels.Validate.FixButton,         UIPilotLabels.Validate.TooltipFix);
+        private static readonly GUIContent ContentBuildUI       = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,     UIPilotLabels.QuickBuild.TooltipBuild);
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -57,8 +68,135 @@ namespace UIPilot.Editor
         private void OnGUI()
         {
             DrawHeader();
-
             EditorGUILayout.Space(8f);
+            DrawQuickBuildSection();
+            DrawManualSection();
+        }
+
+        // ── Section: Quick Build ─────────────────────────────────────────────
+
+        private void DrawQuickBuildSection()
+        {
+            _quickBuildFoldout = EditorGUILayout.Foldout(
+                _quickBuildFoldout, UIPilotLabels.QuickBuild.SectionLabel, true, EditorStyles.foldoutHeader);
+
+            if (!_quickBuildFoldout) return;
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                _qbMainMenu     = EditorGUILayout.Toggle(UIPilotLabels.QuickBuild.MainMenuToggle,     _qbMainMenu);
+                _qbPauseMenu    = EditorGUILayout.Toggle(UIPilotLabels.QuickBuild.PauseMenuToggle,    _qbPauseMenu);
+                _qbSettingsMenu = EditorGUILayout.Toggle(UIPilotLabels.QuickBuild.SettingsMenuToggle, _qbSettingsMenu);
+
+                EditorGUILayout.Space(4f);
+
+                var anySelected = _qbMainMenu || _qbPauseMenu || _qbSettingsMenu;
+                using (new EditorGUI.DisabledScope(!anySelected))
+                {
+                    if (GUILayout.Button(ContentBuildUI))
+                        ExecuteQuickBuild();
+                }
+            }
+        }
+
+        private void ExecuteQuickBuild()
+        {
+            Debug.Log(UIPilotLabels.QuickBuild.ConsoleStart);
+
+            var selectedMenus = BuildSelectedMenuArray();
+
+            foreach (var menu in selectedMenus)
+                UIGeneratorModule.Generate(menu);
+
+            ScriptSetupModule.GenerateGameManager(selectedMenus);
+
+            EditorApplication.delayCall += QuickBuildDelayedWire;
+        }
+
+        private MenuType[] BuildSelectedMenuArray()
+        {
+            var list = new List<MenuType>();
+            if (_qbMainMenu)     list.Add(MenuType.MainMenu);
+            if (_qbPauseMenu)    list.Add(MenuType.PauseMenu);
+            if (_qbSettingsMenu) list.Add(MenuType.SettingsMenu);
+            return list.ToArray();
+        }
+
+        private void QuickBuildDelayedWire()
+        {
+            EditorApplication.delayCall -= QuickBuildDelayedWire;
+
+            var go = GameObject.Find(ScriptSetupContent.GameObjects.ManagerName);
+            if (go == null)
+            {
+                Debug.LogWarning(UIPilotLabels.QuickBuild.WarnGameObjectNotFound);
+                return;
+            }
+
+            var managerType = Type.GetType("UIPilot_GameManager, Assembly-CSharp");
+            if (managerType == null)
+            {
+                Debug.LogWarning(UIPilotLabels.QuickBuild.WarnTypeNotResolved);
+                return;
+            }
+
+            go.AddComponent(managerType);
+            EditorUtility.SetDirty(go);
+
+            var buttons  = BindingModule.FindUIPilotButtons();
+            var actions  = ActionDiscoveryModule.Scan();
+            var selections = BuildAutoSelections(buttons, actions);
+
+            BindingModule.ApplyBindings(selections, actions);
+            ValidationModule.Validate();
+
+            Debug.Log(UIPilotLabels.QuickBuild.ConsoleComplete);
+
+            EditorUtility.SetDirty(go);
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+
+        private static Dictionary<string, int> BuildAutoSelections(
+            List<Button> buttons, List<DiscoveredAction> actions)
+        {
+            const string btnPrefix = "UIPilot_Btn_";
+            var selections = new Dictionary<string, int>();
+
+            foreach (var btn in buttons)
+            {
+                if (btn == null) continue;
+
+                var label = btn.name.StartsWith(btnPrefix, StringComparison.Ordinal)
+                    ? btn.name.Substring(btnPrefix.Length)
+                    : btn.name;
+
+                var expectedMethod = "On" + label + "Pressed";
+
+                for (var i = 0; i < actions.Count; i++)
+                {
+                    if (actions[i].MethodName == expectedMethod)
+                    {
+                        selections[btn.name] = i + 1; // +1 because index 0 = "None"
+                        break;
+                    }
+                }
+
+                if (!selections.ContainsKey(btn.name))
+                    selections[btn.name] = 0;
+            }
+
+            return selections;
+        }
+
+        // ── Section: Manual (foldout wrapper) ────────────────────────────────
+
+        private void DrawManualSection()
+        {
+            EditorGUILayout.Space(6f);
+            _manualFoldout = EditorGUILayout.Foldout(
+                _manualFoldout, UIPilotLabels.QuickBuild.ManualSectionLabel, true, EditorStyles.foldoutHeader);
+
+            if (!_manualFoldout) return;
 
             DrawGenerateSection();
             DrawDiscoverSection();
