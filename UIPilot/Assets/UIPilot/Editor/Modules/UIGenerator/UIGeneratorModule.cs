@@ -23,7 +23,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             var panelName = GetPanelName(menuType);
 
-            if (IsPanelIntact(panelName))
+            var (_, buttons, _) = GetMenuConfig(menuType);
+            if (IsPanelIntact(panelName, buttons))
             {
                 Debug.Log(UIGeneratorContent.Messages.PanelIntact + panelName);
                 return;
@@ -42,6 +43,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
                 Undo.RegisterCreatedObjectUndo(canvasGO, UIGeneratorContent.Undo.Action);
 
             var panelGO = BuildMenu(canvasGO, menuType);
+            panelGO.transform.SetSiblingIndex(GetExpectedSiblingIndex(menuType));
 
             if (!canvasIsNew)
                 Undo.RegisterCreatedObjectUndo(panelGO, UIGeneratorContent.Undo.Action);
@@ -167,17 +169,25 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         // ── Helpers ──────────────────────────────────────────────────────────
 
-        private static bool IsPanelIntact(string panelName)
+        private static bool IsPanelIntact(string panelName, string[] expectedButtons)
         {
             var panel = GameObject.Find(panelName);
             if (panel == null) return false;
 
-            foreach (Transform child in panel.transform)
-                if (child.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix,
-                        System.StringComparison.Ordinal))
-                    return true;
+            foreach (var label in expectedButtons)
+            {
+                var expectedName = UIGeneratorContent.GameObjects.ButtonPrefix + label;
+                var found        = false;
 
-            return false;
+                foreach (Transform child in panel.transform)
+                {
+                    if (child.name == expectedName) { found = true; break; }
+                }
+
+                if (!found) return false;
+            }
+
+            return true;
         }
 
         private static void CleanUpLegacyCanvases()
@@ -226,6 +236,17 @@ namespace UIPilot.Editor.Modules.UIGenerator
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
+        }
+
+        private static int GetExpectedSiblingIndex(MenuType menuType)
+        {
+            return menuType switch
+            {
+                MenuType.MainMenu     => 0,
+                MenuType.PauseMenu    => 1,
+                MenuType.SettingsMenu => 2,
+                _                     => throw new ArgumentOutOfRangeException(nameof(menuType), menuType, null)
+            };
         }
 
         private static (string title, string[] buttons, string prefix) GetMenuConfig(MenuType menuType)

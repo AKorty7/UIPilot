@@ -113,6 +113,8 @@ namespace UIPilot.Editor
 
             if (!confirmed) return;
 
+            UnityEngine.Debug.ClearDeveloperConsole();
+
             Undo.IncrementCurrentGroup();
             Undo.SetCurrentGroupName(UIPilotLabels.QuickBuild.ClearButton);
 
@@ -131,6 +133,7 @@ namespace UIPilot.Editor
 
         private void ExecuteQuickBuild()
         {
+            UnityEngine.Debug.ClearDeveloperConsole();
             Debug.Log(UIPilotLabels.QuickBuild.ConsoleStart);
 
             var selectedMenus = BuildSelectedMenuArray();
