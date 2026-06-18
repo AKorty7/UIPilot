@@ -9,6 +9,7 @@ using UIPilot.Editor.Modules.ActionDiscovery;
 using UIPilot.Editor.Modules.Binding;
 using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
+using UIPilot.Editor.Modules.Resilience;
 using UIPilot.Editor.Modules.SceneAudit;
 using UIPilot.Editor.Modules.Validation;
 
@@ -17,9 +18,11 @@ namespace UIPilot.Editor
     public sealed class UIPilotWindow : EditorWindow
     {
         // ── Scene Audit state ────────────────────────────────────────────────
-        private bool                    _sceneAuditFoldout = false;
-        private List<SceneAuditResult>  _auditResults      = null;
-        private Vector2                 _auditScrollPos;
+        private bool                                        _sceneAuditFoldout = false;
+        private List<SceneAuditResult>                      _auditResults      = null;
+        private Vector2                                     _auditScrollPos;
+        private List<ResilienceModule.ResilienceResult>     _repairResults     = null;
+        private Vector2                                     _repairScrollPos;
 
         // ── Quick Build state ────────────────────────────────────────────────
         private bool _quickBuildFoldout = true;
@@ -56,8 +59,9 @@ namespace UIPilot.Editor
         private static readonly GUIContent ContentApply         = new GUIContent(UIPilotLabels.Wire.ApplyButton,           UIPilotLabels.Wire.TooltipApply);
         private static readonly GUIContent ContentRunValidate   = new GUIContent(UIPilotLabels.Validate.RunButton,         UIPilotLabels.Validate.TooltipValidate);
         private static readonly GUIContent ContentFix           = new GUIContent(UIPilotLabels.Validate.FixButton,         UIPilotLabels.Validate.TooltipFix);
-        private static readonly GUIContent ContentBuildUI        = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,  UIPilotLabels.QuickBuild.TooltipBuild);
-        private static readonly GUIContent ContentClearQuick    = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,  UIPilotLabels.QuickBuild.TooltipClear);
+        private static readonly GUIContent ContentBuildUI        = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,   UIPilotLabels.QuickBuild.TooltipBuild);
+        private static readonly GUIContent ContentClearQuick    = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,   UIPilotLabels.QuickBuild.TooltipClear);
+        private static readonly GUIContent ContentRepairScene   = new GUIContent(UIPilotLabels.Resilience.RepairSceneButton, UIPilotLabels.Resilience.RepairSceneTooltip);
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -108,7 +112,8 @@ namespace UIPilot.Editor
                 if (GUILayout.Button(ContentClearQuick))
                 {
                     ExecuteQuickClear();
-                    _auditResults = null;
+                    _auditResults  = null;
+                    _repairResults = null;
                 }
             }
         }
@@ -143,7 +148,8 @@ namespace UIPilot.Editor
 
         private void ExecuteQuickBuild()
         {
-            _auditResults = null;
+            _auditResults  = null;
+            _repairResults = null;
             ClearConsole();
             Debug.Log(UIPilotLabels.QuickBuild.ConsoleStart);
 
@@ -245,7 +251,10 @@ namespace UIPilot.Editor
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 if (GUILayout.Button(SceneAuditContent.UI.ScanButton))
+                {
                     RunSceneAudit();
+                    _repairResults = null;
+                }
 
                 if (_auditResults == null) return;
 
@@ -258,7 +267,65 @@ namespace UIPilot.Editor
                     DrawAuditRow(result);
 
                 EditorGUILayout.EndScrollView();
+
+                // Repair button — only when at least one issue exists
+                if (AuditHasIssues())
+                {
+                    EditorGUILayout.Space(4f);
+                    if (GUILayout.Button(ContentRepairScene))
+                        RunRepair();
+                }
+
+                // Repair results list
+                if (_repairResults != null)
+                {
+                    EditorGUILayout.Space(4f);
+                    EditorGUILayout.LabelField(UIPilotLabels.Resilience.RepairResultsHeader,
+                        EditorStyles.boldLabel);
+
+                    _repairScrollPos = EditorGUILayout.BeginScrollView(
+                        _repairScrollPos, GUILayout.Height(120f));
+
+                    foreach (var r in _repairResults)
+                        DrawRepairRow(r);
+
+                    EditorGUILayout.EndScrollView();
+                }
             }
+        }
+
+        private bool AuditHasIssues()
+        {
+            if (_auditResults == null) return false;
+            foreach (var r in _auditResults)
+                if (r.Severity != SceneAuditSeverity.OK) return true;
+            return false;
+        }
+
+        private void RunRepair()
+        {
+            ClearConsole();
+            _repairResults = ResilienceModule.Repair(_auditResults);
+            _auditResults  = SceneAuditModule.Scan();
+            Repaint();
+        }
+
+        private static void DrawRepairRow(ResilienceModule.ResilienceResult result)
+        {
+            var style = new GUIStyle(EditorStyles.label);
+            style.normal.textColor = result.Success
+                ? new Color(0.2f, 0.8f, 0.2f)
+                : new Color(0.9f, 0.2f, 0.2f);
+
+            var prefix = result.Success
+                ? UIPilotLabels.Resilience.RepairSuccessPrefix
+                : UIPilotLabels.Resilience.RepairFailPrefix;
+
+            var body = string.IsNullOrEmpty(result.Detail)
+                ? result.Label
+                : result.Label + "  —  " + result.Detail;
+
+            EditorGUILayout.LabelField(prefix + " " + body, style);
         }
 
         private void RunSceneAudit()
@@ -280,7 +347,7 @@ namespace UIPilot.Editor
             switch (result.Severity)
             {
                 case SceneAuditSeverity.OK:
-                    rowColor = new Color(0.2f, 0.8f, 0.2f);
+                    rowColor = new Color(0.5f, 0.5f, 0.5f);
                     break;
                 case SceneAuditSeverity.Warning:
                     rowColor = new Color(0.9f, 0.8f, 0.1f);
@@ -290,15 +357,14 @@ namespace UIPilot.Editor
                     break;
             }
 
-            var prev = GUI.color;
-            GUI.color = rowColor;
+            var style = new GUIStyle(EditorStyles.label);
+            style.normal.textColor = rowColor;
 
             var text = string.IsNullOrEmpty(result.Detail)
                 ? result.Label
                 : result.Label + "  —  " + result.Detail;
 
-            EditorGUILayout.LabelField(text);
-            GUI.color = prev;
+            EditorGUILayout.LabelField(text, style);
         }
 
         // ── Section: Manual (foldout wrapper) ────────────────────────────────

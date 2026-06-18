@@ -118,5 +118,14 @@ namespace UIPilot.Editor.Core
             internal const string ConsoleSummary =
                 "UIPilot: Scan complete — {0} items checked, {1} issues found.";
         }
+
+        internal static class Resilience
+        {
+            internal const string RepairSceneButton  = "Repair Scene";
+            internal const string RepairSceneTooltip = "Fix all issues found by the last scan";
+            internal const string RepairResultsHeader = "Repair Results";
+            internal const string RepairSuccessPrefix = "✓";
+            internal const string RepairFailPrefix    = "✗";
+        }
     }
 }

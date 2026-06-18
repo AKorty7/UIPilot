@@ -29,6 +29,47 @@ namespace UIPilot.Editor.Modules.Binding
             return results;
         }
 
+        internal static void ApplyBindings()
+        {
+            var buttons    = FindUIPilotButtons();
+            var actions    = ActionDiscoveryModule.Scan();
+            var selections = BuildAutoSelections(buttons, actions);
+            ApplyBindings(selections, actions);
+        }
+
+        private static Dictionary<string, int> BuildAutoSelections(
+            List<Button> buttons, List<DiscoveredAction> actions)
+        {
+            var selections = new Dictionary<string, int>();
+
+            foreach (var btn in buttons)
+            {
+                if (btn == null) continue;
+
+                var label = btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal)
+                    ? btn.name.Substring(ButtonPrefix.Length)
+                    : btn.name;
+
+                var expectedMethod = "On" + label + "Pressed";
+                var matched        = false;
+
+                for (var i = 0; i < actions.Count; i++)
+                {
+                    if (actions[i].MethodName == expectedMethod)
+                    {
+                        selections[btn.name] = i + 1;
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched)
+                    selections[btn.name] = 0;
+            }
+
+            return selections;
+        }
+
         internal static void ApplyBindings(
             Dictionary<string, int> selections,
             List<DiscoveredAction>  actions)
