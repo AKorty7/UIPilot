@@ -685,9 +685,11 @@ namespace UIPilot.Editor
                 _wireScrollPos = EditorGUILayout.BeginScrollView(
                     _wireScrollPos, GUILayout.Height(140f));
 
+                var seen = new HashSet<string>();
                 foreach (var btn in _wiredButtons)
                 {
                     if (btn == null) continue;
+                    if (!seen.Add(btn.name)) continue;
 
                     using (new EditorGUILayout.HorizontalScope())
                     {
