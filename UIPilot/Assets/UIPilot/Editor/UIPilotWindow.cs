@@ -115,6 +115,8 @@ namespace UIPilot.Editor
 
         private static void ExecuteQuickClear()
         {
+            ClearConsole();
+
             var confirmed = EditorUtility.DisplayDialog(
                 UIPilotLabels.QuickBuild.DialogTitle,
                 UIPilotLabels.QuickBuild.DialogMessage,
@@ -122,8 +124,6 @@ namespace UIPilot.Editor
                 UIPilotLabels.QuickBuild.DialogCancel);
 
             if (!confirmed) return;
-
-            UnityEngine.Debug.ClearDeveloperConsole();
 
             Undo.IncrementCurrentGroup();
             Undo.SetCurrentGroupName(UIPilotLabels.QuickBuild.ClearButton);
@@ -144,7 +144,7 @@ namespace UIPilot.Editor
         private void ExecuteQuickBuild()
         {
             _auditResults = null;
-            UnityEngine.Debug.ClearDeveloperConsole();
+            ClearConsole();
             Debug.Log(UIPilotLabels.QuickBuild.ConsoleStart);
 
             var selectedMenus = BuildSelectedMenuArray();
@@ -263,7 +263,7 @@ namespace UIPilot.Editor
 
         private void RunSceneAudit()
         {
-            UnityEngine.Debug.ClearDeveloperConsole();
+            ClearConsole();
             _auditResults = SceneAuditModule.Scan();
 
             var issues = 0;
@@ -547,6 +547,17 @@ namespace UIPilot.Editor
             );
             EditorGUILayout.Space(4f);
             EditorGUILayout.HelpBox(UIPilotLabels.Window.WorkflowGuide, MessageType.Info);
+        }
+
+        // ── Utilities ────────────────────────────────────────────────────────
+
+        private static void ClearConsole()
+        {
+            var assembly = System.Reflection.Assembly
+                .GetAssembly(typeof(UnityEditor.Editor));
+            var type   = assembly.GetType("UnityEditor.LogEntries");
+            var method = type.GetMethod("Clear");
+            method.Invoke(null, null);
         }
     }
 }
