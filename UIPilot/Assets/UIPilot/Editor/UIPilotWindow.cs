@@ -17,19 +17,34 @@ namespace UIPilot.Editor
 {
     public sealed class UIPilotWindow : EditorWindow
     {
-        // ── Scene Audit state ────────────────────────────────────────────────
-        private bool                                        _sceneAuditFoldout = false;
-        private List<SceneAuditResult>                      _auditResults      = null;
-        private Vector2                                     _auditScrollPos;
-        private List<ResilienceModule.ResilienceResult>     _repairResults     = null;
-        private Vector2                                     _repairScrollPos;
+        // ── Header state ─────────────────────────────────────────────────────
+        private bool _showHelperText = true;
 
-        // ── Quick Build state ────────────────────────────────────────────────
-        private bool _quickBuildFoldout = true;
-        private bool _manualFoldout     = false;
-        private bool _qbMainMenu        = true;
-        private bool _qbPauseMenu       = true;
-        private bool _qbSettingsMenu    = false;
+        // ── Collapse All state ───────────────────────────────────────────────
+        private bool _allCollapsed   = false;
+        private bool _savedBuildOpen;
+        private bool _savedScanOpen;
+        private bool _savedManualOpen;
+
+        // ── Build section state ──────────────────────────────────────────────
+        private bool _buildFoldout   = true;
+        private bool _qbMainMenu     = true;
+        private bool _qbPauseMenu    = true;
+        private bool _qbSettingsMenu = false;
+
+        // ── Scan & Repair state ──────────────────────────────────────────────
+        private bool                                    _scanRepairFoldout = false;
+        private List<SceneAuditResult>                  _auditResults      = null;
+        private Vector2                                 _auditScrollPos;
+        private List<ResilienceModule.ResilienceResult> _repairResults     = null;
+        private Vector2                                 _repairScrollPos;
+
+        // ── Validate state ───────────────────────────────────────────────────
+        private List<ValidationResult> _validationResults;
+        private Vector2                _validateScrollPos;
+
+        // ── Manual section state ─────────────────────────────────────────────
+        private bool _manualFoldout = false;
 
         // ── Generate state ───────────────────────────────────────────────────
         private MenuType _selectedMenuType;
@@ -38,9 +53,8 @@ namespace UIPilot.Editor
         private List<DiscoveredAction> _discoveredActions;
         private Vector2                _discoverScrollPos;
 
-        // ── Validate state ───────────────────────────────────────────────────
-        private List<ValidationResult> _validationResults;
-        private Vector2                _validateScrollPos;
+        // ── Window scroll state ──────────────────────────────────────────────
+        private Vector2 _windowScrollPos;
 
         // ── Wire state ───────────────────────────────────────────────────────
         private List<Button>            _wiredButtons;
@@ -50,18 +64,19 @@ namespace UIPilot.Editor
         private Vector2                 _wireScrollPos;
 
         // ── Cached GUIContent ────────────────────────────────────────────────
-        private static readonly GUIContent ContentGenerate      = new GUIContent(UIPilotLabels.Generate.ButtonLabel,       UIPilotLabels.Generate.TooltipGenerate);
-        private static readonly GUIContent ContentClearMain     = new GUIContent(UIPilotLabels.Generate.ClearMainMenu,     UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentClearPause    = new GUIContent(UIPilotLabels.Generate.ClearPauseMenu,    UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentClearSet      = new GUIContent(UIPilotLabels.Generate.ClearSettings,     UIPilotLabels.Generate.TooltipClearPanel);
-        private static readonly GUIContent ContentScan          = new GUIContent(UIPilotLabels.Discover.ScanButton,        UIPilotLabels.Discover.TooltipScan);
-        private static readonly GUIContent ContentRefresh       = new GUIContent(UIPilotLabels.Wire.RefreshButton,         UIPilotLabels.Wire.TooltipRefresh);
-        private static readonly GUIContent ContentApply         = new GUIContent(UIPilotLabels.Wire.ApplyButton,           UIPilotLabels.Wire.TooltipApply);
-        private static readonly GUIContent ContentRunValidate   = new GUIContent(UIPilotLabels.Validate.RunButton,         UIPilotLabels.Validate.TooltipValidate);
-        private static readonly GUIContent ContentFix           = new GUIContent(UIPilotLabels.Validate.FixButton,         UIPilotLabels.Validate.TooltipFix);
-        private static readonly GUIContent ContentBuildUI        = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,   UIPilotLabels.QuickBuild.TooltipBuild);
-        private static readonly GUIContent ContentClearQuick    = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,   UIPilotLabels.QuickBuild.TooltipClear);
-        private static readonly GUIContent ContentRepairScene   = new GUIContent(UIPilotLabels.Resilience.RepairSceneButton, UIPilotLabels.Resilience.RepairSceneTooltip);
+        private static readonly GUIContent ContentScanScene   = new GUIContent(SceneAuditContent.UI.ScanButton,        UIPilotLabels.SceneAudit.TooltipScanScene);
+        private static readonly GUIContent ContentRepairScene = new GUIContent(UIPilotLabels.Resilience.RepairSceneButton, UIPilotLabels.Resilience.RepairSceneTooltip);
+        private static readonly GUIContent ContentRunValidate = new GUIContent(UIPilotLabels.Validate.RunButton,       UIPilotLabels.Validate.TooltipValidate);
+        private static readonly GUIContent ContentFix         = new GUIContent(UIPilotLabels.Validate.FixButton,       UIPilotLabels.Validate.TooltipFix);
+        private static readonly GUIContent ContentGenerate    = new GUIContent(UIPilotLabels.Generate.ButtonLabel,     UIPilotLabels.Generate.TooltipGenerate);
+        private static readonly GUIContent ContentClearMain   = new GUIContent(UIPilotLabels.Generate.ClearMainMenu,   UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentClearPause  = new GUIContent(UIPilotLabels.Generate.ClearPauseMenu,  UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentClearSet    = new GUIContent(UIPilotLabels.Generate.ClearSettings,   UIPilotLabels.Generate.TooltipClearPanel);
+        private static readonly GUIContent ContentScan        = new GUIContent(UIPilotLabels.Discover.ScanButton,      UIPilotLabels.Discover.TooltipScan);
+        private static readonly GUIContent ContentRefresh     = new GUIContent(UIPilotLabels.Wire.RefreshButton,       UIPilotLabels.Wire.TooltipRefresh);
+        private static readonly GUIContent ContentApply       = new GUIContent(UIPilotLabels.Wire.ApplyButton,         UIPilotLabels.Wire.TooltipApply);
+        private static readonly GUIContent ContentBuildUI     = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,   UIPilotLabels.QuickBuild.TooltipBuild);
+        private static readonly GUIContent ContentClearQuick  = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,   UIPilotLabels.QuickBuild.TooltipClear);
 
         // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -74,25 +89,105 @@ namespace UIPilot.Editor
             window.Show();
         }
 
+        private void OnEnable()
+        {
+            minSize         = new Vector2(300f, 500f);
+            _showHelperText = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsHelperText, true);
+            _buildFoldout   = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsBuildOpen,  true);
+            _manualFoldout  = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsManualOpen, false);
+        }
+
         // ── GUI ──────────────────────────────────────────────────────────────
 
         private void OnGUI()
         {
+            _windowScrollPos = EditorGUILayout.BeginScrollView(_windowScrollPos);
             DrawHeader();
-            EditorGUILayout.Space(8f);
-            DrawQuickBuildSection();
-            DrawSceneAuditSection();
+            EditorGUILayout.Space(6f);
+            DrawBuildSection();
+            DrawScanRepairSection();
             DrawManualSection();
+            EditorGUILayout.EndScrollView();
         }
 
-        // ── Section: Quick Build ─────────────────────────────────────────────
+        // ── Header ───────────────────────────────────────────────────────────
 
-        private void DrawQuickBuildSection()
+        private void DrawHeader()
         {
-            _quickBuildFoldout = EditorGUILayout.Foldout(
-                _quickBuildFoldout, UIPilotLabels.QuickBuild.SectionLabel, true, EditorStyles.foldoutHeader);
+            EditorGUILayout.Space(6f);
 
-            if (!_quickBuildFoldout) return;
+            // Title row with Collapse All toggle
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(
+                    UIPilotLabels.Window.Title,
+                    new GUIStyle(EditorStyles.largeLabel) { fontSize = 16, fontStyle = FontStyle.Bold });
+
+                var collapseLabel = _allCollapsed
+                    ? UIPilotLabels.Window.ExpandAllButton
+                    : UIPilotLabels.Window.CollapseAllButton;
+
+                if (GUILayout.Button(collapseLabel, GUILayout.Width(22f), GUILayout.Height(18f)))
+                    ToggleCollapseAll();
+            }
+
+            // Helper text row with ? toggle
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (_showHelperText)
+                {
+                    var wrapStyle = new GUIStyle(EditorStyles.label) { wordWrap = true };
+                    EditorGUILayout.LabelField(UIPilotLabels.Window.HelperText, wrapStyle);
+                }
+                else
+                {
+                    GUILayout.FlexibleSpace();
+                }
+
+                if (GUILayout.Button(UIPilotLabels.Window.HelpToggle, GUILayout.Width(22f), GUILayout.Height(18f)))
+                {
+                    _showHelperText = !_showHelperText;
+                    EditorPrefs.SetBool(UIPilotLabels.Window.EditorPrefsHelperText, _showHelperText);
+                }
+            }
+        }
+
+        private void ToggleCollapseAll()
+        {
+            if (!_allCollapsed)
+            {
+                _savedBuildOpen    = _buildFoldout;
+                _savedScanOpen     = _scanRepairFoldout;
+                _savedManualOpen   = _manualFoldout;
+                _buildFoldout      = false;
+                _scanRepairFoldout = false;
+                _manualFoldout     = false;
+            }
+            else
+            {
+                _buildFoldout      = _savedBuildOpen;
+                _scanRepairFoldout = _savedScanOpen;
+                _manualFoldout     = _savedManualOpen;
+            }
+
+            _allCollapsed = !_allCollapsed;
+        }
+
+        // ── Section: Build ───────────────────────────────────────────────────
+
+        private void DrawBuildSection()
+        {
+            var newOpen = EditorGUILayout.Foldout(
+                _buildFoldout, UIPilotLabels.Sections.Build, true, EditorStyles.foldoutHeader);
+
+            if (newOpen != _buildFoldout)
+            {
+                _buildFoldout = newOpen;
+                _allCollapsed = false;
+                EditorPrefs.SetBool(UIPilotLabels.Window.EditorPrefsBuildOpen, _buildFoldout);
+            }
+
+            if (!_buildFoldout) return;
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
@@ -193,8 +288,8 @@ namespace UIPilot.Editor
             go.AddComponent(managerType);
             EditorUtility.SetDirty(go);
 
-            var buttons  = BindingModule.FindUIPilotButtons();
-            var actions  = ActionDiscoveryModule.Scan();
+            var buttons    = BindingModule.FindUIPilotButtons();
+            var actions    = ActionDiscoveryModule.Scan();
             var selections = BuildAutoSelections(buttons, actions);
 
             BindingModule.ApplyBindings(selections, actions);
@@ -238,60 +333,116 @@ namespace UIPilot.Editor
             return selections;
         }
 
-        // ── Section: Scene Audit ─────────────────────────────────────────────
+        // ── Section: Scan & Repair ───────────────────────────────────────────
 
-        private void DrawSceneAuditSection()
+        private void DrawScanRepairSection()
         {
             EditorGUILayout.Space(6f);
-            _sceneAuditFoldout = EditorGUILayout.Foldout(
-                _sceneAuditFoldout, SceneAuditContent.UI.SectionHeader, true, EditorStyles.foldoutHeader);
 
-            if (!_sceneAuditFoldout) return;
+            var newOpen = EditorGUILayout.Foldout(
+                _scanRepairFoldout, UIPilotLabels.Sections.ScanRepair, true, EditorStyles.foldoutHeader);
+
+            if (newOpen != _scanRepairFoldout)
+            {
+                _scanRepairFoldout = newOpen;
+                _allCollapsed      = false;
+            }
+
+            if (!_scanRepairFoldout) return;
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                if (GUILayout.Button(SceneAuditContent.UI.ScanButton))
+                // 1. Scan Scene button
+                if (GUILayout.Button(ContentScanScene))
                 {
                     RunSceneAudit();
                     _repairResults = null;
                 }
 
-                if (_auditResults == null) return;
+                // 2. Audit results
+                if (_auditResults != null)
+                {
+                    EditorGUILayout.Space(4f);
 
+                    GUILayout.BeginVertical(GUILayout.Height(200f));
+
+                    foreach (var result in _auditResults)
+                        DrawAuditRow(result);
+
+                    GUILayout.EndVertical();
+
+                    // 3. Repair Scene button — conditional on issues
+                    if (AuditHasIssues())
+                    {
+                        EditorGUILayout.Space(4f);
+                        if (GUILayout.Button(ContentRepairScene))
+                            RunRepair();
+                    }
+
+                    // 4. Repair results
+                    if (_repairResults != null)
+                    {
+                        EditorGUILayout.Space(4f);
+                        EditorGUILayout.LabelField(UIPilotLabels.Resilience.RepairResultsHeader,
+                            EditorStyles.boldLabel);
+
+                        GUILayout.BeginVertical(GUILayout.Height(120f));
+
+                        foreach (var r in _repairResults)
+                            DrawRepairRow(r);
+
+                        GUILayout.EndVertical();
+                    }
+                }
+
+                // 5. Divider
+                EditorGUILayout.Space(8f);
+                DrawSeparator();
                 EditorGUILayout.Space(4f);
 
-                _auditScrollPos = EditorGUILayout.BeginScrollView(
-                    _auditScrollPos, GUILayout.Height(180f));
+                // 6. Run Validation button
+                if (GUILayout.Button(ContentRunValidate))
+                    _validationResults = ValidationModule.Validate();
 
-                foreach (var result in _auditResults)
-                    DrawAuditRow(result);
-
-                EditorGUILayout.EndScrollView();
-
-                // Repair button — only when at least one issue exists
-                if (AuditHasIssues())
+                // 7. Validation results
+                if (_validationResults != null)
                 {
                     EditorGUILayout.Space(4f);
-                    if (GUILayout.Button(ContentRepairScene))
-                        RunRepair();
-                }
 
-                // Repair results list
-                if (_repairResults != null)
-                {
-                    EditorGUILayout.Space(4f);
-                    EditorGUILayout.LabelField(UIPilotLabels.Resilience.RepairResultsHeader,
-                        EditorStyles.boldLabel);
+                    var hasIssues = false;
+                    foreach (var r in _validationResults)
+                        if (r.Severity == ValidationSeverity.Error || r.Severity == ValidationSeverity.Warning)
+                        { hasIssues = true; break; }
 
-                    _repairScrollPos = EditorGUILayout.BeginScrollView(
-                        _repairScrollPos, GUILayout.Height(120f));
+                    if (!hasIssues)
+                    {
+                        EditorGUILayout.LabelField(UIPilotLabels.Validate.AllClear,
+                            EditorStyles.centeredGreyMiniLabel);
+                    }
+                    else
+                    {
+                        GUILayout.BeginVertical(GUILayout.Height(150f));
 
-                    foreach (var r in _repairResults)
-                        DrawRepairRow(r);
+                        foreach (var result in _validationResults)
+                            DrawValidationRow(result);
 
-                    EditorGUILayout.EndScrollView();
+                        GUILayout.EndVertical();
+                    }
                 }
             }
+        }
+
+        private void RunSceneAudit()
+        {
+            ClearConsole();
+            _auditResults = SceneAuditModule.Scan();
+
+            var issues = 0;
+            foreach (var r in _auditResults)
+                if (r.Severity != SceneAuditSeverity.OK) issues++;
+
+            Debug.Log(string.Format(
+                UIPilotLabels.SceneAudit.ConsoleSummary, _auditResults.Count, issues));
         }
 
         private bool AuditHasIssues()
@@ -308,37 +459,6 @@ namespace UIPilot.Editor
             _repairResults = ResilienceModule.Repair(_auditResults);
             _auditResults  = SceneAuditModule.Scan();
             Repaint();
-        }
-
-        private static void DrawRepairRow(ResilienceModule.ResilienceResult result)
-        {
-            var style = new GUIStyle(EditorStyles.label);
-            style.normal.textColor = result.Success
-                ? new Color(0.2f, 0.8f, 0.2f)
-                : new Color(0.9f, 0.2f, 0.2f);
-
-            var prefix = result.Success
-                ? UIPilotLabels.Resilience.RepairSuccessPrefix
-                : UIPilotLabels.Resilience.RepairFailPrefix;
-
-            var body = string.IsNullOrEmpty(result.Detail)
-                ? result.Label
-                : result.Label + "  —  " + result.Detail;
-
-            EditorGUILayout.LabelField(prefix + " " + body, style);
-        }
-
-        private void RunSceneAudit()
-        {
-            ClearConsole();
-            _auditResults = SceneAuditModule.Scan();
-
-            var issues = 0;
-            foreach (var r in _auditResults)
-                if (r.Severity != SceneAuditSeverity.OK) issues++;
-
-            Debug.Log(string.Format(
-                UIPilotLabels.SceneAudit.ConsoleSummary, _auditResults.Count, issues));
         }
 
         private static void DrawAuditRow(SceneAuditResult result)
@@ -367,184 +487,22 @@ namespace UIPilot.Editor
             EditorGUILayout.LabelField(text, style);
         }
 
-        // ── Section: Manual (foldout wrapper) ────────────────────────────────
-
-        private void DrawManualSection()
+        private static void DrawRepairRow(ResilienceModule.ResilienceResult result)
         {
-            EditorGUILayout.Space(6f);
-            _manualFoldout = EditorGUILayout.Foldout(
-                _manualFoldout, UIPilotLabels.QuickBuild.ManualSectionLabel, true, EditorStyles.foldoutHeader);
+            var style = new GUIStyle(EditorStyles.label);
+            style.normal.textColor = result.Success
+                ? new Color(0.2f, 0.8f, 0.2f)
+                : new Color(0.9f, 0.2f, 0.2f);
 
-            if (!_manualFoldout) return;
+            var prefix = result.Success
+                ? UIPilotLabels.Resilience.RepairSuccessPrefix
+                : UIPilotLabels.Resilience.RepairFailPrefix;
 
-            DrawGenerateSection();
-            DrawDiscoverSection();
-            DrawWireSection();
-            DrawValidateSection();
-        }
+            var body = string.IsNullOrEmpty(result.Detail)
+                ? result.Label
+                : result.Label + "  —  " + result.Detail;
 
-        // ── Section: Generate ────────────────────────────────────────────────
-
-        private void DrawGenerateSection()
-        {
-            EditorGUILayout.Space(6f);
-            EditorGUILayout.LabelField(UIPilotLabels.Sections.Generate, EditorStyles.boldLabel);
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                _selectedMenuType = (MenuType)EditorGUILayout.EnumPopup(
-                    UIPilotLabels.Generate.MenuTypeLabel, _selectedMenuType);
-
-                EditorGUILayout.Space(4f);
-
-                if (GUILayout.Button(ContentGenerate))
-                    UIGeneratorModule.Generate(_selectedMenuType);
-
-                EditorGUILayout.Space(4f);
-
-                if (GUILayout.Button(ContentClearMain))
-                    UIGeneratorModule.ClearPanel(MenuType.MainMenu);
-                if (GUILayout.Button(ContentClearPause))
-                    UIGeneratorModule.ClearPanel(MenuType.PauseMenu);
-                if (GUILayout.Button(ContentClearSet))
-                    UIGeneratorModule.ClearPanel(MenuType.SettingsMenu);
-            }
-        }
-
-        // ── Section: Discover ────────────────────────────────────────────────
-
-        private void DrawDiscoverSection()
-        {
-            EditorGUILayout.Space(6f);
-            EditorGUILayout.LabelField(UIPilotLabels.Sections.Discover, EditorStyles.boldLabel);
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                if (GUILayout.Button(ContentScan))
-                    _discoveredActions = ActionDiscoveryModule.Scan();
-
-                if (_discoveredActions == null) return;
-
-                EditorGUILayout.Space(4f);
-
-                if (_discoveredActions.Count == 0)
-                {
-                    EditorGUILayout.LabelField(UIPilotLabels.Discover.EmptyList,
-                        EditorStyles.centeredGreyMiniLabel);
-                    return;
-                }
-
-                _discoverScrollPos = EditorGUILayout.BeginScrollView(
-                    _discoverScrollPos, GUILayout.Height(120f));
-
-                foreach (var action in _discoveredActions)
-                    EditorGUILayout.LabelField(action.FullLabel);
-
-                EditorGUILayout.EndScrollView();
-            }
-        }
-
-        // ── Section: Wire ────────────────────────────────────────────────────
-
-        private void DrawWireSection()
-        {
-            EditorGUILayout.Space(6f);
-            EditorGUILayout.LabelField(UIPilotLabels.Sections.Wire, EditorStyles.boldLabel);
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                if (GUILayout.Button(ContentRefresh))
-                    RefreshWireState();
-
-                if (_wiredButtons == null
-                    || _availableActions == null
-                    || _bindingSelections == null
-                    || _actionDropdownOptions == null)
-                {
-                    EditorGUILayout.Space(4f);
-                    EditorGUILayout.HelpBox(UIPilotLabels.Wire.HelpRefreshNeeded, MessageType.Info);
-                    return;
-                }
-
-                EditorGUILayout.Space(4f);
-
-                if (_wiredButtons.Count == 0)
-                {
-                    EditorGUILayout.LabelField(UIPilotLabels.Wire.NoButtons,
-                        EditorStyles.centeredGreyMiniLabel);
-                    return;
-                }
-
-                if (_availableActions.Count == 0)
-                {
-                    EditorGUILayout.HelpBox(UIPilotLabels.Wire.HelpNoActions, MessageType.Warning);
-                    return;
-                }
-
-                _wireScrollPos = EditorGUILayout.BeginScrollView(
-                    _wireScrollPos, GUILayout.Height(140f));
-
-                foreach (var btn in _wiredButtons)
-                {
-                    if (btn == null) continue;
-
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUILayout.LabelField(btn.name, GUILayout.Width(180f));
-
-                        if (!_bindingSelections.ContainsKey(btn.name))
-                            _bindingSelections[btn.name] = 0;
-
-                        _bindingSelections[btn.name] = EditorGUILayout.Popup(
-                            _bindingSelections[btn.name],
-                            _actionDropdownOptions);
-                    }
-                }
-
-                EditorGUILayout.EndScrollView();
-
-                EditorGUILayout.Space(4f);
-                EditorGUILayout.LabelField(UIPilotLabels.Wire.AssignHint,
-                    EditorStyles.centeredGreyMiniLabel);
-                EditorGUILayout.Space(2f);
-
-                if (GUILayout.Button(ContentApply))
-                    BindingModule.ApplyBindings(_bindingSelections, _availableActions);
-            }
-        }
-
-        // ── Section: Validate ────────────────────────────────────────────────
-
-        private void DrawValidateSection()
-        {
-            EditorGUILayout.Space(6f);
-            EditorGUILayout.LabelField(UIPilotLabels.Sections.Validate, EditorStyles.boldLabel);
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                if (GUILayout.Button(ContentRunValidate))
-                    _validationResults = ValidationModule.Validate();
-
-                if (_validationResults == null) return;
-
-                EditorGUILayout.Space(4f);
-
-                var hasIssues = false;
-                foreach (var r in _validationResults)
-                    if (r.Severity == ValidationSeverity.Error || r.Severity == ValidationSeverity.Warning)
-                    { hasIssues = true; break; }
-
-                if (!hasIssues)
-                {
-                    EditorGUILayout.LabelField(UIPilotLabels.Validate.AllClear,
-                        EditorStyles.centeredGreyMiniLabel);
-                    return;
-                }
-
-                _validateScrollPos = EditorGUILayout.BeginScrollView(
-                    _validateScrollPos, GUILayout.Height(150f));
-
-                foreach (var result in _validationResults)
-                    DrawValidationRow(result);
-
-                EditorGUILayout.EndScrollView();
-            }
+            EditorGUILayout.LabelField(prefix + " " + body, style);
         }
 
         private void DrawValidationRow(ValidationResult result)
@@ -586,6 +544,179 @@ namespace UIPilot.Editor
             }
         }
 
+        private static void DrawSeparator()
+        {
+            var rect = EditorGUILayout.GetControlRect(false, 1f);
+            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 0.5f));
+        }
+
+        // ── Section: Manual ──────────────────────────────────────────────────
+
+        private void DrawManualSection()
+        {
+            EditorGUILayout.Space(6f);
+
+            var newOpen = EditorGUILayout.Foldout(
+                _manualFoldout, UIPilotLabels.QuickBuild.ManualSectionLabel, true, EditorStyles.foldoutHeader);
+
+            if (newOpen != _manualFoldout)
+            {
+                _manualFoldout = newOpen;
+                _allCollapsed  = false;
+                EditorPrefs.SetBool(UIPilotLabels.Window.EditorPrefsManualOpen, _manualFoldout);
+            }
+
+            if (!_manualFoldout) return;
+
+            DrawGenerateSection();
+            DrawDiscoverSection();
+            DrawWireSection();
+        }
+
+        // ── Section: Generate ────────────────────────────────────────────────
+
+        private void DrawGenerateSection()
+        {
+            EditorGUILayout.Space(6f);
+            EditorGUILayout.LabelField(UIPilotLabels.Sections.Generate, EditorStyles.boldLabel);
+            var descStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+            EditorGUILayout.LabelField(UIPilotLabels.Manual.GenerateDesc, descStyle);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                _selectedMenuType = (MenuType)EditorGUILayout.EnumPopup(
+                    UIPilotLabels.Generate.MenuTypeLabel, _selectedMenuType);
+
+                EditorGUILayout.Space(4f);
+
+                if (GUILayout.Button(ContentGenerate))
+                    UIGeneratorModule.Generate(_selectedMenuType);
+
+                EditorGUILayout.Space(4f);
+
+                if (GUILayout.Button(ContentClearMain))
+                    UIGeneratorModule.ClearPanel(MenuType.MainMenu);
+                if (GUILayout.Button(ContentClearPause))
+                    UIGeneratorModule.ClearPanel(MenuType.PauseMenu);
+                if (GUILayout.Button(ContentClearSet))
+                    UIGeneratorModule.ClearPanel(MenuType.SettingsMenu);
+            }
+        }
+
+        // ── Section: Discover ────────────────────────────────────────────────
+
+        private void DrawDiscoverSection()
+        {
+            EditorGUILayout.Space(6f);
+            EditorGUILayout.LabelField(UIPilotLabels.Sections.Discover, EditorStyles.boldLabel);
+            var descStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+            EditorGUILayout.LabelField(UIPilotLabels.Manual.DiscoverDesc, descStyle);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                if (GUILayout.Button(ContentScan))
+                    _discoveredActions = ActionDiscoveryModule.Scan();
+
+                if (_discoveredActions == null) return;
+
+                EditorGUILayout.Space(4f);
+
+                if (_discoveredActions.Count == 0)
+                {
+                    EditorGUILayout.LabelField(UIPilotLabels.Discover.EmptyList,
+                        EditorStyles.centeredGreyMiniLabel);
+                    return;
+                }
+
+                _discoverScrollPos = EditorGUILayout.BeginScrollView(
+                    _discoverScrollPos, GUILayout.Height(120f));
+
+                foreach (var action in _discoveredActions)
+                    EditorGUILayout.LabelField(action.FullLabel);
+
+                EditorGUILayout.EndScrollView();
+            }
+        }
+
+        // ── Section: Wire ────────────────────────────────────────────────────
+
+        private void DrawWireSection()
+        {
+            EditorGUILayout.Space(6f);
+            EditorGUILayout.LabelField(UIPilotLabels.Sections.Wire, EditorStyles.boldLabel);
+            var descStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+            EditorGUILayout.LabelField(UIPilotLabels.Manual.WireDesc, descStyle);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                if (GUILayout.Button(ContentRefresh))
+                    RefreshWireState();
+
+                if (_wiredButtons == null
+                    || _availableActions == null
+                    || _bindingSelections == null
+                    || _actionDropdownOptions == null)
+                {
+                    EditorGUILayout.Space(4f);
+                    EditorGUILayout.HelpBox(UIPilotLabels.Wire.HelpRefreshNeeded, MessageType.Info);
+                    return;
+                }
+
+                EditorGUILayout.Space(4f);
+
+                if (_wiredButtons.Count == 0)
+                {
+                    EditorGUILayout.LabelField(UIPilotLabels.Wire.NoButtons,
+                        EditorStyles.centeredGreyMiniLabel);
+                    return;
+                }
+
+                if (_availableActions.Count == 0)
+                {
+                    EditorGUILayout.HelpBox(UIPilotLabels.Wire.HelpNoActions, MessageType.Warning);
+                    return;
+                }
+
+                var guidanceStyle = new GUIStyle(EditorStyles.miniLabel)
+                {
+                    wordWrap  = true,
+                    normal    = { textColor = new Color(1f, 0.85f, 0.4f) }
+                };
+                EditorGUILayout.LabelField(UIPilotLabels.Manual.WireGuidance, guidanceStyle);
+                EditorGUILayout.Space(2f);
+
+                _wireScrollPos = EditorGUILayout.BeginScrollView(
+                    _wireScrollPos, GUILayout.Height(140f));
+
+                foreach (var btn in _wiredButtons)
+                {
+                    if (btn == null) continue;
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField(btn.name, GUILayout.Width(180f));
+
+                        if (!_bindingSelections.ContainsKey(btn.name))
+                            _bindingSelections[btn.name] = 0;
+
+                        _bindingSelections[btn.name] = EditorGUILayout.Popup(
+                            _bindingSelections[btn.name],
+                            _actionDropdownOptions);
+                    }
+                }
+
+                EditorGUILayout.EndScrollView();
+
+                EditorGUILayout.Space(4f);
+                EditorGUILayout.LabelField(UIPilotLabels.Wire.AssignHint,
+                    EditorStyles.centeredGreyMiniLabel);
+                EditorGUILayout.Space(2f);
+
+                if (GUILayout.Button(ContentApply))
+                    BindingModule.ApplyBindings(_bindingSelections, _availableActions);
+
+                var noteStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+                EditorGUILayout.LabelField(UIPilotLabels.Manual.ApplyBindingsNote, noteStyle);
+            }
+        }
+
         // ── Wire helpers ─────────────────────────────────────────────────────
 
         private void RefreshWireState()
@@ -600,19 +731,6 @@ namespace UIPilot.Editor
                 options[i + 1] = _availableActions[i].FullLabel;
 
             _actionDropdownOptions = options;
-        }
-
-        // ── Header ───────────────────────────────────────────────────────────
-
-        private static void DrawHeader()
-        {
-            EditorGUILayout.Space(6f);
-            EditorGUILayout.LabelField(
-                UIPilotLabels.Window.Title,
-                new GUIStyle(EditorStyles.largeLabel) { fontSize = 16, fontStyle = FontStyle.Bold }
-            );
-            EditorGUILayout.Space(4f);
-            EditorGUILayout.HelpBox(UIPilotLabels.Window.WorkflowGuide, MessageType.Info);
         }
 
         // ── Utilities ────────────────────────────────────────────────────────

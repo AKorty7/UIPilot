@@ -15,10 +15,22 @@ namespace UIPilot.Editor.Core
                 "② Scan Project to find your scripts\n" +
                 "③ Load Buttons & Actions in Wire, then assign methods\n" +
                 "④ Validate to check your scene";
+
+            internal const string HelperText =
+                "Quick Build generates your UI in one click. Use Scan & Repair to diagnose issues.";
+            internal const string HelpToggle       = "?";
+            internal const string CollapseAllButton = "−";
+            internal const string ExpandAllButton   = "+";
+
+            internal const string EditorPrefsHelperText = "UIPilot_ShowHelperText";
+            internal const string EditorPrefsBuildOpen  = "UIPilot_BuildOpen";
+            internal const string EditorPrefsManualOpen = "UIPilot_ManualOpen";
         }
 
         internal static class Sections
         {
+            internal const string Build       = "Build";
+            internal const string ScanRepair  = "Scan & Repair";
             internal const string Generate    = "Generate";
             internal const string Discover    = "Discover";
             internal const string Wire        = "Wire";
@@ -66,6 +78,20 @@ namespace UIPilot.Editor.Core
                 "Click Load Buttons & Actions to load your UIPilot buttons and available script methods";
             internal const string HelpNoActions  =
                 "No public methods found. Add a MonoBehaviour script with public void methods to a GameObject in your scene, then Refresh";
+        }
+
+        internal static class Manual
+        {
+            internal const string GenerateDesc =
+                "Manually create or remove individual menu panels in the scene.";
+            internal const string DiscoverDesc =
+                "Scans your project for public void methods you can assign to buttons.";
+            internal const string WireDesc =
+                "Assign a script method to each button's click event.";
+            internal const string WireGuidance =
+                "Select methods from UIPilot_GameManager unless you are using a custom script.";
+            internal const string ApplyBindingsNote =
+                "Quick Build wires buttons automatically. Use this only if you have changed assignments manually.";
         }
 
         internal static class Validate
@@ -117,6 +143,8 @@ namespace UIPilot.Editor.Core
         {
             internal const string ConsoleSummary =
                 "UIPilot: Scan complete — {0} items checked, {1} issues found.";
+            internal const string TooltipScanScene =
+                "Audit every UIPilot object in the scene and report missing or broken components";
         }
 
         internal static class Resilience
