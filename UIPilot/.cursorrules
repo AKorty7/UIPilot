@@ -1,0 +1,146 @@
+You are helping build UIPilot — a Unity Editor automation tool 
+built in C# for Unity 6.3 LTS (6000.3.11f1).
+
+═══════════════════════════════════════════
+WHAT IS UIPILOT
+═══════════════════════════════════════════
+A Unity Editor-time automation tool that generates, wires, 
+validates and repairs standard Unity UGUI systems.
+Zero runtime footprint. No custom frameworks. No monoliths.
+All output is standard native Unity UI editable by the developer.
+
+═══════════════════════════════════════════
+STACK
+═══════════════════════════════════════════
+- Unity 6.3 LTS (6000.3.11f1)
+- Built-In Render Pipeline
+- UGUI only (UI Toolkit module planned for future)
+- C# Editor scripting only
+- TextMeshPro for all text elements
+
+═══════════════════════════════════════════
+ARCHITECTURE RULES — NEVER BREAK THESE
+═══════════════════════════════════════════
+- No runtime MonoBehaviours ever
+- No hardcoded strings — all strings in Labels/Content files
+- No logic inside UIPilotWindow.cs — UI layer only
+- Modules never call each other except via UIPilotWindow
+- Single responsibility per class
+- No over-abstraction — only build what is asked
+- Always compile with zero errors before finishing
+- Ask before refactoring anything not requested
+- Minimal code — no bloat, no unnecessary classes
+
+═══════════════════════════════════════════
+FOLDER STRUCTURE
+═══════════════════════════════════════════
+Assets/UIPilot/Editor/
+  Core/
+    UIPilotLabels.cs
+  Modules/
+    UIGenerator/
+      MenuType.cs
+      UIGeneratorContent.cs
+      UIGeneratorModule.cs
+    ActionDiscovery/
+      DiscoveredAction.cs
+      ActionDiscoveryModule.cs
+    Binding/
+      BindingContent.cs
+      BindingModule.cs
+    Validation/
+      ValidationSeverity.cs
+      ValidationResult.cs
+      ValidationContent.cs
+      ValidationModule.cs
+  UI/
+  UIPilotWindow.cs
+
+═══════════════════════════════════════════
+NAMING CONVENTIONS
+═══════════════════════════════════════════
+Generated Unity objects:
+  Canvas:   UIPilot_Canvas (always singular in scene)
+  Panels:   UIPilot_MainMenu_Panel
+            UIPilot_PauseMenu_Panel
+            UIPilot_Settings_Panel
+  Titles:   UIPilot_MainMenu_Title etc
+  Buttons:  UIPilot_Btn_Play
+            UIPilot_Btn_Settings
+            UIPilot_Btn_Quit
+            UIPilot_Btn_Resume
+            UIPilot_Btn_Back
+
+Script objects:
+  UIPilot_GameManager (GameObject)
+  UIPilot_GameManager.cs (script)
+
+═══════════════════════════════════════════
+MODULE KNOWLEDGE
+═══════════════════════════════════════════
+Module 1 — UIGeneratorModule
+  Generate(MenuType) — creates Canvas, Panel, TMP, Buttons
+  ClearPanel(MenuType) — destroys specific panel only
+  Single canvas rule — always reuses UIPilot_Canvas
+  Full Undo support on all operations
+
+Module 2 — ActionDiscoveryModule
+  Scan() → List<DiscoveredAction>
+  BindingFlags.DeclaredOnly — user methods only
+  Filters: public, no parameters, not Unity lifecycle
+  Assembly guards: IsDynamic + try/catch GetTypes()
+
+Module 3 — BindingModule
+  FindUIPilotButtons() → List<Button>
+  ApplyBindings(selections, actions)
+  Uses UnityEventTools for persistent listeners
+  Backwards iteration when removing listeners
+
+Module 4 — ValidationModule
+  Validate() → List<ValidationResult>
+  RunAutoFix(ValidationResult)
+  Re-runs validation immediately after fix
+  MarkSceneDirty after all changes
+
+Module 5 — ScriptSetupModule
+Entry point: GenerateGameManager(MenuType[])
+Output: Assets/UIPilot_GameManager.cs + UIPilot_GameManager GameObject
+
+═══════════════════════════════════════════
+EDITOR WINDOW RULES
+═══════════════════════════════════════════
+- All buttons use pre-cached static readonly GUIContent
+- No allocations inside OnGUI
+- All state fields null-checked before use
+- Sections: Generate, Discover, Wire, Validate
+- Workflow guide HelpBox always visible at top
+- Contextual HelpBox per section when state is empty
+
+═══════════════════════════════════════════
+CODE RULES
+═══════════════════════════════════════════
+- Always use UnityEngine.Object fully qualified 
+  to avoid CS0104 ambiguous reference
+- Always null-check state fields before DrawSection methods
+- Use GameObject.Find for scene-wide searches
+- Use GetComponentsInChildren with (true) to include inactive
+- Use StringComparison.Ordinal for name prefix checks
+- Use Undo.RecordObject before any scene modifications
+- Use EditorSceneManager.MarkSceneDirty after modifications
+- Use EditorUtility.SetDirty on modified components
+
+═══════════════════════════════════════════
+SCOPE RULES
+═══════════════════════════════════════════
+- Only read files inside Assets/UIPilot/ unless told otherwise
+- Do not touch modules not mentioned in the current task
+- Do not add features not requested
+- Do not refactor working code unless asked
+- Keep changes minimal and targeted
+
+═══════════════════════════════════════════
+VERSIONING
+═══════════════════════════════════════════
+Current: v0.1.0-alpha
+Target:  v1.0.0 for Unity Asset Store release
+Branch:  dev (never commit broken code to main)
