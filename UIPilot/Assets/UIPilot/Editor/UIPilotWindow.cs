@@ -9,12 +9,18 @@ using UIPilot.Editor.Modules.ActionDiscovery;
 using UIPilot.Editor.Modules.Binding;
 using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
+using UIPilot.Editor.Modules.SceneAudit;
 using UIPilot.Editor.Modules.Validation;
 
 namespace UIPilot.Editor
 {
     public sealed class UIPilotWindow : EditorWindow
     {
+        // ── Scene Audit state ────────────────────────────────────────────────
+        private bool                    _sceneAuditFoldout = false;
+        private List<SceneAuditResult>  _auditResults      = null;
+        private Vector2                 _auditScrollPos;
+
         // ── Quick Build state ────────────────────────────────────────────────
         private bool _quickBuildFoldout = true;
         private bool _manualFoldout     = false;
@@ -71,6 +77,7 @@ namespace UIPilot.Editor
             DrawHeader();
             EditorGUILayout.Space(8f);
             DrawQuickBuildSection();
+            DrawSceneAuditSection();
             DrawManualSection();
         }
 
@@ -99,7 +106,10 @@ namespace UIPilot.Editor
                 }
 
                 if (GUILayout.Button(ContentClearQuick))
+                {
                     ExecuteQuickClear();
+                    _auditResults = null;
+                }
             }
         }
 
@@ -133,6 +143,7 @@ namespace UIPilot.Editor
 
         private void ExecuteQuickBuild()
         {
+            _auditResults = null;
             UnityEngine.Debug.ClearDeveloperConsole();
             Debug.Log(UIPilotLabels.QuickBuild.ConsoleStart);
 
@@ -219,6 +230,75 @@ namespace UIPilot.Editor
             }
 
             return selections;
+        }
+
+        // ── Section: Scene Audit ─────────────────────────────────────────────
+
+        private void DrawSceneAuditSection()
+        {
+            EditorGUILayout.Space(6f);
+            _sceneAuditFoldout = EditorGUILayout.Foldout(
+                _sceneAuditFoldout, SceneAuditContent.UI.SectionHeader, true, EditorStyles.foldoutHeader);
+
+            if (!_sceneAuditFoldout) return;
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                if (GUILayout.Button(SceneAuditContent.UI.ScanButton))
+                    RunSceneAudit();
+
+                if (_auditResults == null) return;
+
+                EditorGUILayout.Space(4f);
+
+                _auditScrollPos = EditorGUILayout.BeginScrollView(
+                    _auditScrollPos, GUILayout.Height(180f));
+
+                foreach (var result in _auditResults)
+                    DrawAuditRow(result);
+
+                EditorGUILayout.EndScrollView();
+            }
+        }
+
+        private void RunSceneAudit()
+        {
+            UnityEngine.Debug.ClearDeveloperConsole();
+            _auditResults = SceneAuditModule.Scan();
+
+            var issues = 0;
+            foreach (var r in _auditResults)
+                if (r.Severity != SceneAuditSeverity.OK) issues++;
+
+            Debug.Log(string.Format(
+                UIPilotLabels.SceneAudit.ConsoleSummary, _auditResults.Count, issues));
+        }
+
+        private static void DrawAuditRow(SceneAuditResult result)
+        {
+            Color rowColor;
+            switch (result.Severity)
+            {
+                case SceneAuditSeverity.OK:
+                    rowColor = new Color(0.2f, 0.8f, 0.2f);
+                    break;
+                case SceneAuditSeverity.Warning:
+                    rowColor = new Color(0.9f, 0.8f, 0.1f);
+                    break;
+                default: // Missing, Broken
+                    rowColor = new Color(0.9f, 0.2f, 0.2f);
+                    break;
+            }
+
+            var prev = GUI.color;
+            GUI.color = rowColor;
+
+            var text = string.IsNullOrEmpty(result.Detail)
+                ? result.Label
+                : result.Label + "  —  " + result.Detail;
+
+            EditorGUILayout.LabelField(text);
+            GUI.color = prev;
         }
 
         // ── Section: Manual (foldout wrapper) ────────────────────────────────

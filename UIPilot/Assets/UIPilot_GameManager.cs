@@ -32,4 +32,10 @@ public class UIPilot_GameManager : MonoBehaviour
         // TODO: implement Resume logic
         Debug.Log("Resume pressed — add your logic");
     }
+
+    public void OnBackPressed()
+    {
+        // TODO: implement Back logic
+        Debug.Log("Back pressed — add your logic");
+    }
 }

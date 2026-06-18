@@ -112,5 +112,11 @@ namespace UIPilot.Editor.Core
             internal const string DialogCancel    = "Cancel";
             internal const string ConsoleCleared  = "UIPilot: Scene cleared. UIPilot_GameManager.cs left intact — delete manually if needed.";
         }
+
+        internal static class SceneAudit
+        {
+            internal const string ConsoleSummary =
+                "UIPilot: Scan complete — {0} items checked, {1} issues found.";
+        }
     }
 }
