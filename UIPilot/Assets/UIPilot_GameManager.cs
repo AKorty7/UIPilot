@@ -8,6 +8,35 @@ using UnityEngine;
 
 public class UIPilot_GameManager : MonoBehaviour
 {
+    private const string MainMenuPanel = "UIPilot_MainMenu_Panel";
+    private const string PauseMenuPanel = "UIPilot_PauseMenu_Panel";
+    private const string SettingsPanel = "UIPilot_Settings_Panel";
+
+    private GameObject _mainMenuPanelGO;
+    private GameObject _pauseMenuPanelGO;
+    private GameObject _settingsPanelGO;
+
+    private void Awake()
+    {
+        _mainMenuPanelGO = GameObject.Find(MainMenuPanel);
+        _pauseMenuPanelGO = GameObject.Find(PauseMenuPanel);
+        _settingsPanelGO = GameObject.Find(SettingsPanel);
+
+        ShowPanel(MainMenuPanel);
+    }
+
+    public void ShowPanel(string panelName)
+    {
+        if (_mainMenuPanelGO != null)
+            _mainMenuPanelGO.SetActive(panelName == MainMenuPanel);
+
+        if (_pauseMenuPanelGO != null)
+            _pauseMenuPanelGO.SetActive(panelName == PauseMenuPanel);
+
+        if (_settingsPanelGO != null)
+            _settingsPanelGO.SetActive(panelName == SettingsPanel);
+    }
+
     public void OnPlayPressed()
     {
         // TODO: Load your game scene here
@@ -17,8 +46,7 @@ public class UIPilot_GameManager : MonoBehaviour
 
     public void OnSettingsPressed()
     {
-        // TODO: implement Settings logic
-        Debug.Log("Settings pressed — add your logic");
+        ShowPanel(SettingsPanel);
     }
 
     public void OnQuitPressed()
@@ -29,13 +57,11 @@ public class UIPilot_GameManager : MonoBehaviour
 
     public void OnResumePressed()
     {
-        // TODO: implement Resume logic
-        Debug.Log("Resume pressed — add your logic");
+        ShowPanel(MainMenuPanel);
     }
 
     public void OnBackPressed()
     {
-        // TODO: implement Back logic
-        Debug.Log("Back pressed — add your logic");
+        ShowPanel(MainMenuPanel);
     }
 }
