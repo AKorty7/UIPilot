@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UIPilot.Editor.Modules.UIGenerator;
@@ -16,14 +17,19 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             if (IsGameManagerIntact())
             {
                 Debug.Log(ScriptSetupContent.Messages.GameManagerIntact);
+                return;
             }
-            else
+
+            if (HasCustomizedGameManagerScript() && !ConfirmOverwriteCustomizedGameManager())
             {
-                var labels = CollectUniqueLabels(selectedMenus);
-                var script = BuildScript(labels);
-                WriteScript(script);
-                CreateGameObject();
+                Debug.Log(ScriptSetupContent.Messages.RegenerationCancelled);
+                return;
             }
+
+            var labels = CollectUniqueLabels(selectedMenus);
+            var script = BuildScript(labels);
+            WriteScript(script);
+            CreateGameObject();
         }
 
         // ── Label collection ─────────────────────────────────────────────────
@@ -59,12 +65,79 @@ namespace UIPilot.Editor.Modules.ScriptSetup
 
         private static bool IsGameManagerIntact()
         {
-            var fullPath = Path.Combine(
-                Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length),
-                ScriptSetupContent.Paths.OutputAssetPath);
-
-            return File.Exists(fullPath)
+            return File.Exists(GetFullOutputPath())
                 && GameObject.Find(ScriptSetupContent.GameObjects.ManagerName) != null;
+        }
+
+        // ── Customization protection ─────────────────────────────────────────
+        // Quick Clear removes the scene GameObject but leaves the script file
+        // on disk. That makes IsGameManagerIntact() report "not intact" even
+        // when the file still holds hand-written logic, so regeneration must
+        // check the file's actual contents before it can be overwritten.
+
+        private static bool HasCustomizedGameManagerScript()
+        {
+            var fullPath = GetFullOutputPath();
+            if (!File.Exists(fullPath)) return false;
+
+            var content = File.ReadAllText(fullPath);
+            return IsGameManagerCustomized(content);
+        }
+
+        private static bool ConfirmOverwriteCustomizedGameManager()
+        {
+            return EditorUtility.DisplayDialog(
+                ScriptSetupContent.Dialogs.CustomGameManagerTitle,
+                ScriptSetupContent.Dialogs.CustomGameManagerMessage,
+                ScriptSetupContent.Dialogs.CustomGameManagerConfirm,
+                ScriptSetupContent.Dialogs.CustomGameManagerCancel);
+        }
+
+        // Compares every On{Label}Pressed method body against the exact body
+        // BuildMethod() would generate for that label. Any mismatch — extra
+        // statements, edited logic, even a method that no longer parses as
+        // expected — means the file has been customized beyond the stub.
+        private static bool IsGameManagerCustomized(string fileContent)
+        {
+            var content = NormalizeLineEndings(fileContent);
+            var declarations = Regex.Matches(content, @"public\s+void\s+On(\w+)Pressed\s*\(\s*\)");
+
+            foreach (Match declaration in declarations)
+            {
+                var label = declaration.Groups[1].Value;
+
+                var actualBody = ExtractMethodBody(content, declaration.Index + declaration.Length);
+                if (actualBody == null)
+                    return true; // Malformed/unexpected structure — protect rather than guess.
+
+                var expectedMethod = NormalizeLineEndings(BuildMethod(label));
+                var expectedBody   = ExtractMethodBody(expectedMethod, 0);
+
+                if (actualBody.Trim() != expectedBody.Trim())
+                    return true;
+            }
+
+            return false;
+        }
+
+        // Given text and a search start index, finds the next method body —
+        // the text between the first '{' at/after startIndex and the closing
+        // '}' that lines up at the method's own 4-space indent level.
+        private static string ExtractMethodBody(string content, int searchFromIndex)
+        {
+            var openBraceIndex = content.IndexOf('{', searchFromIndex);
+            if (openBraceIndex < 0) return null;
+
+            var bodyStart  = openBraceIndex + 1;
+            var closeIndex = content.IndexOf("\n    }", bodyStart);
+            if (closeIndex < 0) return null;
+
+            return content.Substring(bodyStart, closeIndex - bodyStart);
+        }
+
+        private static string NormalizeLineEndings(string text)
+        {
+            return text.Replace("\r\n", "\n").Replace("\r", "\n");
         }
 
         private static string BuildScript(List<string> labels)
@@ -100,13 +173,16 @@ namespace UIPilot.Editor.Modules.ScriptSetup
 
         // ── File I/O ─────────────────────────────────────────────────────────
 
-        private static void WriteScript(string contents)
+        private static string GetFullOutputPath()
         {
-            var fullPath = Path.Combine(
+            return Path.Combine(
                 Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length),
                 ScriptSetupContent.Paths.OutputAssetPath);
+        }
 
-            File.WriteAllText(fullPath, contents, Encoding.UTF8);
+        private static void WriteScript(string contents)
+        {
+            File.WriteAllText(GetFullOutputPath(), contents, Encoding.UTF8);
             Debug.Log(ScriptSetupContent.Messages.FileWritten);
 
             AssetDatabase.Refresh();

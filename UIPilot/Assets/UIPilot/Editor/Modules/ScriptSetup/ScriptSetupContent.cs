@@ -52,6 +52,19 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 "Add the UIPilot_GameManager component to the UIPilot_GameManager GameObject manually.";
             internal const string FileWritten =
                 "UIPilot: Script written to Assets/UIPilot_GameManager.cs";
+            internal const string RegenerationCancelled =
+                "UIPilot: Regeneration cancelled — UIPilot_GameManager.cs left untouched.";
+        }
+
+        internal static class Dialogs
+        {
+            internal const string CustomGameManagerTitle =
+                "Custom GameManager Logic Detected";
+            internal const string CustomGameManagerMessage =
+                "UIPilot_GameManager.cs contains custom logic beyond the generated template. " +
+                "Regenerating will overwrite it. Continue?";
+            internal const string CustomGameManagerConfirm = "Overwrite";
+            internal const string CustomGameManagerCancel  = "Cancel";
         }
 
         internal static class Undo
