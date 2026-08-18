@@ -37,11 +37,13 @@ namespace UIPilot.Editor.Modules.UIGenerator
             }
 
             // Panel exists but is broken (no buttons) — destroy it before regenerating.
-            var brokenPanel = GameObject.Find(panelName);
+            // FindIncludingInactive because GameManager.ShowPanel() can leave a panel
+            // inactive; GameObject.Find alone would miss it and leave a duplicate.
+            var brokenPanel = FindIncludingInactive(panelName);
             if (brokenPanel != null)
                 Undo.DestroyObjectImmediate(brokenPanel);
 
-            var existingCanvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
+            var existingCanvas = FindIncludingInactive(UIGeneratorContent.GameObjects.Canvas);
             var canvasIsNew    = existingCanvas == null;
             var canvasGO       = canvasIsNew ? CreateCanvas() : existingCanvas;
             canvasGO.transform.localScale = Vector3.one;
@@ -61,7 +63,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
         internal static void ClearPanel(MenuType menuType)
         {
             // Search scene-wide: panel may live inside an old canvas, not just UIPilot_Canvas.
-            var panelGO = GameObject.Find(GetPanelName(menuType));
+            var panelGO = FindIncludingInactive(GetPanelName(menuType));
             if (panelGO == null) return;
 
             var parentCanvas = panelGO.transform.parent != null
@@ -181,7 +183,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         private static bool IsPanelIntact(string panelName, string[] expectedButtons)
         {
-            var panel = GameObject.Find(panelName);
+            var panel = FindIncludingInactive(panelName);
             if (panel == null) return false;
 
             foreach (var label in expectedButtons)
@@ -218,6 +220,23 @@ namespace UIPilot.Editor.Modules.UIGenerator
                         System.StringComparison.Ordinal))
                     return true;
             return false;
+        }
+
+        // GameObject.Find only searches active objects. GameManager.ShowPanel()
+        // can leave a panel inactive, so lifecycle lookups (intact-check, destroy-
+        // before-regenerate, clear) need to also catch inactive instances —
+        // otherwise an inactive panel goes unfound and a duplicate gets built
+        // alongside it.
+        private static GameObject FindIncludingInactive(string name)
+        {
+            var active = GameObject.Find(name);
+            if (active != null) return active;
+
+            foreach (var candidate in Resources.FindObjectsOfTypeAll<GameObject>())
+                if (candidate.name == name && candidate.scene.IsValid())
+                    return candidate;
+
+            return null;
         }
 
         private static string GetPanelName(MenuType menuType)
