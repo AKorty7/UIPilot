@@ -17,14 +17,64 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 "// ─────────────────────────────────────────────────────────────\n" +
                 "\n";
 
+            // {0}/{1}/{2} are the MainMenu/PauseMenu/Settings panel name literals,
+            // supplied by ScriptSetupModule from UIGeneratorContent's panel-naming
+            // constants so this stays the single source of truth for panel names.
             internal const string Header =
                 "using UnityEngine;\n" +
                 "\n" +
                 "public class UIPilot_GameManager : MonoBehaviour\n" +
-                "{\n";
+                "{{\n" +
+                "    private const string MainMenuPanel = \"{0}\";\n" +
+                "    private const string PauseMenuPanel = \"{1}\";\n" +
+                "    private const string SettingsPanel = \"{2}\";\n" +
+                "\n" +
+                "    private GameObject _mainMenuPanelGO;\n" +
+                "    private GameObject _pauseMenuPanelGO;\n" +
+                "    private GameObject _settingsPanelGO;\n" +
+                "    private string _currentPanel;\n" +
+                "    private string _settingsReturnPanel = MainMenuPanel;\n" +
+                "\n" +
+                "    private void Awake()\n" +
+                "    {{\n" +
+                "        _mainMenuPanelGO = FindPanel(MainMenuPanel);\n" +
+                "        _pauseMenuPanelGO = FindPanel(PauseMenuPanel);\n" +
+                "        _settingsPanelGO = FindPanel(SettingsPanel);\n" +
+                "\n" +
+                "        ShowPanel(MainMenuPanel);\n" +
+                "    }}\n" +
+                "\n" +
+                "    private static GameObject FindPanel(string panelName)\n" +
+                "    {{\n" +
+                "        var panel = GameObject.Find(panelName);\n" +
+                "        if (panel != null) return panel;\n" +
+                "\n" +
+                "        foreach (var candidate in Resources.FindObjectsOfTypeAll<GameObject>())\n" +
+                "            if (candidate.name == panelName && candidate.scene.IsValid())\n" +
+                "                return candidate;\n" +
+                "\n" +
+                "        return null;\n" +
+                "    }}\n" +
+                "\n" +
+                "    public void ShowPanel(string panelName)\n" +
+                "    {{\n" +
+                "        if (_mainMenuPanelGO != null)\n" +
+                "            _mainMenuPanelGO.SetActive(panelName == MainMenuPanel);\n" +
+                "\n" +
+                "        if (_pauseMenuPanelGO != null)\n" +
+                "            _pauseMenuPanelGO.SetActive(panelName == PauseMenuPanel);\n" +
+                "\n" +
+                "        if (_settingsPanelGO != null)\n" +
+                "            _settingsPanelGO.SetActive(panelName == SettingsPanel);\n" +
+                "\n" +
+                "        _currentPanel = panelName;\n" +
+                "    }}\n" +
+                "\n";
 
             internal const string Footer = "}\n";
 
+            // Generic fallback body for any label without a bespoke implementation
+            // below (e.g. custom/future buttons).
             internal const string MethodTemplate =
                 "    public void On{0}Pressed()\n" +
                 "    {{\n" +
@@ -36,6 +86,24 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 "        // TODO: Load your game scene here\n" +
                 "        // Example: SceneManager.LoadScene(\"GameScene\");\n" +
                 "        Debug.Log(\"Play pressed — add your scene load logic\");";
+
+            internal const string SettingsMethodBody =
+                "        _settingsReturnPanel = _currentPanel == SettingsPanel ? MainMenuPanel : _currentPanel;\n" +
+                "        ShowPanel(SettingsPanel);";
+
+            internal const string BackMethodBody =
+                "        ShowPanel(_settingsReturnPanel);";
+
+            internal const string ResumeMethodBody =
+                "        Time.timeScale = 1f;\n" +
+                "        ShowPanel(string.Empty);";
+
+            internal const string QuitMethodBody =
+                "#if UNITY_EDITOR\n" +
+                "        UnityEditor.EditorApplication.isPlaying = false;\n" +
+                "#else\n" +
+                "        Application.Quit();\n" +
+                "#endif";
         }
 
         internal static class GameObjects
@@ -72,7 +140,11 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             internal const string Action = "Generate GameManager";
         }
 
-        // Button label with a bespoke Play body — keyed by label string.
-        internal const string PlayLabel = "Play";
+        // Button labels with bespoke method bodies — keyed by label string.
+        internal const string PlayLabel     = "Play";
+        internal const string SettingsLabel = "Settings";
+        internal const string BackLabel     = "Back";
+        internal const string ResumeLabel   = "Resume";
+        internal const string QuitLabel     = "Quit";
     }
 }

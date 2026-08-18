@@ -9,7 +9,11 @@ namespace UIPilot.Editor.Modules.UIGenerator
 {
     internal static class UIGeneratorModule
     {
-        private static readonly Color LabelTextColor = new(26f / 255f, 26f / 255f, 26f / 255f);
+        // Buttons use Unity's default white Image background, while menu
+        // panels use a dark overlay. Keep the two text treatments separate so
+        // regenerating the UI preserves contrast in both places.
+        private static readonly Color TitleTextColor  = Color.white;
+        private static readonly Color ButtonTextColor = new(26f / 255f, 26f / 255f, 26f / 255f);
 
         // ── Public entry points ──────────────────────────────────────────────
 
@@ -40,6 +44,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             var existingCanvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             var canvasIsNew    = existingCanvas == null;
             var canvasGO       = canvasIsNew ? CreateCanvas() : existingCanvas;
+            canvasGO.transform.localScale = Vector3.one;
 
             if (canvasIsNew)
                 Undo.RegisterCreatedObjectUndo(canvasGO, UIGeneratorContent.Undo.Action);
@@ -88,6 +93,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             var canvasGO = new GameObject(UIGeneratorContent.GameObjects.Canvas);
             canvasGO.layer = LayerMask.NameToLayer(UIGeneratorContent.Layers.UI);
+            canvasGO.transform.localScale = Vector3.one;
 
             var canvas = canvasGO.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -144,7 +150,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             tmp.fontSize  = 64f;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontStyle = FontStyles.Bold;
-            tmp.color     = LabelTextColor;
+            tmp.color     = TitleTextColor;
 
             var le = go.AddComponent<LayoutElement>();
             le.preferredHeight = 100f;
@@ -168,7 +174,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             tmp.text      = label;
             tmp.fontSize  = 28f;
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color     = LabelTextColor;
+            tmp.color     = ButtonTextColor;
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────

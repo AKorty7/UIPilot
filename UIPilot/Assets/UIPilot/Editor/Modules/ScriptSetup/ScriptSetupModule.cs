@@ -144,7 +144,7 @@ namespace UIPilot.Editor.Modules.ScriptSetup
         {
             var sb = new StringBuilder();
             sb.Append(ScriptSetupContent.Script.GeneratedHeader);
-            sb.Append(ScriptSetupContent.Script.Header);
+            sb.Append(BuildHeader());
 
             for (var i = 0; i < labels.Count; i++)
             {
@@ -156,19 +156,52 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             return sb.ToString();
         }
 
+        // Panel-name literals are derived from UIGeneratorContent — the same
+        // prefix + PanelSuffix composition UIGeneratorModule uses to name the
+        // panels it creates — so this stays the single source of truth.
+        private static string BuildHeader()
+        {
+            return string.Format(
+                ScriptSetupContent.Script.Header,
+                GetPanelName(UIGeneratorContent.GameObjects.MainMenuPrefix),
+                GetPanelName(UIGeneratorContent.GameObjects.PauseMenuPrefix),
+                GetPanelName(UIGeneratorContent.GameObjects.SettingsMenuPrefix));
+        }
+
+        private static string GetPanelName(string prefix)
+        {
+            return prefix + UIGeneratorContent.GameObjects.PanelSuffix;
+        }
+
         private static string BuildMethod(string label)
         {
-            // Play gets a bespoke body; all others use the generic template.
+            // Bespoke labels get bespoke bodies; any other/future label falls
+            // back to the generic stub template.
             if (label == ScriptSetupContent.PlayLabel)
-            {
-                return
-                    "    public void OnPlayPressed()\n" +
-                    "    {\n" +
-                    ScriptSetupContent.Script.PlayMethodBody + "\n" +
-                    "    }\n";
-            }
+                return BuildMethodWithBody(label, ScriptSetupContent.Script.PlayMethodBody);
+
+            if (label == ScriptSetupContent.SettingsLabel)
+                return BuildMethodWithBody(label, ScriptSetupContent.Script.SettingsMethodBody);
+
+            if (label == ScriptSetupContent.BackLabel)
+                return BuildMethodWithBody(label, ScriptSetupContent.Script.BackMethodBody);
+
+            if (label == ScriptSetupContent.ResumeLabel)
+                return BuildMethodWithBody(label, ScriptSetupContent.Script.ResumeMethodBody);
+
+            if (label == ScriptSetupContent.QuitLabel)
+                return BuildMethodWithBody(label, ScriptSetupContent.Script.QuitMethodBody);
 
             return string.Format(ScriptSetupContent.Script.MethodTemplate, label);
+        }
+
+        private static string BuildMethodWithBody(string label, string body)
+        {
+            return
+                "    public void On" + label + "Pressed()\n" +
+                "    {\n" +
+                body + "\n" +
+                "    }\n";
         }
 
         // ── File I/O ─────────────────────────────────────────────────────────

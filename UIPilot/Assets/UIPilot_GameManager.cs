@@ -15,14 +15,28 @@ public class UIPilot_GameManager : MonoBehaviour
     private GameObject _mainMenuPanelGO;
     private GameObject _pauseMenuPanelGO;
     private GameObject _settingsPanelGO;
+    private string _currentPanel;
+    private string _settingsReturnPanel = MainMenuPanel;
 
     private void Awake()
     {
-        _mainMenuPanelGO = GameObject.Find(MainMenuPanel);
-        _pauseMenuPanelGO = GameObject.Find(PauseMenuPanel);
-        _settingsPanelGO = GameObject.Find(SettingsPanel);
+        _mainMenuPanelGO = FindPanel(MainMenuPanel);
+        _pauseMenuPanelGO = FindPanel(PauseMenuPanel);
+        _settingsPanelGO = FindPanel(SettingsPanel);
 
         ShowPanel(MainMenuPanel);
+    }
+
+    private static GameObject FindPanel(string panelName)
+    {
+        var panel = GameObject.Find(panelName);
+        if (panel != null) return panel;
+
+        foreach (var candidate in Resources.FindObjectsOfTypeAll<GameObject>())
+            if (candidate.name == panelName && candidate.scene.IsValid())
+                return candidate;
+
+        return null;
     }
 
     public void ShowPanel(string panelName)
@@ -35,6 +49,8 @@ public class UIPilot_GameManager : MonoBehaviour
 
         if (_settingsPanelGO != null)
             _settingsPanelGO.SetActive(panelName == SettingsPanel);
+
+        _currentPanel = panelName;
     }
 
     public void OnPlayPressed()
@@ -46,22 +62,27 @@ public class UIPilot_GameManager : MonoBehaviour
 
     public void OnSettingsPressed()
     {
+        _settingsReturnPanel = _currentPanel == SettingsPanel ? MainMenuPanel : _currentPanel;
         ShowPanel(SettingsPanel);
     }
 
     public void OnQuitPressed()
     {
-        // TODO: implement Quit logic
-        Debug.Log("Quit pressed — add your logic");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     public void OnResumePressed()
     {
-        ShowPanel(MainMenuPanel);
+        Time.timeScale = 1f;
+        ShowPanel(string.Empty);
     }
 
     public void OnBackPressed()
     {
-        ShowPanel(MainMenuPanel);
+        ShowPanel(_settingsReturnPanel);
     }
 }
