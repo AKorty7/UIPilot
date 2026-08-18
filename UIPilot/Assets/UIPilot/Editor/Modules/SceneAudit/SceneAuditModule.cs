@@ -10,7 +10,8 @@ namespace UIPilot.Editor.Modules.SceneAudit
 {
     internal static class SceneAuditModule
     {
-        private const int CallStatePersistent = 2;
+        private const int CallStatePersistent =
+            (int)UnityEngine.Events.UnityEventCallState.EditorAndRuntime;
 
         // ── Public entry point ───────────────────────────────────────────────
 

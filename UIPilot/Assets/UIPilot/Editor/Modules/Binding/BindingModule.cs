@@ -77,7 +77,8 @@ namespace UIPilot.Editor.Modules.Binding
                 var onClickProp      = serializedButton.FindProperty("m_OnClick");
                 var callsProp        = onClickProp.FindPropertyRelative("m_PersistentCalls.m_Calls");
                 var lastCall         = callsProp.GetArrayElementAtIndex(callsProp.arraySize - 1);
-                lastCall.FindPropertyRelative("m_CallState").intValue = 2;
+                lastCall.FindPropertyRelative("m_CallState").intValue =
+                    (int)UnityEngine.Events.UnityEventCallState.EditorAndRuntime;
                 serializedButton.ApplyModifiedPropertiesWithoutUndo();
 
                 EditorUtility.SetDirty(button);
