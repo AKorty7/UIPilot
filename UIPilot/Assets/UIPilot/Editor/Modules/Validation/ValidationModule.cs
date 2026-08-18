@@ -4,14 +4,12 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.Validation
 {
     internal static class ValidationModule
     {
-        private const string CanvasName   = "UIPilot_Canvas";
-        private const string ButtonPrefix = "UIPilot_Btn_";
-
         // ── Public entry points ──────────────────────────────────────────────
 
         internal static List<ValidationResult> Validate()
@@ -63,7 +61,7 @@ namespace UIPilot.Editor.Modules.Validation
 
         private static void CheckCanvas(List<ValidationResult> results)
         {
-            var canvasGO = GameObject.Find(CanvasName);
+            var canvasGO = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvasGO == null)
             {
                 results.Add(new ValidationResult(
@@ -110,7 +108,7 @@ namespace UIPilot.Editor.Modules.Validation
 
         private static void CheckButtons(List<ValidationResult> results)
         {
-            var canvasGO = GameObject.Find(CanvasName);
+            var canvasGO = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvasGO == null) return;
 
             var buttons       = canvasGO.GetComponentsInChildren<Button>(true);
@@ -119,7 +117,7 @@ namespace UIPilot.Editor.Modules.Validation
 
             foreach (var btn in buttons)
             {
-                if (!btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal))
+                if (!btn.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix, System.StringComparison.Ordinal))
                     continue;
 
                 var onClick       = btn.onClick;

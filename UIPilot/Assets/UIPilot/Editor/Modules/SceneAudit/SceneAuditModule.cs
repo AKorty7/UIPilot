@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.SceneAudit
@@ -130,7 +131,7 @@ namespace UIPilot.Editor.Modules.SceneAudit
 
         private static void CheckGameManagerGO(List<SceneAuditResult> results)
         {
-            var go = GameObject.Find(SceneAuditGameObjects.ManagerName);
+            var go = GameObject.Find(ScriptSetupContent.GameObjects.ManagerName);
             if (go == null)
             {
                 results.Add(new SceneAuditResult(
@@ -224,7 +225,6 @@ namespace UIPilot.Editor.Modules.SceneAudit
 
     internal static class SceneAuditGameObjects
     {
-        internal const string ManagerName         = "UIPilot_GameManager";
-        internal const string ManagerScriptSearch = "UIPilot_GameManager t:Script";
+        internal const string ManagerScriptSearch = ScriptSetupContent.GameObjects.ManagerName + " t:Script";
     }
 }

@@ -5,25 +5,23 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using UIPilot.Editor.Modules.ActionDiscovery;
+using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.Binding
 {
     internal static class BindingModule
     {
-        private const string CanvasName   = "UIPilot_Canvas";
-        private const string ButtonPrefix = "UIPilot_Btn_";
-
         // ── Public entry points ──────────────────────────────────────────────
 
         internal static List<Button> FindUIPilotButtons()
         {
             var results = new List<Button>();
 
-            var canvas = GameObject.Find(CanvasName);
+            var canvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvas == null) return results;
 
             foreach (var btn in canvas.GetComponentsInChildren<Button>(true))
-                if (btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal))
+                if (btn.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix, System.StringComparison.Ordinal))
                     results.Add(btn);
 
             return results;
@@ -46,8 +44,8 @@ namespace UIPilot.Editor.Modules.Binding
             {
                 if (btn == null) continue;
 
-                var label = btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal)
-                    ? btn.name.Substring(ButtonPrefix.Length)
+                var label = btn.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix, System.StringComparison.Ordinal)
+                    ? btn.name.Substring(UIGeneratorContent.GameObjects.ButtonPrefix.Length)
                     : btn.name;
 
                 var expectedMethod = "On" + label + "Pressed";
@@ -142,7 +140,7 @@ namespace UIPilot.Editor.Modules.Binding
 
         private static Button FindButtonByName(string buttonName)
         {
-            var canvas = GameObject.Find(CanvasName);
+            var canvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvas == null) return null;
 
             foreach (var btn in canvas.GetComponentsInChildren<Button>(true))
