@@ -9,6 +9,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
 {
     internal static class UIGeneratorModule
     {
+        private static readonly Color LabelTextColor = new(26f / 255f, 26f / 255f, 26f / 255f);
+
         // ── Public entry points ──────────────────────────────────────────────
 
         internal static void Generate(MenuType menuType)
@@ -142,6 +144,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             tmp.fontSize  = 64f;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontStyle = FontStyles.Bold;
+            tmp.color     = LabelTextColor;
 
             var le = go.AddComponent<LayoutElement>();
             le.preferredHeight = 100f;
@@ -165,6 +168,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             tmp.text      = label;
             tmp.fontSize  = 28f;
             tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color     = LabelTextColor;
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────

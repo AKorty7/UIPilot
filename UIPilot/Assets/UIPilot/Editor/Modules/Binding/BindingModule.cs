@@ -5,69 +5,26 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using UIPilot.Editor.Modules.ActionDiscovery;
+using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.Binding
 {
     internal static class BindingModule
     {
-        private const string CanvasName   = "UIPilot_Canvas";
-        private const string ButtonPrefix = "UIPilot_Btn_";
-
         // ── Public entry points ──────────────────────────────────────────────
 
         internal static List<Button> FindUIPilotButtons()
         {
             var results = new List<Button>();
 
-            var canvas = GameObject.Find(CanvasName);
+            var canvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvas == null) return results;
 
             foreach (var btn in canvas.GetComponentsInChildren<Button>(true))
-                if (btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal))
+                if (btn.name.StartsWith(UIGeneratorContent.GameObjects.ButtonPrefix, System.StringComparison.Ordinal))
                     results.Add(btn);
 
             return results;
-        }
-
-        internal static void ApplyBindings()
-        {
-            var buttons    = FindUIPilotButtons();
-            var actions    = ActionDiscoveryModule.Scan();
-            var selections = BuildAutoSelections(buttons, actions);
-            ApplyBindings(selections, actions);
-        }
-
-        private static Dictionary<string, int> BuildAutoSelections(
-            List<Button> buttons, List<DiscoveredAction> actions)
-        {
-            var selections = new Dictionary<string, int>();
-
-            foreach (var btn in buttons)
-            {
-                if (btn == null) continue;
-
-                var label = btn.name.StartsWith(ButtonPrefix, System.StringComparison.Ordinal)
-                    ? btn.name.Substring(ButtonPrefix.Length)
-                    : btn.name;
-
-                var expectedMethod = "On" + label + "Pressed";
-                var matched        = false;
-
-                for (var i = 0; i < actions.Count; i++)
-                {
-                    if (actions[i].MethodName == expectedMethod)
-                    {
-                        selections[btn.name] = i + 1;
-                        matched = true;
-                        break;
-                    }
-                }
-
-                if (!matched)
-                    selections[btn.name] = 0;
-            }
-
-            return selections;
         }
 
         internal static void ApplyBindings(
@@ -142,7 +99,7 @@ namespace UIPilot.Editor.Modules.Binding
 
         private static Button FindButtonByName(string buttonName)
         {
-            var canvas = GameObject.Find(CanvasName);
+            var canvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
             if (canvas == null) return null;
 
             foreach (var btn in canvas.GetComponentsInChildren<Button>(true))
