@@ -1,15 +1,11 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UIPilot.Editor.Modules.Binding;
 using UIPilot.Editor.Modules.SceneAudit;
-using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
-using UIPilot.Editor.Modules.Validation;
 
 namespace UIPilot.Editor.Modules.Resilience
 {
@@ -31,102 +27,169 @@ namespace UIPilot.Editor.Modules.Resilience
             }
         }
 
-        // ── Public entry point ───────────────────────────────────────────────
-
-        public static List<ResilienceResult> Repair(List<SceneAuditResult> auditResults)
+        // Follow-up work that requires another module. Resilience decides *what*
+        // is needed; UIPilotWindow performs the cross-module calls.
+        internal enum RepairFollowUpKind
         {
-            Debug.Log(ResilienceContent.Console.RepairStart);
+            None = 0,
+            GeneratePanel,
+            GenerateGameManager,
+            ReapplyBindings
+        }
 
-            Undo.IncrementCurrentGroup();
-            var undoGroup = Undo.GetCurrentGroup();
-            Undo.SetCurrentGroupName(ResilienceContent.UndoLabel);
+        internal sealed class RepairFollowUp
+        {
+            internal RepairFollowUpKind Kind            { get; }
+            internal string             ResultLabel     { get; }
+            internal string             SuccessDetail   { get; }
+            internal MenuType           MenuType        { get; }
+            internal MenuType[]         Menus           { get; }
+            internal ResilienceResult   CompletedResult { get; }
 
-            var results = new List<ResilienceResult>();
+            internal bool NeedsWindowAction => Kind != RepairFollowUpKind.None;
+
+            private RepairFollowUp(
+                RepairFollowUpKind kind,
+                string             resultLabel,
+                string             successDetail,
+                MenuType           menuType,
+                MenuType[]         menus,
+                ResilienceResult   completedResult)
+            {
+                Kind            = kind;
+                ResultLabel     = resultLabel;
+                SuccessDetail   = successDetail;
+                MenuType        = menuType;
+                Menus           = menus;
+                CompletedResult = completedResult;
+            }
+
+            internal static RepairFollowUp Completed(ResilienceResult result)
+            {
+                return new RepairFollowUp(
+                    RepairFollowUpKind.None, null, null, default, null, result);
+            }
+
+            internal static RepairFollowUp GeneratePanel(
+                string resultLabel, string successDetail, MenuType menuType)
+            {
+                return new RepairFollowUp(
+                    RepairFollowUpKind.GeneratePanel,
+                    resultLabel,
+                    successDetail,
+                    menuType,
+                    null,
+                    null);
+            }
+
+            internal static RepairFollowUp GenerateGameManager(string resultLabel)
+            {
+                return new RepairFollowUp(
+                    RepairFollowUpKind.GenerateGameManager,
+                    resultLabel,
+                    ResilienceContent.Results.GameManagerFixed,
+                    default,
+                    new[] { MenuType.MainMenu, MenuType.PauseMenu, MenuType.SettingsMenu },
+                    null);
+            }
+
+            internal static RepairFollowUp ReapplyBindings(string resultLabel)
+            {
+                return new RepairFollowUp(
+                    RepairFollowUpKind.ReapplyBindings,
+                    resultLabel,
+                    ResilienceContent.Results.ListenersFixed,
+                    default,
+                    null,
+                    null);
+            }
+        }
+
+        // ── Public entry point ───────────────────────────────────────────────
+        // Walks the audit list, applies repairs that Resilience can do itself
+        // (Canvas scaler, EventSystem), and records follow-ups for the window
+        // to run against other modules. Result order matches audit order.
+
+        internal static List<RepairFollowUp> Repair(List<SceneAuditResult> auditResults)
+        {
+            var followUps = new List<RepairFollowUp>();
 
             foreach (var audit in auditResults)
             {
                 if (audit.Severity == SceneAuditSeverity.OK)
                     continue;
 
-                var result = Dispatch(audit);
-                results.Add(result);
+                followUps.Add(Dispatch(audit));
             }
 
-            // ── Post-repair validation ───────────────────────────────────────
-            var validationResults = ValidationModule.Validate();
-            var remainingIssues   = 0;
-            foreach (var v in validationResults)
-                if (v.Severity == ValidationSeverity.Error || v.Severity == ValidationSeverity.Warning)
-                    remainingIssues++;
+            return followUps;
+        }
 
-            Debug.Log(string.Format(ResilienceContent.Console.ValidationLog, remainingIssues));
-
-            // ── Collapse entire repair into one undo step ────────────────────
-            Undo.CollapseUndoOperations(undoGroup);
-
-            var succeeded = 0;
-            foreach (var r in results)
-                if (r.Success) succeeded++;
-
-            Debug.Log(string.Format(
-                ResilienceContent.Console.RepairComplete, results.Count, succeeded));
-
-            return results;
+        internal static ResilienceResult MakeResult(string label, string detail, bool success)
+        {
+            return new ResilienceResult(label, detail, success);
         }
 
         // ── Dispatch ─────────────────────────────────────────────────────────
 
-        private static ResilienceResult Dispatch(SceneAuditResult audit)
+        private static RepairFollowUp Dispatch(SceneAuditResult audit)
         {
             var label = audit.Label;
 
             // Canvas
             if (label == SceneAuditContent.Labels.Canvas)
-                return RepairCanvas(audit);
+                return RepairCanvas();
 
             // EventSystem
             if (label == SceneAuditContent.Labels.EventSystem)
-                return RepairEventSystem();
+                return RepairFollowUp.Completed(RepairEventSystem());
 
             // Panels
             if (label == SceneAuditContent.Labels.MainMenuPanel)
-                return RepairPanel(ResilienceContent.Labels.MainMenuPanel, MenuType.MainMenu);
+                return RepairFollowUp.GeneratePanel(
+                    ResilienceContent.Labels.MainMenuPanel,
+                    ResilienceContent.Results.PanelRegenerated,
+                    MenuType.MainMenu);
 
             if (label == SceneAuditContent.Labels.PauseMenuPanel)
-                return RepairPanel(ResilienceContent.Labels.PauseMenuPanel, MenuType.PauseMenu);
+                return RepairFollowUp.GeneratePanel(
+                    ResilienceContent.Labels.PauseMenuPanel,
+                    ResilienceContent.Results.PanelRegenerated,
+                    MenuType.PauseMenu);
 
             if (label == SceneAuditContent.Labels.SettingsPanel)
-                return RepairPanel(ResilienceContent.Labels.SettingsPanel, MenuType.SettingsMenu);
+                return RepairFollowUp.GeneratePanel(
+                    ResilienceContent.Labels.SettingsPanel,
+                    ResilienceContent.Results.PanelRegenerated,
+                    MenuType.SettingsMenu);
 
             // GameManager GO or script on disk
             if (label == SceneAuditContent.Labels.GameManagerGO ||
                 label == SceneAuditContent.Labels.GameManagerScript)
-                return RepairGameManager(label);
+                return RepairFollowUp.GenerateGameManager(label);
 
             // Button listeners
             if (label == SceneAuditContent.Labels.ButtonListeners)
-                return RepairButtonListeners();
+                return RepairFollowUp.ReapplyBindings(ResilienceContent.Labels.ButtonListeners);
 
-            return new ResilienceResult(label, ResilienceContent.Results.UnknownLabel, false);
+            return RepairFollowUp.Completed(
+                new ResilienceResult(label, ResilienceContent.Results.UnknownLabel, false));
         }
 
         // ── Canvas repair ────────────────────────────────────────────────────
 
-        private static ResilienceResult RepairCanvas(SceneAuditResult audit)
+        private static RepairFollowUp RepairCanvas()
         {
             var canvasGO = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
 
-            // Missing: generate any menu so the canvas is (re)created with
-            // the correct CanvasScaler.  UIGeneratorModule handles idempotency.
+            // Missing: window must generate a menu so the canvas is (re)created
+            // with the correct CanvasScaler. UIGeneratorModule handles idempotency.
             if (canvasGO == null)
             {
-                UIGeneratorModule.Generate(MenuType.MainMenu);
-
-                MarkSceneDirty();
-                return new ResilienceResult(
+                return RepairFollowUp.GeneratePanel(
                     ResilienceContent.Labels.Canvas,
                     ResilienceContent.Results.CanvasRepaired,
-                    GameObject.Find(UIGeneratorContent.GameObjects.Canvas) != null);
+                    MenuType.MainMenu);
             }
 
             // Present but misconfigured scaler
@@ -143,10 +206,10 @@ namespace UIPilot.Editor.Modules.Resilience
             EditorUtility.SetDirty(canvasGO);
             MarkSceneDirty();
 
-            return new ResilienceResult(
+            return RepairFollowUp.Completed(new ResilienceResult(
                 ResilienceContent.Labels.CanvasScaler,
                 ResilienceContent.Results.CanvasScalerFixed,
-                true);
+                true));
         }
 
         // ── EventSystem repair ───────────────────────────────────────────────
@@ -170,69 +233,6 @@ namespace UIPilot.Editor.Modules.Resilience
                 ResilienceContent.Labels.EventSystem,
                 ResilienceContent.Results.EventSystemFixed,
                 true);
-        }
-
-        // ── Panel repair ─────────────────────────────────────────────────────
-
-        private static ResilienceResult RepairPanel(string resultLabel, MenuType menuType)
-        {
-            try
-            {
-                UIGeneratorModule.Generate(menuType);
-                MarkSceneDirty();
-                return new ResilienceResult(resultLabel, ResilienceContent.Results.PanelRegenerated, true);
-            }
-            catch (Exception ex)
-            {
-                return new ResilienceResult(resultLabel, ex.Message, false);
-            }
-        }
-
-        // ── GameManager repair ───────────────────────────────────────────────
-
-        private static ResilienceResult RepairGameManager(string auditLabel)
-        {
-            var allMenus = new[]
-            {
-                MenuType.MainMenu,
-                MenuType.PauseMenu,
-                MenuType.SettingsMenu
-            };
-
-            try
-            {
-                ScriptSetupModule.GenerateGameManager(allMenus);
-                MarkSceneDirty();
-                return new ResilienceResult(auditLabel, ResilienceContent.Results.GameManagerFixed, true);
-            }
-            catch (Exception ex)
-            {
-                return new ResilienceResult(auditLabel, ex.Message, false);
-            }
-        }
-
-        // ── Button listener repair ───────────────────────────────────────────
-
-        private static ResilienceResult RepairButtonListeners()
-        {
-            try
-            {
-                BindingModule.FindUIPilotButtons();
-                BindingModule.ApplyBindings();
-                MarkSceneDirty();
-
-                return new ResilienceResult(
-                    ResilienceContent.Labels.ButtonListeners,
-                    ResilienceContent.Results.ListenersFixed,
-                    true);
-            }
-            catch (Exception ex)
-            {
-                return new ResilienceResult(
-                    ResilienceContent.Labels.ButtonListeners,
-                    ex.Message,
-                    false);
-            }
         }
 
         // ── Utility ──────────────────────────────────────────────────────────

@@ -456,9 +456,96 @@ namespace UIPilot.Editor
         private void RunRepair()
         {
             ClearConsole();
-            _repairResults = ResilienceModule.Repair(_auditResults);
-            _auditResults  = SceneAuditModule.Scan();
+            Debug.Log(ResilienceContent.Console.RepairStart);
+
+            Undo.IncrementCurrentGroup();
+            var undoGroup = Undo.GetCurrentGroup();
+            Undo.SetCurrentGroupName(ResilienceContent.UndoLabel);
+
+            var followUps = ResilienceModule.Repair(_auditResults);
+            _repairResults = ExecuteRepairFollowUps(followUps);
+
+            var validationResults = ValidationModule.Validate();
+            var remainingIssues   = 0;
+            foreach (var v in validationResults)
+                if (v.Severity == ValidationSeverity.Error || v.Severity == ValidationSeverity.Warning)
+                    remainingIssues++;
+
+            Debug.Log(string.Format(ResilienceContent.Console.ValidationLog, remainingIssues));
+
+            Undo.CollapseUndoOperations(undoGroup);
+
+            var succeeded = 0;
+            foreach (var r in _repairResults)
+                if (r.Success) succeeded++;
+
+            Debug.Log(string.Format(
+                ResilienceContent.Console.RepairComplete, _repairResults.Count, succeeded));
+
+            _auditResults = SceneAuditModule.Scan();
             Repaint();
+        }
+
+        // Runs the cross-module steps Resilience recorded, in audit order.
+        private static List<ResilienceModule.ResilienceResult> ExecuteRepairFollowUps(
+            List<ResilienceModule.RepairFollowUp> followUps)
+        {
+            var results = new List<ResilienceModule.ResilienceResult>();
+
+            foreach (var followUp in followUps)
+            {
+                if (!followUp.NeedsWindowAction)
+                {
+                    results.Add(followUp.CompletedResult);
+                    continue;
+                }
+
+                try
+                {
+                    switch (followUp.Kind)
+                    {
+                        case ResilienceModule.RepairFollowUpKind.GeneratePanel:
+                        {
+                            UIGeneratorModule.Generate(followUp.MenuType);
+                            break;
+                        }
+
+                        case ResilienceModule.RepairFollowUpKind.GenerateGameManager:
+                        {
+                            ScriptSetupModule.GenerateGameManager(followUp.Menus);
+                            break;
+                        }
+
+                        case ResilienceModule.RepairFollowUpKind.ReapplyBindings:
+                        {
+                            var buttons    = BindingModule.FindUIPilotButtons();
+                            var actions    = ActionDiscoveryModule.Scan();
+                            var selections = BuildAutoSelections(buttons, actions);
+                            BindingModule.ApplyBindings(selections, actions);
+                            break;
+                        }
+                    }
+
+                    EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+
+                    var success = true;
+                    if (followUp.Kind == ResilienceModule.RepairFollowUpKind.GeneratePanel
+                        && followUp.ResultLabel == ResilienceContent.Labels.Canvas)
+                    {
+                        success = GameObject.Find(UIGeneratorContent.GameObjects.Canvas) != null;
+                    }
+
+                    results.Add(ResilienceModule.MakeResult(
+                        followUp.ResultLabel, followUp.SuccessDetail, success));
+                }
+                catch (Exception ex)
+                {
+                    results.Add(ResilienceModule.MakeResult(
+                        followUp.ResultLabel, ex.Message, false));
+                }
+            }
+
+            return results;
         }
 
         private static void DrawAuditRow(SceneAuditResult result)
