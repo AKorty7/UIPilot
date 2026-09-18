@@ -37,11 +37,21 @@ FOLDER STRUCTURE
 Assets/UIPilot/Editor/
   Core/
     UIPilotLabels.cs
+    UIPilotEventSystem.cs   (the only place an EventSystem is created —
+                             picks the input module for the project)
+    UIPilotSceneQuery.cs    (finds canvas children incl. inactive ones)
+    UIPilotTheme.cs         (ScriptableObject: every colour, size and
+                             decoration switch of the generated menus)
   Modules/
     UIGenerator/
       MenuType.cs
       UIGeneratorContent.cs
       UIGeneratorModule.cs
+      UIGeneratorMenuBuilder.cs   (STRUCTURE only — never sets a look)
+      UIGeneratorStyler.cs        (the ONLY code that sets appearance;
+                                   used by Build UI and Apply Theme)
+      UIGeneratorThemePresets.cs  (Soft Club, Soft Club Night, Ink)
+      UIGeneratorArt.cs           (finds the shipped sprites and font)
     ActionDiscovery/
       DiscoveredAction.cs
       ActionDiscoveryModule.cs
@@ -54,7 +64,27 @@ Assets/UIPilot/Editor/
       ValidationContent.cs
       ValidationModule.cs
   UI/
+    UIPilotStyles.cs        (cached GUIStyles, colours, GUILayoutOptions —
+                             never build a GUIStyle inside OnGUI)
   UIPilotWindow.cs
+Assets/UIPilot/Art/       (white tintable sprites + Michroma font, shipped)
+Assets/UIPilot/Themes/    (the preset theme assets buyers pick from)
+
+═══════════════════════════════════════════
+DESIGN SYSTEM — READ BEFORE ANY VISUAL CHANGE
+═══════════════════════════════════════════
+design-system/uipilot/MASTER.md is the source of truth for how
+the generated menus AND the UIPilot window look: colour tokens,
+type scale, 8-point spacing, components, states, accessibility.
+- Follow it. Do not invent colours, sizes or a second accent.
+- No placeholder copy, ever: every string shows real project
+  data or does real work.
+- A visual change is not done until it has been rendered in
+  Unity and looked at (MASTER.md section 9).
+- If the design itself should change, change MASTER.md first.
+- The menu look is a UIPilotTheme asset. A theme never changes
+  structure; all styling goes through UIGeneratorStyler.Apply.
+  Rules: design-system/uipilot/pages/generated-menus.md, "Themes".
 
 ═══════════════════════════════════════════
 NAMING CONVENTIONS
