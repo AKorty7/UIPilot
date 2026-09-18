@@ -1,0 +1,28 @@
+UIPilot — Third-Party Notices
+=============================
+
+UIPilot includes the following third-party component. Its licence applies to that
+component only; everything else in this package is covered by the Unity Asset Store EULA.
+
+
+Michroma (typeface)
+-------------------
+Files:     Art/Fonts/Michroma-Regular.ttf
+           Art/Fonts/Michroma SDF.asset        (TextMeshPro font asset built from it)
+           Art/Fonts/Michroma SDF Glow.mat     (material preset for that font asset)
+Copyright: Copyright 2011 The Michroma Project Authors
+           (https://github.com/googlefonts/Michroma-font)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Michroma-OFL.txt, and https://openfontlicense.org
+
+The font is used for the lettering of the menus UIPilot generates. Under the OFL you may
+use it in your own games, commercial or not, and redistribute it with them. You may not
+sell the font by itself. If you modify the font, the modified version must stay under the
+OFL and may not use the name "Michroma".
+
+To use a different typeface: select any generated text object and change
+TextMeshPro > Font Asset. UIPilot does not depend on Michroma being present; if the font
+asset is removed, newly generated menus fall back to TextMeshPro's default font.
+
+
+Everything else in Art/ (sprites and icons) was created for UIPilot and is original work.

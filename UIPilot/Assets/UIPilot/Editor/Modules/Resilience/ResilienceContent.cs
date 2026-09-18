@@ -24,7 +24,7 @@ namespace UIPilot.Editor.Modules.Resilience
             internal const string CanvasScalerFixed = "CanvasScaler set to ScaleWithScreenSize 1920×1080";
             internal const string EventSystemFixed  = "EventSystem created";
             internal const string PanelRegenerated  = "Panel regenerated via UIGeneratorModule";
-            internal const string GameManagerFixed  = "GameManager script and GameObject created";
+            internal const string GameManagerFixed  = "GameManager restored — component attached and buttons re-wired";
             internal const string ListenersFixed    = "Button listeners re-applied";
             internal const string UnknownLabel      = "Unknown audit label — no repair dispatched";
             internal const string ValidationSuffix  = " — post-repair validation: {0} issue(s) remain";

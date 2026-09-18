@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.SceneAudit;
 using UIPilot.Editor.Modules.UIGenerator;
 
@@ -222,10 +223,7 @@ namespace UIPilot.Editor.Modules.Resilience
                     ResilienceContent.Results.EventSystemFixed,
                     true);
 
-            var esGO = new GameObject(UIGeneratorContent.GameObjects.EventSystem);
-            esGO.AddComponent<EventSystem>();
-            esGO.AddComponent<StandaloneInputModule>();
-            Undo.RegisterCreatedObjectUndo(esGO, ResilienceContent.UndoLabel);
+            UIPilotEventSystem.Create(ResilienceContent.UndoLabel);
 
             MarkSceneDirty();
 

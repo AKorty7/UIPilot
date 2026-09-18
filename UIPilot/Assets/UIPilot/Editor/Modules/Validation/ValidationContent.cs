@@ -2,11 +2,6 @@ namespace UIPilot.Editor.Modules.Validation
 {
     internal static class ValidationContent
     {
-        internal static class GameObjects
-        {
-            internal const string EventSystem = "EventSystem";
-        }
-
         internal static class Messages
         {
             internal const string NoEventSystem    = "No EventSystem found in scene.";
@@ -16,7 +11,7 @@ namespace UIPilot.Editor.Modules.Validation
             internal const string WrongScaleMode   = "CanvasScaler is not set to Scale With Screen Size.";
             internal const string CanvasScalerOk   = "CanvasScaler is correctly configured.";
             internal const string ButtonNoListener = "{0} has no method assigned.";
-            internal const string ButtonRuntimeOnly = "{0} has a Runtime Only listener. Re-apply bindings via Wire.";
+            internal const string ButtonListenerOff = "{0} has a click listener that is switched Off. Re-apply bindings in Manual > Wire.";
             internal const string AllButtonsWired  = "All buttons have persistent listeners.";
         }
 

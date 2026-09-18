@@ -74,8 +74,10 @@ namespace UIPilot.Editor.Modules.ActionDiscovery
 
         private static bool IsValidAction(MethodInfo method)
         {
-            if (method.IsSpecialName)                 return false; // property accessors, operators
-            if (method.GetParameters().Length != 0)   return false;
+            if (method.IsSpecialName)                   return false; // property accessors, operators
+            if (method.ReturnType != typeof(void))      return false; // UnityAction cannot bind a return value
+            if (method.IsGenericMethodDefinition)       return false;
+            if (method.GetParameters().Length != 0)     return false;
             if (LifecycleMethods.Contains(method.Name)) return false;
             return true;
         }

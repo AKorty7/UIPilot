@@ -33,6 +33,7 @@ namespace UIPilot.Editor.Modules.Binding
         {
             var allBehaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(
                 FindObjectsSortMode.None);
+            var allButtons    = FindUIPilotButtons();
 
             foreach (var kvp in selections)
             {
@@ -57,30 +58,12 @@ namespace UIPilot.Editor.Modules.Binding
                     continue;
                 }
 
-                var button = FindButtonByName(kvp.Key);
-                if (button == null) continue;
-
-                Undo.RecordObject(button, BindingContent.Undo.Action);
-
-                // Remove all existing persistent listeners before adding the new one.
-                var eventCount = button.onClick.GetPersistentEventCount();
-                for (var i = eventCount - 1; i >= 0; i--)
-                    UnityEventTools.RemovePersistentListener(button.onClick, i);
-
-                var call = System.Delegate.CreateDelegate(
-                    typeof(UnityEngine.Events.UnityAction), target, method)
-                    as UnityEngine.Events.UnityAction;
-
-                UnityEventTools.AddPersistentListener(button.onClick, call);
-
-                var serializedButton = new SerializedObject(button);
-                var onClickProp      = serializedButton.FindProperty("m_OnClick");
-                var callsProp        = onClickProp.FindPropertyRelative("m_PersistentCalls.m_Calls");
-                var lastCall         = callsProp.GetArrayElementAtIndex(callsProp.arraySize - 1);
-                lastCall.FindPropertyRelative("m_CallState").intValue = 2;
-                serializedButton.ApplyModifiedPropertiesWithoutUndo();
-
-                EditorUtility.SetDirty(button);
+                // Menus share button names (Settings and Quit exist in both the
+                // Main and Pause menus), so a selection applies to every button
+                // carrying that name — not just the first one found.
+                foreach (var button in allButtons)
+                    if (button.name == kvp.Key)
+                        BindButton(button, target, method);
             }
 
             EditorSceneManager.MarkSceneDirty(
@@ -89,23 +72,37 @@ namespace UIPilot.Editor.Modules.Binding
 
         // ── Helpers ──────────────────────────────────────────────────────────
 
+        private static void BindButton(
+            Button button, MonoBehaviour target, System.Reflection.MethodInfo method)
+        {
+            Undo.RecordObject(button, BindingContent.Undo.Action);
+
+            // Remove all existing persistent listeners before adding the new one.
+            var eventCount = button.onClick.GetPersistentEventCount();
+            for (var i = eventCount - 1; i >= 0; i--)
+                UnityEventTools.RemovePersistentListener(button.onClick, i);
+
+            var call = System.Delegate.CreateDelegate(
+                typeof(UnityEngine.Events.UnityAction), target, method)
+                as UnityEngine.Events.UnityAction;
+
+            UnityEventTools.AddPersistentListener(button.onClick, call);
+
+            var serializedButton = new SerializedObject(button);
+            var onClickProp      = serializedButton.FindProperty("m_OnClick");
+            var callsProp        = onClickProp.FindPropertyRelative("m_PersistentCalls.m_Calls");
+            var lastCall         = callsProp.GetArrayElementAtIndex(callsProp.arraySize - 1);
+            lastCall.FindPropertyRelative("m_CallState").intValue = 2;
+            serializedButton.ApplyModifiedPropertiesWithoutUndo();
+
+            EditorUtility.SetDirty(button);
+        }
+
         private static MonoBehaviour FindBehaviour(MonoBehaviour[] all, string className)
         {
             foreach (var mb in all)
                 if (mb.GetType().Name == className)
                     return mb;
-            return null;
-        }
-
-        private static Button FindButtonByName(string buttonName)
-        {
-            var canvas = GameObject.Find(UIGeneratorContent.GameObjects.Canvas);
-            if (canvas == null) return null;
-
-            foreach (var btn in canvas.GetComponentsInChildren<Button>(true))
-                if (btn.name == buttonName)
-                    return btn;
-
             return null;
         }
     }

@@ -1,23 +1,20 @@
 using System;
-using TMPro;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Core;
 
 namespace UIPilot.Editor.Modules.UIGenerator
 {
     internal static class UIGeneratorModule
     {
-        // Buttons use Unity's default white Image background, while menu
-        // panels use a dark overlay. Keep the two text treatments separate so
-        // regenerating the UI preserves contrast in both places.
-        private static readonly Color TitleTextColor  = Color.white;
-        private static readonly Color ButtonTextColor = new(26f / 255f, 26f / 255f, 26f / 255f);
-
         // ── Public entry points ──────────────────────────────────────────────
 
-        internal static void Generate(MenuType menuType)
+        // theme may be null: the built-in Soft Club look is used.
+        internal static void Generate(MenuType menuType, UIPilotTheme theme)
         {
             Undo.IncrementCurrentGroup();
             Undo.SetCurrentGroupName(UIGeneratorContent.Undo.Action);
@@ -37,7 +34,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             }
 
             // Panel exists but is broken (no buttons) — destroy it before regenerating.
-            var brokenPanel = GameObject.Find(panelName);
+            var brokenPanel = FindPanel(panelName);
             if (brokenPanel != null)
                 Undo.DestroyObjectImmediate(brokenPanel);
 
@@ -49,7 +46,9 @@ namespace UIPilot.Editor.Modules.UIGenerator
             if (canvasIsNew)
                 Undo.RegisterCreatedObjectUndo(canvasGO, UIGeneratorContent.Undo.Action);
 
-            var panelGO = BuildMenu(canvasGO, menuType);
+            var (title, menuButtons, prefix) = GetMenuConfig(menuType);
+            var panelGO = UIGeneratorMenuBuilder.Build(
+                canvasGO, menuType, title, menuButtons, prefix, ResolveTheme(theme));
             panelGO.transform.SetSiblingIndex(GetExpectedSiblingIndex(menuType));
 
             if (!canvasIsNew)
@@ -58,10 +57,111 @@ namespace UIPilot.Editor.Modules.UIGenerator
             Selection.activeGameObject = canvasGO;
         }
 
+        // Restyles every generated menu already in the scene. Appearance only:
+        // layout, names and button wiring are untouched, so it is safe on menus the
+        // developer has rearranged. Returns how many menus were restyled.
+        internal static int ApplyTheme(UIPilotTheme theme)
+        {
+            var resolved = ResolveTheme(theme);
+            var restyled = 0;
+
+            foreach (MenuType menuType in Enum.GetValues(typeof(MenuType)))
+            {
+                var panelGO = FindPanel(GetPanelName(menuType));
+                if (panelGO == null) continue;
+
+                Undo.RegisterFullObjectHierarchyUndo(panelGO, UIPilotLabels.Theme.UndoApply);
+                UIGeneratorStyler.Apply(panelGO, resolved);
+                restyled++;
+            }
+
+            return restyled;
+        }
+
+        // The preset the window selects when the developer has not chosen a theme.
+        internal static UIPilotTheme FindDefaultThemeAsset()
+        {
+            foreach (var guid in AssetDatabase.FindAssets(
+                         UIPilotLabels.Theme.DefaultAsset + UIPilotLabels.Theme.AssetFilter))
+            {
+                var theme = AssetDatabase.LoadAssetAtPath<UIPilotTheme>(AssetDatabase.GUIDToAssetPath(guid));
+                if (theme != null && theme.name == UIPilotLabels.Theme.DefaultAsset) return theme;
+            }
+
+            return null;
+        }
+
+        // No theme selected, or its asset was deleted: fall back to the built-in look.
+        private static UIPilotTheme ResolveTheme(UIPilotTheme theme)
+        {
+            return theme != null ? theme : UIGeneratorThemePresets.SoftClub();
+        }
+
+        // ── Theme assets ─────────────────────────────────────────────────────
+
+        // Assets > Create > UIPilot > Theme. A new theme starts as a full copy of
+        // Soft Club, font and title glow included, then enters rename like any asset.
+        [MenuItem(UIPilotLabels.Theme.CreateMenuPath)]
+        private static void CreateThemeAsset()
+        {
+            ProjectWindowUtil.CreateAsset(UIGeneratorThemePresets.SoftClub(), UIPilotLabels.Theme.NewAssetFile);
+        }
+
+        // The shipped presets that no longer exist anywhere in the project, by name.
+        // A preset the developer moved or edited still counts as present.
+        internal static List<string> FindMissingDefaultThemes()
+        {
+            var present = new HashSet<string>();
+            foreach (var guid in AssetDatabase.FindAssets(UIPilotLabels.Theme.AssetFilter))
+                present.Add(Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)));
+
+            var missing = new List<string>();
+            foreach (var preset in UIGeneratorThemePresets.All)
+                if (!present.Contains(preset.Name))
+                    missing.Add(preset.Name);
+
+            return missing;
+        }
+
+        // Recreates the missing presets from their factories and returns the new
+        // asset paths. Never overwrites: a theme that exists is left alone, and a
+        // stray file at the target path gets a numbered name instead.
+        internal static List<string> RestoreDefaultThemes()
+        {
+            var missing  = FindMissingDefaultThemes();
+            var restored = new List<string>();
+
+            foreach (var preset in UIGeneratorThemePresets.All)
+            {
+                if (!missing.Contains(preset.Name)) continue;
+
+                EnsureFolder(UIPilotLabels.Theme.PresetFolder);
+                var path = AssetDatabase.GenerateUniqueAssetPath(
+                    UIPilotLabels.Theme.PresetFolder + "/" + preset.Name + UIPilotLabels.Theme.AssetExtension);
+
+                AssetDatabase.CreateAsset(preset.Create(), path);
+                restored.Add(path);
+            }
+
+            if (restored.Count > 0)
+                AssetDatabase.SaveAssets();
+
+            return restored;
+        }
+
+        private static void EnsureFolder(string folder)
+        {
+            if (AssetDatabase.IsValidFolder(folder)) return;
+
+            var parent = Path.GetDirectoryName(folder).Replace('\\', '/');
+            EnsureFolder(parent);
+            AssetDatabase.CreateFolder(parent, Path.GetFileName(folder));
+        }
+
         internal static void ClearPanel(MenuType menuType)
         {
             // Search scene-wide: panel may live inside an old canvas, not just UIPilot_Canvas.
-            var panelGO = GameObject.Find(GetPanelName(menuType));
+            var panelGO = FindPanel(GetPanelName(menuType));
             if (panelGO == null) return;
 
             var parentCanvas = panelGO.transform.parent != null
@@ -81,10 +181,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             if (UnityEngine.Object.FindFirstObjectByType<EventSystem>() != null) return;
 
-            var esGO = new GameObject(UIGeneratorContent.GameObjects.EventSystem);
-            esGO.AddComponent<EventSystem>();
-            esGO.AddComponent<StandaloneInputModule>();
-            Undo.RegisterCreatedObjectUndo(esGO, UIGeneratorContent.Undo.Action);
+            UIPilotEventSystem.Create(UIGeneratorContent.Undo.Action);
         }
 
         // ── Canvas ───────────────────────────────────────────────────────────
@@ -109,93 +206,27 @@ namespace UIPilot.Editor.Modules.UIGenerator
             return canvasGO;
         }
 
-        // ── Menu ─────────────────────────────────────────────────────────────
-
-        private static GameObject BuildMenu(GameObject canvas, MenuType menuType)
-        {
-            var (title, buttons, prefix) = GetMenuConfig(menuType);
-
-            var panelGO   = CreateUIObject(prefix + UIGeneratorContent.GameObjects.PanelSuffix, canvas);
-            var panelRect = (RectTransform)panelGO.transform;
-            SetStretch(panelRect);
-
-            var bg = panelGO.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.85f);
-
-            var vlg = panelGO.AddComponent<VerticalLayoutGroup>();
-            vlg.childAlignment         = TextAnchor.MiddleCenter;
-            vlg.spacing                = 20f;
-            vlg.padding                = new RectOffset(0, 0, 80, 80);
-            vlg.childControlWidth      = true;
-            vlg.childControlHeight     = true;
-            vlg.childForceExpandWidth  = true;
-            vlg.childForceExpandHeight = false;
-
-            CreateTitle(panelGO, prefix + UIGeneratorContent.GameObjects.TitleSuffix, title);
-
-            foreach (var label in buttons)
-                CreateButton(panelGO, label);
-
-            return panelGO;
-        }
-
-        // ── Title ────────────────────────────────────────────────────────────
-
-        private static void CreateTitle(GameObject parent, string objectName, string displayText)
-        {
-            var go  = CreateUIObject(objectName, parent);
-
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text      = displayText;
-            tmp.fontSize  = 64f;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.fontStyle = FontStyles.Bold;
-            tmp.color     = TitleTextColor;
-
-            var le = go.AddComponent<LayoutElement>();
-            le.preferredHeight = 100f;
-        }
-
-        // ── Button ───────────────────────────────────────────────────────────
-
-        private static void CreateButton(GameObject parent, string label)
-        {
-            var btnGO = CreateUIObject(UIGeneratorContent.GameObjects.ButtonPrefix + label, parent);
-            btnGO.AddComponent<Image>();
-            btnGO.AddComponent<Button>();
-
-            var le = btnGO.AddComponent<LayoutElement>();
-            le.preferredHeight = 70f;
-
-            var textGO = CreateUIObject(UIGeneratorContent.GameObjects.ButtonTextChild, btnGO);
-            SetStretch((RectTransform)textGO.transform);
-
-            var tmp = textGO.AddComponent<TextMeshProUGUI>();
-            tmp.text      = label;
-            tmp.fontSize  = 28f;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color     = ButtonTextColor;
-        }
-
         // ── Helpers ──────────────────────────────────────────────────────────
+
+        // Finds a panel even when the developer has unticked it in the Inspector.
+        private static GameObject FindPanel(string panelName)
+        {
+            return UIPilotSceneQuery.FindInCanvas(UIGeneratorContent.GameObjects.Canvas, panelName);
+        }
 
         private static bool IsPanelIntact(string panelName, string[] expectedButtons)
         {
-            var panel = GameObject.Find(panelName);
+            var panel = FindPanel(panelName);
             if (panel == null) return false;
 
+            // Anywhere under the panel: Settings buttons sit inside their rows.
+            var present = new System.Collections.Generic.HashSet<string>();
+            foreach (var button in panel.GetComponentsInChildren<Button>(true))
+                present.Add(button.name);
+
             foreach (var label in expectedButtons)
-            {
-                var expectedName = UIGeneratorContent.GameObjects.ButtonPrefix + label;
-                var found        = false;
-
-                foreach (Transform child in panel.transform)
-                {
-                    if (child.name == expectedName) { found = true; break; }
-                }
-
-                if (!found) return false;
-            }
+                if (!present.Contains(UIGeneratorContent.GameObjects.ButtonPrefix + label))
+                    return false;
 
             return true;
         }
@@ -226,28 +257,6 @@ namespace UIPilot.Editor.Modules.UIGenerator
             return prefix + UIGeneratorContent.GameObjects.PanelSuffix;
         }
 
-        private static GameObject CreateUIObject(string name, GameObject parent)
-        {
-            var go = new GameObject(name);
-            go.AddComponent<RectTransform>();
-
-            if (parent != null)
-            {
-                go.transform.SetParent(parent.transform, false);
-                go.layer = parent.layer;
-            }
-
-            return go;
-        }
-
-        private static void SetStretch(RectTransform rect)
-        {
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-        }
-
         private static int GetExpectedSiblingIndex(MenuType menuType)
         {
             return menuType switch
@@ -263,7 +272,10 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             return menuType switch
             {
-                MenuType.MainMenu     => (UIGeneratorContent.Menus.MainMenu,
+                // The project's real name, from Player Settings > Product Name.
+                MenuType.MainMenu     => (string.IsNullOrWhiteSpace(PlayerSettings.productName)
+                                              ? UIGeneratorContent.Menus.MainMenuFallback
+                                              : PlayerSettings.productName,
                                           UIGeneratorContent.ButtonSets.MainMenu,
                                           UIGeneratorContent.GameObjects.MainMenuPrefix),
 

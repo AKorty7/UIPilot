@@ -165,7 +165,15 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 ScriptSetupContent.Script.Header,
                 GetPanelName(UIGeneratorContent.GameObjects.MainMenuPrefix),
                 GetPanelName(UIGeneratorContent.GameObjects.PauseMenuPrefix),
-                GetPanelName(UIGeneratorContent.GameObjects.SettingsMenuPrefix));
+                GetPanelName(UIGeneratorContent.GameObjects.SettingsMenuPrefix),
+                UIGeneratorContent.GameObjects.VolumeValue,
+                UIGeneratorContent.GameObjects.VolumeFill,
+                UIGeneratorContent.GameObjects.FullscreenValue,
+                UIGeneratorContent.GameObjects.QualityValue,
+                UIGeneratorContent.GameObjects.MainMenuFootnote,
+                UIGeneratorContent.Settings.VersionFormat,
+                UIGeneratorContent.Settings.On,
+                UIGeneratorContent.Settings.Off);
         }
 
         private static string GetPanelName(string prefix)
@@ -173,26 +181,29 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             return prefix + UIGeneratorContent.GameObjects.PanelSuffix;
         }
 
+        // Button label → the body of its On{Label}Pressed() method. The labels are
+        // UIGeneratorContent's, the same ones that name the buttons in the scene.
+        private static readonly Dictionary<string, string> MethodBodies = new Dictionary<string, string>
+        {
+            { UIGeneratorContent.Buttons.Play,        ScriptSetupContent.Script.PlayMethodBody },
+            { UIGeneratorContent.Buttons.Settings,    ScriptSetupContent.Script.SettingsMethodBody },
+            { UIGeneratorContent.Buttons.Back,        ScriptSetupContent.Script.BackMethodBody },
+            { UIGeneratorContent.Buttons.Resume,      ScriptSetupContent.Script.ResumeMethodBody },
+            { UIGeneratorContent.Buttons.Quit,        ScriptSetupContent.Script.QuitMethodBody },
+            { UIGeneratorContent.Buttons.VolumeDown,  ScriptSetupContent.Script.VolumeDownMethodBody },
+            { UIGeneratorContent.Buttons.VolumeUp,    ScriptSetupContent.Script.VolumeUpMethodBody },
+            { UIGeneratorContent.Buttons.Fullscreen,  ScriptSetupContent.Script.FullscreenMethodBody },
+            { UIGeneratorContent.Buttons.QualityDown, ScriptSetupContent.Script.QualityDownMethodBody },
+            { UIGeneratorContent.Buttons.QualityUp,   ScriptSetupContent.Script.QualityUpMethodBody },
+        };
+
+        // Known labels get their real body; any other (a button the developer
+        // adds later) falls back to the generic stub template.
         private static string BuildMethod(string label)
         {
-            // Bespoke labels get bespoke bodies; any other/future label falls
-            // back to the generic stub template.
-            if (label == ScriptSetupContent.PlayLabel)
-                return BuildMethodWithBody(label, ScriptSetupContent.Script.PlayMethodBody);
-
-            if (label == ScriptSetupContent.SettingsLabel)
-                return BuildMethodWithBody(label, ScriptSetupContent.Script.SettingsMethodBody);
-
-            if (label == ScriptSetupContent.BackLabel)
-                return BuildMethodWithBody(label, ScriptSetupContent.Script.BackMethodBody);
-
-            if (label == ScriptSetupContent.ResumeLabel)
-                return BuildMethodWithBody(label, ScriptSetupContent.Script.ResumeMethodBody);
-
-            if (label == ScriptSetupContent.QuitLabel)
-                return BuildMethodWithBody(label, ScriptSetupContent.Script.QuitMethodBody);
-
-            return string.Format(ScriptSetupContent.Script.MethodTemplate, label);
+            return MethodBodies.TryGetValue(label, out var body)
+                ? BuildMethodWithBody(label, body)
+                : string.Format(ScriptSetupContent.Script.MethodTemplate, label);
         }
 
         private static string BuildMethodWithBody(string label, string body)
@@ -225,11 +236,15 @@ namespace UIPilot.Editor.Modules.ScriptSetup
 
         private static void CreateGameObject()
         {
+            // Only the script may have been missing — never create a second GameObject.
+            if (GameObject.Find(ScriptSetupContent.GameObjects.ManagerName) != null) return;
+
             var go = new GameObject(ScriptSetupContent.GameObjects.ManagerName);
             Undo.RegisterCreatedObjectUndo(go, ScriptSetupContent.Undo.Action);
 
-            // Script component cannot be added in the same frame as AssetDatabase.Refresh().
-            Debug.Log(ScriptSetupContent.Messages.AddComponentManually);
+            // Script component cannot be added in the same frame as AssetDatabase.Refresh();
+            // UIPilotWindow attaches it once the type resolves.
+            Debug.Log(ScriptSetupContent.Messages.GameObjectCreated);
         }
     }
 }

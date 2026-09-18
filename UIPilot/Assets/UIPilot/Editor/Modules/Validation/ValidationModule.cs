@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.Validation
@@ -41,13 +42,7 @@ namespace UIPilot.Editor.Modules.Validation
                 results.Add(new ValidationResult(
                     ValidationContent.Messages.NoEventSystem,
                     ValidationSeverity.Error,
-                    () =>
-                    {
-                        var go = new GameObject(ValidationContent.GameObjects.EventSystem);
-                        go.AddComponent<EventSystem>();
-                        go.AddComponent<StandaloneInputModule>();
-                        Undo.RegisterCreatedObjectUndo(go, ValidationContent.Undo.AutoFix);
-                    }));
+                    () => UIPilotEventSystem.Create(ValidationContent.Undo.AutoFix)));
             }
             else
             {
@@ -113,7 +108,7 @@ namespace UIPilot.Editor.Modules.Validation
 
             var buttons       = canvasGO.GetComponentsInChildren<Button>(true);
             var allWired      = true;
-            var anyRuntimeOnly = false;
+            var anySwitchedOff = false;
 
             foreach (var btn in buttons)
             {
@@ -132,22 +127,22 @@ namespace UIPilot.Editor.Modules.Validation
                     continue;
                 }
 
-                // Check for Runtime Only call state — persistent calls should be
-                // EditorAndRuntime or RuntimeOnly only if intentional; flag them.
+                // A listener set to Off never fires. Runtime Only is not a problem:
+                // it is Unity's default and the state UIPilot itself writes.
                 for (var i = 0; i < persistentCount; i++)
                 {
-                    if (onClick.GetPersistentListenerState(i) == UnityEngine.Events.UnityEventCallState.RuntimeOnly)
+                    if (onClick.GetPersistentListenerState(i) == UnityEngine.Events.UnityEventCallState.Off)
                     {
-                        anyRuntimeOnly = true;
+                        anySwitchedOff = true;
                         results.Add(new ValidationResult(
-                            string.Format(ValidationContent.Messages.ButtonRuntimeOnly, btn.name),
+                            string.Format(ValidationContent.Messages.ButtonListenerOff, btn.name),
                             ValidationSeverity.Warning));
                         break;
                     }
                 }
             }
 
-            if (allWired && !anyRuntimeOnly && buttons.Length > 0)
+            if (allWired && !anySwitchedOff && buttons.Length > 0)
             {
                 results.Add(new ValidationResult(
                     ValidationContent.Messages.AllButtonsWired,
