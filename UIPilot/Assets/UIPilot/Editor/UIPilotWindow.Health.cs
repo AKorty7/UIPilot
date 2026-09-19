@@ -18,6 +18,10 @@ namespace UIPilot.Editor
         private static readonly GUIContent ContentHealthFix   = new GUIContent(UIPilotLabels.Health.FixButton,      UIPilotLabels.Health.FixTooltip);
         private static readonly GUIContent ContentWarnOnPlay  = new GUIContent(UIPilotLabels.Health.WarnOnPlay,     UIPilotLabels.Health.WarnOnPlayTip);
         private static readonly GUIContent ContentWarnOnBuild = new GUIContent(UIPilotLabels.Health.WarnOnBuild,    UIPilotLabels.Health.WarnOnBuildTip);
+        private static readonly GUIContent ContentShowLamp    = new GUIContent(UIPilotLabels.Health.ShowOnToolbar,  UIPilotLabels.Health.ShowOnToolbarTip);
+        private static readonly GUIContent ContentNotNow      = new GUIContent(UIPilotLabels.Health.NotNow,         UIPilotLabels.Health.NotNowTip);
+        private static readonly GUIContent ContentGotIt       = new GUIContent(UIPilotLabels.Health.ToolbarTipDismiss);
+        private static readonly GUIContent ContentLampToggle  = new GUIContent(UIPilotLabels.Health.ToolbarLampToggle, UIPilotLabels.Health.ToolbarLampToggleTip);
 
         private static readonly Dictionary<HealthCheck, GUIContent> CheckToggles = new Dictionary<HealthCheck, GUIContent>
         {
@@ -71,19 +75,43 @@ namespace UIPilot.Editor
             }
         }
 
-        // Once, until dismissed: how to put the lamp on the main toolbar. Unity
-        // hides toolbar items that packages add, and offers no public way to show one.
+        // Unity hides toolbar items that packages add. Until the lamp is on the
+        // toolbar (or the tip is dismissed), one click puts it there. If a later
+        // Unity stops that working, the tip says where to click instead.
         private static void DrawToolbarTip()
         {
             if (EditorPrefs.GetBool(UIPilotLabels.Health.EditorPrefsToolbarTip, false)) return;
 
+            var shown = UIPilotToolbarLamp.IsShown();
+            if (shown == true) return;
+
             EditorGUILayout.Space(8f);
+            if (shown == null)
+                DrawToolbarTipRow(UIPilotLabels.Health.ToolbarTipManual, null, ContentGotIt);
+            else
+                DrawToolbarTipRow(UIPilotLabels.Health.ToolbarTip, ContentShowLamp, ContentNotNow);
+        }
+
+        // The text, then the buttons under it: the action first, dismissing second.
+        private static void DrawToolbarTipRow(string text, GUIContent action, GUIContent dismiss)
+        {
+            GUILayout.Label(text, UIPilotStyles.Description);
+
             using (new EditorGUILayout.HorizontalScope())
             {
-                GUILayout.Label(UIPilotLabels.Health.ToolbarTip, UIPilotStyles.Description);
+                if (action != null && GUILayout.Button(action, EditorStyles.miniButton, UIPilotStyles.FitWidth))
+                {
+                    UIPilotToolbarLamp.SetShown(true);
+                    GUIUtility.ExitGUI();
+                }
 
-                if (GUILayout.Button(UIPilotLabels.Health.ToolbarTipDismiss, EditorStyles.miniButton, UIPilotStyles.FitWidth))
+                if (GUILayout.Button(dismiss, EditorStyles.miniButton, UIPilotStyles.FitWidth))
+                {
                     EditorPrefs.SetBool(UIPilotLabels.Health.EditorPrefsToolbarTip, true);
+                    GUIUtility.ExitGUI();
+                }
+
+                GUILayout.FlexibleSpace();
             }
         }
 
@@ -210,6 +238,7 @@ namespace UIPilot.Editor
                 }
 
                 EditorGUILayout.Space(4f);
+                DrawToolbarLampToggle();
 
                 var warnOnPlay = HealthSettings.WarnOnPlay;
                 if (EditorGUILayout.ToggleLeft(ContentWarnOnPlay, warnOnPlay) != warnOnPlay)
@@ -224,6 +253,20 @@ namespace UIPilot.Editor
 
             if (EditorGUI.EndChangeCheck())
                 UIPilotHealthMonitor.CheckNow();
+        }
+
+        // The lasting on/off for the toolbar lamp, after the tip is gone.
+        private static void DrawToolbarLampToggle()
+        {
+            var shown = UIPilotToolbarLamp.IsShown();
+            if (!shown.HasValue)
+            {
+                GUILayout.Label(UIPilotLabels.Health.ToolbarTipManual, UIPilotStyles.Description);
+                return;
+            }
+
+            if (EditorGUILayout.ToggleLeft(ContentLampToggle, shown.Value) != shown.Value)
+                UIPilotToolbarLamp.SetShown(!shown.Value);
         }
 
         private static int EnabledCheckCount()

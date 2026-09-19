@@ -30,6 +30,10 @@ ARCHITECTURE RULES — NEVER BREAK THESE
 - Scope: UIPilot may READ any UI in the scene (UI Health), but may
   CHANGE an object that is not UIPilot_ only when the developer clicks
   that row's Fix, as one undoable step. Checks never modify a scene.
+- Unity internals: only UIPilotToolbarLamp may use one (the internal
+  MainToolbar.TryGetOverlay, to show the toolbar lamp; approved
+  2026-09-19). Look it up by reflection, guard every call, and keep
+  a public fallback (written instructions). Nowhere else.
 - UI Health must not cry wolf: report only what is certain. A check
   that would guess (draw order across nested or camera canvases,
   runtime-only state) stays silent instead.

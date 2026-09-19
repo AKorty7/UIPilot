@@ -74,8 +74,17 @@ namespace UIPilot.Editor.Core
             internal const string EditorPrefsChecksOpen = "UIPilot_HealthChecksOpen";
             internal const string EditorPrefsToolbarTip = "UIPilot_HealthToolbarTipDone";
 
-            // Unity hides toolbar items added by packages until the user ticks them.
-            internal const string ToolbarTip        = "Keep this in view: right-click an empty part of Unity's main toolbar (or click its ⋮ menu) and tick UIPilot > UI Health. A lamp then shows the result above every window.";
+            // Unity hides toolbar items added by packages until they are switched on.
+            internal const string ToolbarTip           = "Keep this in view: put the UI Health lamp on Unity's main toolbar, above every window.";
+            internal const string ShowOnToolbar        = "Show on Toolbar";
+            internal const string ShowOnToolbarTip     = "Adds the UI Health lamp to Unity's main toolbar. Take it off again under Checks, or from the toolbar's right-click menu.";
+            internal const string NotNow               = "Not now";
+            internal const string NotNowTip            = "Hide this tip. The switch under Checks adds the lamp later.";
+            internal const string ToolbarLampToggle    = "Lamp on Unity's main toolbar";
+            internal const string ToolbarLampToggleTip = "The UI Health lamp above every window: green when all is clear, amber or red with a count.";
+
+            // When the toolbar cannot be reached from code (a later Unity changed it).
+            internal const string ToolbarTipManual  = "Keep this in view: right-click an empty part of Unity's main toolbar (or click its ⋮ menu) and tick UIPilot > UI Health. A lamp then shows the result above every window.";
             internal const string ToolbarTipDismiss = "Got it";
 
             // Main toolbar

@@ -307,7 +307,7 @@ Checking never changes anything. A change is made only when you click **Fix**.
 |---|---|
 | **Tools > UIPilot**, UI Health section | One row per issue: what is wrong, where, and what it means for the player. Click the name to select the object. **Fix** makes the change the row describes, as one step you can undo with **Ctrl+Z**. A row without **Fix** needs a decision from you. |
 | **Hierarchy** | A lamp at the right of each object with an issue (red: *Broken*, amber: *Warning*), and a small lamp on the objects above it, so a folded Hierarchy still shows where to look. Hover a lamp to read the issue. |
-| **Main toolbar** | A lamp and a count, visible above every window. Click it to open the UI Health section. Unity hides toolbar items that packages add, so switch it on once: right-click an empty part of Unity's main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
+| **Main toolbar** | A lamp and a count, visible above every window. Click it to open the UI Health section. Unity hides toolbar items that packages add, so the first time, click **Show on Toolbar** in the UI Health section. Later, **Lamp on Unity's main toolbar** under **Checks** turns it on and off. |
 | **Console** | One warning when you enter Play mode, and one per scene when you build, only when there is something to look at. The build always continues. |
 
 ### What it checks
@@ -338,7 +338,7 @@ is sure of:
   at runtime.
 
 If a check does not suit your project, open **Checks** at the bottom of the UI Health
-section and switch it off. The two Console warnings can be switched off there too.
+section and switch it off. The toolbar lamp and the two Console warnings can be switched off there too.
 These settings are saved for you in this project only; teammates keep their own.
 
 ---
@@ -428,7 +428,7 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 | "Waiting for Unity to compile..." and nothing more happens, or the window shows a red *Stalled* row | Another script in your project has a compile error, so Unity cannot finish compiling. | Fix the errors shown in the Console. The buttons are wired automatically after the next successful compile. |
 | "UIPilot_GameManager type could not be resolved" | The generated script is not in Unity's default assembly. | Keep `UIPilot_GameManager.cs` directly under `Assets/`, outside any folder that has an Assembly Definition, then click **Build UI** again. |
 | Buttons do not react in Play mode | Usually one of the problems UI Health checks for: a wrong input module, a missing raycaster, or something covering the buttons. | Open **Tools > UIPilot** and look at UI Health. Click **Fix** on the row it shows. |
-| The UI Health lamp is not on the main toolbar | Unity hides toolbar items that packages add, until you switch them on. | Right-click an empty part of the main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
+| The UI Health lamp is not on the main toolbar | Unity hides toolbar items that packages add, until they are switched on. | Click **Show on Toolbar** in the UI Health section, or tick **Lamp on Unity's main toolbar** under **Checks**. If neither is there, a later Unity version has changed its toolbar: right-click an empty part of the main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
 | UI Health reports something you did on purpose | Every check follows common practice, and some projects differ. | Switch that check off under **Checks** in the UI Health section. |
 | Clicking **Settings** only logs a warning | The scene has no Settings panel. | Tick **Settings Menu** and click **Build UI**. |
 | The pause menu never appears | Nothing opens it yet. This is by design. | Add the script from section 5.2. |
