@@ -25,7 +25,7 @@ let body = marked.parse(md, { gfm: true });
 const quickStartFigure = `
 <figure class="pair">
   <div class="pair-a"><img class="shot" src="${img('Window_Build.png')}" alt="The Build section of the UIPilot window">
-    <figcaption><strong>The UIPilot window.</strong> Tick the menus, click <strong>Build UI</strong>,
+    <figcaption><strong>The UIPilot window.</strong> UI Health (section 6) is on top. Under Build, tick the menus, click <strong>Build UI</strong>,
       and the row beneath the buttons reports the result.</figcaption>
   </div>
   <div class="pair-b"><img src="${img('UIPilot_MainMenu_Panel.png')}" alt="Generated main menu">
@@ -64,10 +64,30 @@ const themesFigure = `
   <div><img src="${img('Theme_Ink.png')}" alt="Ink theme"><figcaption><strong>Ink</strong></figcaption></div>
 </figure>`;
 
+const healthFigure = `
+<figure class="health">
+  <div><img class="shot" src="${img('Health_Window.png')}" alt="The UI Health section of the UIPilot window">
+    <figcaption><strong>UI Health</strong> on a test scene with one problem of each kind. Click a name to
+      select it; <strong>Fix</strong> is one undoable step.</figcaption>
+  </div>
+  <div><img class="shot" src="${img('Health_Hierarchy.png')}" alt="UI Health lamps in the Hierarchy">
+    <figcaption><strong>The Hierarchy</strong>: a lamp on each object with an issue, and a small one on
+      the objects above it.</figcaption>
+    <img class="shot toolbar" src="${img('Health_Toolbar.png')}" alt="The UI Health lamp on Unity's main toolbar">
+    <figcaption><strong>The main toolbar</strong>, once switched on: the worst lamp and the number of issues.</figcaption>
+  </div>
+</figure>`;
+
 const insertAfterHeading = (html, tag, startsWith, addition) => {
   const re = new RegExp('(<' + tag + '[^>]*>' + startsWith + '[^<]*</' + tag + '>)');
   if (!re.test(html)) throw new Error('Heading not found: ' + startsWith);
   return html.replace(re, '$1' + addition);
+};
+
+const insertBeforeHeading = (html, tag, startsWith, addition) => {
+  const re = new RegExp('(<' + tag + '[^>]*>' + startsWith + '[^<]*</' + tag + '>)');
+  if (!re.test(html)) throw new Error('Heading not found: ' + startsWith);
+  return html.replace(re, addition + '$1');
 };
 
 body = insertAfterHeading(body, 'h2', '3\\. Quick start', quickStartFigure);
@@ -75,6 +95,8 @@ body = insertAfterHeading(body, 'h2', '4\\. What UIPilot creates', panelsFigure)
 body = insertAfterHeading(body, 'h3', 'Scan &amp; Repair', scanFigure);
 body = insertAfterHeading(body, 'h3', 'Manual', manualFigure);
 body = insertAfterHeading(body, 'h3', '5\\.4 Themes', themesFigure);
+// After the table under "Where you see it", so the section starts on the page it heads.
+body = insertBeforeHeading(body, 'h3', 'What it checks', healthFigure);
 
 const css = `
 @page { size: A4; margin: 17mm 19mm 18mm 19mm; }
@@ -141,6 +163,8 @@ figure img { width: 100%; display: block; border: 0.2mm solid var(--rule); }
 figure img.shot { border: 0.25mm solid #1F1F1F; }
 .side { display: grid; grid-template-columns: 62mm 1fr; gap: 6mm; align-items: start; }
 .side figcaption { margin-top: 0; font-size: 9pt; }
+figure img.toolbar { margin-top: 5mm; }
+.health { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; align-items: start; }
 `;
 
 const html = `<!doctype html>
@@ -149,7 +173,7 @@ const html = `<!doctype html>
 <header class="cover">
   <h1>UIPilot User Guide</h1>
   <div class="rule"></div>
-  <p>Setup, the one-click workflow, everything UIPilot creates, and how to make it yours.</p>
+  <p>Setup, the one-click workflow, everything UIPilot creates, how to make it yours, and UI Health, which checks all your UI as you work.</p>
   <div class="open">Open the tool: <span>Tools &gt; UIPilot</span></div>
 </header>
 ${body}

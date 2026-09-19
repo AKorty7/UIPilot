@@ -15,7 +15,7 @@ using UIPilot.Editor.Modules.Validation;
 
 namespace UIPilot.Editor
 {
-    public sealed class UIPilotWindow : EditorWindow
+    public sealed partial class UIPilotWindow : EditorWindow
     {
         // How long Unity gets to start compiling before a waiting build counts as stalled.
         private const double CompileGraceSeconds = 5.0;
@@ -25,6 +25,7 @@ namespace UIPilot.Editor
 
         // ── Collapse All state ───────────────────────────────────────────────
         private bool _allCollapsed   = false;
+        private bool _savedHealthOpen;
         private bool _savedBuildOpen;
         private bool _savedScanOpen;
         private bool _savedManualOpen;
@@ -113,8 +114,11 @@ namespace UIPilot.Editor
             _buildFoldout      = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsBuildOpen,  true);
             _scanRepairFoldout = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsScanOpen,   false);
             _manualFoldout     = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsManualOpen, false);
+            _healthFoldout       = EditorPrefs.GetBool(UIPilotLabels.Health.EditorPrefsOpen,       true);
+            _healthChecksFoldout = EditorPrefs.GetBool(UIPilotLabels.Health.EditorPrefsChecksOpen, false);
             _theme             = LoadSavedTheme();
             RefreshMissingPresets();
+            UIPilotHealthMonitor.Changed += Repaint;
 
             // A Quick Build that had to wait for script compilation resumes here:
             // OnEnable runs again after the domain reload, delayCall does not survive it.
@@ -123,6 +127,11 @@ namespace UIPilot.Editor
                 SessionState.EraseBool(UIPilotLabels.QuickBuild.SessionPendingWire);
                 EditorApplication.delayCall += ResumeQuickBuildWire;
             }
+        }
+
+        private void OnDisable()
+        {
+            UIPilotHealthMonitor.Changed -= Repaint;
         }
 
         // A preset deleted or restored in the Project window shows up here at once.
@@ -154,6 +163,7 @@ namespace UIPilot.Editor
             {
                 DrawHeader();
                 EditorGUILayout.Space(4f);
+                DrawHealthSection();
                 DrawBuildSection();
                 DrawScanRepairSection();
                 DrawManualSection();
@@ -231,15 +241,18 @@ namespace UIPilot.Editor
         {
             if (!_allCollapsed)
             {
+                _savedHealthOpen   = _healthFoldout;
                 _savedBuildOpen    = _buildFoldout;
                 _savedScanOpen     = _scanRepairFoldout;
                 _savedManualOpen   = _manualFoldout;
+                _healthFoldout     = false;
                 _buildFoldout      = false;
                 _scanRepairFoldout = false;
                 _manualFoldout     = false;
             }
             else
             {
+                _healthFoldout     = _savedHealthOpen;
                 _buildFoldout      = _savedBuildOpen;
                 _scanRepairFoldout = _savedScanOpen;
                 _manualFoldout     = _savedManualOpen;

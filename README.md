@@ -8,6 +8,10 @@ UIPilot is a Unity Editor tool that generates, wires, validates, and
 repairs standard UGUI systems in one click. No runtime footprint.
 No custom frameworks. Just clean, native Unity UI — ready to go.
 
+Then it keeps watching. **UI Health** checks every UI in your scenes,
+not only UIPilot's, for the bugs that make a button silently do nothing,
+and fixes most of them in one click.
+
 ---
 
 ## The problem
@@ -26,6 +30,13 @@ UIPilot does all of it in one click.
 
 ## What you get
 
+- **UI Health** — checks all the UI in your open scenes as you work,
+  on save, before Play and on every build: click events pointing at a
+  deleted or renamed method, a missing or wrong-module EventSystem,
+  canvases with no raycaster, invisible images eating a button's clicks,
+  controls a gamepad can never reach, and text under the Steam Deck
+  minimum. Lamps on the toolbar and in the Hierarchy; one-click, undoable
+  fixes. Silent when everything is fine.
 - **Quick Build** — generates MainMenu, PauseMenu, and SettingsMenu
   panels with correctly configured Canvas, CanvasScaler, EventSystem,
   buttons, and a wired GameManager script. One click.
@@ -40,7 +51,8 @@ UIPilot does all of it in one click.
   individual elements for hands-on workflows.
 - **Non-destructive** — UIPilot only creates and edits objects with the
   UIPilot_ prefix. The one thing it adds beyond that is an EventSystem,
-  and only if your scene has none.
+  and only if your scene has none. UI Health reads all your UI but
+  changes something that isn't UIPilot's only when you click its Fix.
 - **Editor-only tool** — all UIPilot code lives in an Editor folder.
   The only file that ships with your game is the GameManager script it
   writes for you to own.

@@ -5,6 +5,12 @@ Menu out of standard Unity UI (UGUI + TextMeshPro), writes a small script for
 the button logic, connects every button to that script, and can check and
 repair the result later.
 
+It also watches **all** the UI in your scenes as you work, not only its own. **UI
+Health** (section 6) catches the mistakes that make a button silently do nothing
+(a click event pointing at a deleted method, a missing raycaster, an invisible
+image covering the button, a control a gamepad can never reach) and text too
+small for Steam Deck, and fixes most of them in one click.
+
 Everything it creates is ordinary Unity UI that you edit in the Inspector.
 UIPilot's own code runs only in the Editor. The one runtime file is
 `UIPilot_GameManager.cs`, which UIPilot writes into your project for you to own
@@ -287,7 +293,61 @@ button or `UIPilot_GameManager`, UIPilot treats it as missing. Rename the visibl
 
 ---
 
-## 6. The UIPilot window
+## 6. UI Health: catch broken UI as you work
+
+UI Health checks every UI in your open scenes, including UI that UIPilot did not
+build, for the mistakes that make a control silently fail. It runs by itself: a
+moment after you stop editing, when you save or open a scene, and just before Play
+mode starts. When you build, it checks every scene the build includes, open or not.
+Checking never changes anything. A change is made only when you click **Fix**.
+
+### Where you see it
+
+| Where | What it shows |
+|---|---|
+| **Tools > UIPilot**, UI Health section | One row per issue: what is wrong, where, and what it means for the player. Click the name to select the object. **Fix** makes the change the row describes, as one step you can undo with **Ctrl+Z**. A row without **Fix** needs a decision from you. |
+| **Hierarchy** | A lamp at the right of each object with an issue (red: *Broken*, amber: *Warning*), and a small lamp on the objects above it, so a folded Hierarchy still shows where to look. Hover a lamp to read the issue. |
+| **Main toolbar** | A lamp and a count, visible above every window. Click it to open the UI Health section. Unity hides toolbar items that packages add, so switch it on once: right-click an empty part of Unity's main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
+| **Console** | One warning when you enter Play mode, and one per scene when you build, only when there is something to look at. The build always continues. |
+
+### What it checks
+
+| Check | What it finds | What Fix does |
+|---|---|---|
+| **Click events** | A button, toggle, slider, dropdown or input field whose event (On Click, On Value Changed, ...) calls an object that was deleted, a method that was renamed or removed, or has no function selected. Nothing happens when the player clicks. | No Fix: select the control and pick the method again in the Inspector. |
+| **EventSystem** | No EventSystem in the open scenes, more than one, one without an input module, or *StandaloneInputModule* in a project whose Active Input Handling is *Input System Package (New)*, which throws an error every frame. | Adds an EventSystem, adds the input module the project needs, or swaps in *InputSystemUIInputModule*. |
+| **Graphic Raycasters** | A Canvas with buttons but no Graphic Raycaster, so nothing on it can be clicked. A nested Canvas needs its own: its parent's raycaster does not reach it. | Adds a Graphic Raycaster. |
+| **Blocked buttons** | An image or text with **Raycast Target** on, drawn over the middle of a button, which takes the button's clicks. Typical culprits: a full-screen fade left at alpha 0, a vignette, a label that overlaps a button. | Turns off Raycast Target on the object in the way. |
+| **Gamepad navigation** | A control with **Navigation** set to *None* (a gamepad or the arrow keys can never reach it), or *Explicit* with no neighbours set (once reached, the player is stuck on it). | Sets Navigation to *Automatic*. |
+| **Text size (Steam Deck)** | Text shorter than 9 px at 1280 x 800, Valve's minimum for Steam Deck Verified (12 px is recommended), worked out from each Canvas Scaler. Hidden panels are included. | No Fix: click the row to select every text it lists, then raise the font size. |
+
+### Why it does not cry wolf
+
+A check that keeps raising false alarms gets ignored, so UI Health only reports what it
+is sure of:
+
+- Menus you show one at a time (main, pause, options) are usually all switched on in
+  the Editor, stacked on top of each other. A panel with buttons of its own is treated
+  as another screen, never as a blocker. Only something in the way that has no buttons
+  of its own is reported.
+- Draw order is compared only where it is certain: inside one canvas, or an overlay
+  canvas with a higher Sort Order over a lower one.
+- An event entry switched **Off** in the Inspector is left alone.
+- Any raycaster counts, including a custom one.
+- In a build, the EventSystem check is skipped: another scene or a prefab often adds one
+  at runtime.
+
+If a check does not suit your project, open **Checks** at the bottom of the UI Health
+section and switch it off. The two Console warnings can be switched off there too.
+These settings are saved for you in this project only; teammates keep their own.
+
+---
+
+## 7. The UIPilot window
+
+### UI Health
+
+The first section. Everything in it is described in section 6.
 
 ### Build
 
@@ -338,12 +398,15 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 
 ---
 
-## 7. What UIPilot changes, and how your work is protected
+## 8. What UIPilot changes, and how your work is protected
 
 - **It only edits its own objects.** UIPilot creates and modifies GameObjects whose
   names start with `UIPilot_`. Two exceptions, both deliberate: it adds an
   `EventSystem` if your scene has none, and it removes any *other* Canvas that
   contains `UIPilot_` objects (left over from older UIPilot versions).
+- **UI Health reads everything and changes nothing on its own.** It looks at every UI
+  in your open scenes, but it changes an object that is not UIPilot's own only when you
+  click **Fix** on that object's row. Each Fix is one step that **Ctrl+Z** undoes.
 - **Your script is protected.** UIPilot rewrites `UIPilot_GameManager.cs` only when
   the script or the `UIPilot_GameManager` GameObject is missing. If you have edited
   any of the `On...Pressed` methods, it shows a confirmation dialog first, and
@@ -357,14 +420,16 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | What you see | Why | What to do |
 |---|---|---|
 | Menu text is invisible, or a *TMP Importer* window pops up | TMP Essential Resources are not imported. | Window > TextMeshPro > Import TMP Essential Resources. Then **Quick Clear** and **Build UI**. |
 | "Waiting for Unity to compile..." and nothing more happens, or the window shows a red *Stalled* row | Another script in your project has a compile error, so Unity cannot finish compiling. | Fix the errors shown in the Console. The buttons are wired automatically after the next successful compile. |
 | "UIPilot_GameManager type could not be resolved" | The generated script is not in Unity's default assembly. | Keep `UIPilot_GameManager.cs` directly under `Assets/`, outside any folder that has an Assembly Definition, then click **Build UI** again. |
-| Buttons do not react in Play mode | Your scene already had an EventSystem whose input module does not match the project's input setting. | Select the **EventSystem** object. If the Inspector shows a *Replace with InputSystemUIInputModule* button, click it. |
+| Buttons do not react in Play mode | Usually one of the problems UI Health checks for: a wrong input module, a missing raycaster, or something covering the buttons. | Open **Tools > UIPilot** and look at UI Health. Click **Fix** on the row it shows. |
+| The UI Health lamp is not on the main toolbar | Unity hides toolbar items that packages add, until you switch them on. | Right-click an empty part of the main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
+| UI Health reports something you did on purpose | Every check follows common practice, and some projects differ. | Switch that check off under **Checks** in the UI Health section. |
 | Clicking **Settings** only logs a warning | The scene has no Settings panel. | Tick **Settings Menu** and click **Build UI**. |
 | The pause menu never appears | Nothing opens it yet. This is by design. | Add the script from section 5.2. |
 | Scan Scene shows a *Button Listeners* warning | A button lost its connection, for example after the GameManager was deleted. | Click **Repair Scene**. |
@@ -373,7 +438,7 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 
 ---
 
-## 9. Limitations
+## 10. Limitations
 
 - UGUI only. UI Toolkit is not supported.
 - One `UIPilot_Canvas` per scene, with up to three menus: Main, Pause, Settings.
@@ -385,11 +450,14 @@ Use these only when you want to do one step by hand. Build UI does all of them f
   to about 130, and **Preferred Width** on the buttons, settings rows, title and rule to about 640.
 - Buttons are connected to methods named `On<ButtonName>Pressed`. Buttons you add
   yourself can be connected in **Manual > Wire** if their name starts with `UIPilot_Btn_`.
+- UI Health checks the scenes open in Edit mode, and every scene in a build. It does not
+  see UI that your scripts create or change at runtime, or a prefab open in Prefab Mode.
+  The blocked-button and text-size checks skip World Space canvases.
 - Tested on Unity 6000.3.11f1 (Windows) with the Built-in Render Pipeline.
 
 ---
 
-## 10. Support
+## 11. Support
 
 Made by NomadStudios — NomadStudios47@outlook.com
 

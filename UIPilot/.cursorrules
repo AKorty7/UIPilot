@@ -24,7 +24,15 @@ ARCHITECTURE RULES — NEVER BREAK THESE
 - No runtime MonoBehaviours ever
 - No hardcoded strings — all strings in Labels/Content files
 - No logic inside UIPilotWindow.cs — UI layer only
-- Modules never call each other except via UIPilotWindow
+- Modules never call each other except via UIPilotWindow, or via
+  UIPilotHealthMonitor, the one coordinator that runs with the window
+  closed (approved 2026-09-19). Nothing else may call a module.
+- Scope: UIPilot may READ any UI in the scene (UI Health), but may
+  CHANGE an object that is not UIPilot_ only when the developer clicks
+  that row's Fix, as one undoable step. Checks never modify a scene.
+- UI Health must not cry wolf: report only what is certain. A check
+  that would guess (draw order across nested or camera canvases,
+  runtime-only state) stays silent instead.
 - Single responsibility per class
 - No over-abstraction — only build what is asked
 - Always compile with zero errors before finishing
@@ -52,6 +60,14 @@ Assets/UIPilot/Editor/
                                    used by Build UI and Apply Theme)
       UIGeneratorThemePresets.cs  (Soft Club, Soft Club Night, Ink)
       UIGeneratorArt.cs           (finds the shipped sprites and font)
+    Health/                 (UI Health: read-only checks of ANY UI)
+      HealthModule.cs       (entry: CheckOpenScenes, CheckSceneForBuild, RunFix)
+      HealthScope.cs        (gathers scene objects once per run)
+      HealthEventChecks.cs  (click events, EventSystem)
+      HealthRaycastChecks.cs  (raycasters, blocked buttons)
+      HealthHandheldChecks.cs (gamepad navigation, Steam Deck text size)
+      HealthCheck.cs / HealthSeverity.cs / HealthIssue.cs
+      HealthContent.cs / HealthSettings.cs (per user, UserSettings/)
     ActionDiscovery/
       DiscoveredAction.cs
       ActionDiscoveryModule.cs
@@ -66,7 +82,12 @@ Assets/UIPilot/Editor/
   UI/
     UIPilotStyles.cs        (cached GUIStyles, colours, GUILayoutOptions —
                              never build a GUIStyle inside OnGUI)
+    UIPilotToolbarLamp.cs   (UI Health lamp on Unity's main toolbar)
+    UIPilotHierarchyLamps.cs (UI Health lamps in the Hierarchy)
   UIPilotWindow.cs
+  UIPilotWindow.Health.cs   (the UI Health section, partial class)
+  UIPilotHealthMonitor.cs   (coordinator: runs checks, window open or not)
+  UIPilotHealthBuildCheck.cs (IProcessSceneWithReport: warns per build scene)
 Assets/UIPilot/Art/       (white tintable sprites + Michroma font, shipped)
 Assets/UIPilot/Themes/    (the preset theme assets buyers pick from)
 

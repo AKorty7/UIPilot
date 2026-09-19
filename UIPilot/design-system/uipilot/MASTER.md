@@ -116,6 +116,23 @@ dimmed, on the right two thirds.
 All controls are **Buttons calling no-argument methods**, so they flow through the
 existing discover → wire → audit pipeline and ordinary UI navigation (keyboard, gamepad).
 
+### Editor components: UI Health
+
+UI Health shows up in three places outside the window's own rows. All three use the
+same 8 px square lamp and the same four lamp colours as the status rows. None of them
+invents a new colour.
+
+| Component | Anatomy | Notes |
+|---|---|---|
+| **Issue row** (window) | lamp · name as a link (selects the targets, accent on hover) / muted detail · mini **Fix** · status word | Fix appears only when the change is safe to make and undoable. The word is *Broken* or *Warning*, never colour alone. |
+| **Summary row** | lamp · bold "All clear" or "N issues to look at in: scenes" / muted detail · mini **Check Now** | Idle grey lamp in Play mode ("Not checked yet"). |
+| **Toolbar lamp** | 16 px icon (8 px lamp centred) + "UI" or "UI  N" | Unity hides package toolbar items by default. A one-time, dismissible tip in the window says how to show it. Tooltip carries the words. |
+| **Hierarchy lamp** | 8 px lamp on the object, 4 px lamp on each ancestor, 30 px from the row's right edge | The small lamp keeps a folded Hierarchy honest. Tooltip gives name and detail. Clear of the prefab arrow. |
+
+Rule: **silent when all is well**. No Console line, no Hierarchy lamp, and a green toolbar
+lamp with no number. A check that cannot be sure stays quiet: a false alarm costs more
+than a miss.
+
 ## 5a. The sprite kit
 
 Vector sources live in `tools/art/` (outside the Unity project); the PNGs they produce

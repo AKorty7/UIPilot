@@ -43,6 +43,50 @@ namespace UIPilot.Editor.Core
             internal const string ConsoleRestored = "UIPilot: Restored default theme(s): {0}";
         }
 
+        internal static class Health
+        {
+            internal const string Section          = "UI Health";
+            internal const string CheckNowButton   = "Check Now";
+            internal const string CheckNowTooltip  = "Check every UI in the open scenes again. UIPilot also checks by itself after you edit, save, open a scene or press Play.";
+            internal const string FixButton        = "Fix";
+            internal const string FixTooltip       = "Make the change described, as one step you can undo with Ctrl+Z.";
+            internal const string RowTooltip       = "Click to select it in the Hierarchy.";
+            internal const string LampTooltip      = "{0}: {1}";
+
+            internal const string NotChecked       = "Not checked yet";
+            internal const string NotCheckedDetail = "UI Health runs in Edit mode. Stop Play mode, or click Check Now.";
+            internal const string AllClear         = "All clear";
+            internal const string AllClearDetail   = "{0} of {1} checks on, across every UI in: {2}. Checked again after edits, on save, on Play and on build.";
+            internal const string IssuesSummary    = "{0} to look at in: {1}";
+            internal const string IssueCountOne    = "1 issue";
+            internal const string IssueCountMany   = "{0} issues";
+            internal const string SceneSeparator   = ", ";
+            internal const string UntitledScene    = "Untitled";
+
+            internal const string ChecksFoldout    = "Checks";
+            internal const string WarnOnPlay       = "Warn in the Console when entering Play mode";
+            internal const string WarnOnPlayTip    = "One summary line, only when there is something to look at.";
+            internal const string WarnOnBuild      = "Warn in the Console for each scene in a build";
+            internal const string WarnOnBuildTip   = "Checks every scene the build includes, even ones not open. The build always continues.";
+            internal const string SettingsNote     = "Saved for you in this project only. Teammates keep their own.";
+
+            internal const string EditorPrefsOpen       = "UIPilot_HealthOpen";
+            internal const string EditorPrefsChecksOpen = "UIPilot_HealthChecksOpen";
+            internal const string EditorPrefsToolbarTip = "UIPilot_HealthToolbarTipDone";
+
+            // Unity hides toolbar items added by packages until the user ticks them.
+            internal const string ToolbarTip        = "Keep this in view: right-click an empty part of Unity's main toolbar (or click its ⋮ menu) and tick UIPilot > UI Health. A lamp then shows the result above every window.";
+            internal const string ToolbarTipDismiss = "Got it";
+
+            // Main toolbar
+            internal const string ToolbarPath      = "UIPilot/UI Health";
+            internal const string ToolbarText      = "UI";
+            internal const string ToolbarCount     = "UI  {0}";
+            internal const string ToolbarOk        = "UIPilot UI Health: all clear.";
+            internal const string ToolbarIssues    = "UIPilot UI Health: {0}. Click to see them.";
+            internal const string ToolbarIdle      = "UIPilot UI Health checks the open scenes in Edit mode.";
+        }
+
         internal static class EventSystem
         {
             internal const string ObjectName = "EventSystem";
@@ -60,7 +104,7 @@ namespace UIPilot.Editor.Core
                 "④ Validate to check your scene";
 
             internal const string HelperText =
-                "Tick the menus you want, then click Build UI. Scan & Repair checks the result and fixes anything missing.";
+                "UI Health checks every UI in your open scenes as you work. To make menus, tick them under Build and click Build UI.";
             internal const string HelpToggle       = "?";
             internal const string CollapseAllButton = "−";
             internal const string ExpandAllButton   = "+";

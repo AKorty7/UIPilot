@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -49,6 +50,33 @@ namespace UIPilot.Editor
 
         internal const float LampSize = 8f;
 
+        // ── Lamp icons ───────────────────────────────────────────────────────
+        // The main toolbar takes an icon, not a draw call, so its lamp is a small
+        // texture: the same 8 px square as every other lamp, centred in 16 px.
+        private static readonly Dictionary<Color, Texture2D> LampIcons = new Dictionary<Color, Texture2D>();
+
+        internal static Texture2D LampIcon(Color color)
+        {
+            if (LampIcons.TryGetValue(color, out var icon) && icon != null) return icon;
+
+            const int size  = 16;
+            const int inset = 4;
+            var pixels = new Color32[size * size];
+            for (var y = inset; y < size - inset; y++)
+                for (var x = inset; x < size - inset; x++)
+                    pixels[y * size + x] = color;
+
+            icon = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                hideFlags  = HideFlags.HideAndDontSave,
+                filterMode = FilterMode.Point
+            };
+            icon.SetPixels32(pixels);
+            icon.Apply();
+
+            return LampIcons[color] = icon;
+        }
+
         // ── Styles ───────────────────────────────────────────────────────────
         internal static GUIStyle Title          { get; private set; }
         internal static GUIStyle SectionFoldout { get; private set; }
@@ -56,6 +84,7 @@ namespace UIPilot.Editor
         internal static GUIStyle Card          { get; private set; }
         internal static GUIStyle PrimaryButton { get; private set; }
         internal static GUIStyle RowLabel      { get; private set; }
+        internal static GUIStyle RowLink       { get; private set; }
         internal static GUIStyle RowDetail     { get; private set; }
         internal static GUIStyle StatusWord    { get; private set; }
         internal static GUIStyle Description   { get; private set; }
@@ -89,6 +118,11 @@ namespace UIPilot.Editor
             };
 
             RowLabel = new GUIStyle(EditorStyles.label) { wordWrap = true };
+
+            // A row label that selects its object: looks like the label, but takes
+            // the accent on hover so it reads as clickable.
+            RowLink = new GUIStyle(RowLabel);
+            RowLink.hover.textColor = proSkin ? new Color(0.50f, 0.84f, 0.85f) : new Color(0.04f, 0.43f, 0.44f);
 
             RowDetail = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
             RowDetail.normal.textColor = muted;
