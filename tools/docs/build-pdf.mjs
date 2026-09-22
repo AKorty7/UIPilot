@@ -68,9 +68,10 @@ const themesFigure = `
   <div><img src="${img('Theme_JRPGWindow.png')}" alt="JRPG Window theme"><figcaption><strong>JRPG Window</strong></figcaption></div>
   <div><img src="${img('Theme_PixelRetro.png')}" alt="Pixel Retro theme"><figcaption><strong>Pixel Retro</strong></figcaption></div>
 </figure>
-<figure class="duo">
+<figure class="trio">
   <div><img src="${img('Theme_SciFiHUD.png')}" alt="Sci-Fi HUD theme"><figcaption><strong>Sci-Fi HUD</strong></figcaption></div>
-  <div><img src="${img('Theme_MilitaryShooter.png')}" alt="Military Shooter theme"><figcaption><strong>Military Shooter</strong>, with its own scene. The game names are made up; the JRPG, Pixel and Sci-Fi menus are shown over scenes drawn for them.</figcaption></div>
+  <div><img src="${img('Theme_MilitaryShooter.png')}" alt="Military Shooter theme"><figcaption><strong>Military Shooter</strong>, with its own scene</figcaption></div>
+  <div><img src="${img('Theme_SurvivalHorror.png')}" alt="Survival Horror theme"><figcaption><strong>Survival Horror</strong>, with its own scene. The game names are made up; the JRPG, Pixel and Sci-Fi menus are shown over scenes drawn for them.</figcaption></div>
 </figure>`;
 
 const hoursFigure = `

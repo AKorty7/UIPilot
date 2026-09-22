@@ -433,8 +433,114 @@ def shooter():
     return layers
 
 
+# ── Horror: dead trees, fog, a house with one lit window, the dark closing in ──
+def bare_tree(rng, x, ground, height, white, k=1.0):
+    """A leafless tree as a set of tapering strokes, branching at random."""
+    out = []
+
+    def branch(x0, y0, angle, length, width, depth):
+        x1 = x0 + math.cos(angle) * length
+        y1 = y0 - math.sin(angle) * length
+        out.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="{white}" '
+                   f'stroke-width="{max(0.6, width):.1f}" stroke-linecap="round"/>')
+        if depth == 0:
+            return
+        n = 2 if rng.random() < 0.75 else 3
+        for _ in range(n):
+            a = angle + rng.uniform(-0.75, 0.75) + (0.25 if rng.random() < 0.5 else -0.25)
+            branch(x1, y1, a, length * rng.uniform(0.55, 0.75), width * 0.62, depth - 1)
+
+    branch(x, ground, math.pi / 2 + rng.uniform(-0.12, 0.12), height * 0.42, height * 0.05 * k, 5)
+    return "".join(out)
+
+
+def horror():
+    S = gb.S
+    rng = random.Random(66)
+    hy = H * 0.66
+    house_x = W * 0.78
+
+    def knoll(x):
+        return 150 * S * max(0.0, 1 - abs(x - house_x) / (620 * S)) ** 1.3
+
+    far = gb.ridge(rng, hy - 120 * S, 70 * S, 0.5, 14 * S)
+    mid = gb.ridge(rng, hy + 10 * S, 60 * S, 0.5, 14 * S, lift=knoll, flatten=(house_x, 90 * S, hy + 10 * S - 150 * S, 80 * S))
+    near = gb.ridge(rng, hy + 330 * S, 120 * S, 0.5, 14 * S)
+    ground = hy + 10 * S - 150 * S
+
+    layers = []
+
+    def add(key, body, compressed, night, dawn, day, dusk, rise=0.0, defs="", size=FULL):
+        layers.append((key, page(body, defs, size), compressed, size, dict(night=night, dawn=dawn, day=day, dusk=dusk, rise=rise)))
+
+    white = "#FFFFFF"
+    add("sky_base", f'<rect width="{W}" height="{H}" fill="{white}"/>', False,
+        colour("#12161F"), colour("#4C5550"), colour("#8E9591"), colour("#4A2A26"), size=FLAT)
+    add("sky_top", f'<rect width="{W}" height="{H}" fill="url(#zenith)"/>', False,
+        colour("#04050A"), colour("#1E2622"), colour("#5F6A66"), colour("#1A0F10"), size=VGRAD,
+        defs='<linearGradient id="zenith" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="1"/>'
+             '<stop offset="0.75" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+
+    mx, my, mr = W * 0.60, H * 0.50, 40 * S * 3
+    add("moon", f'<circle cx="{mx}" cy="{my}" r="{mr*3:.0f}" fill="url(#halo)"/>'
+                f'<circle cx="{mx}" cy="{my}" r="{mr:.0f}" fill="{white}" filter="url(#soften)"/>', False,
+        colour("#C9CBD2", 1.0), colour("#C9CBD2", 0.25), colour("#C9CBD2", 0.0), colour("#C9CBD2", 0.35), rise=-0.32, size=HALF,
+        defs=f'<radialGradient id="halo"><stop offset="0.3" stop-color="{white}" stop-opacity="0.28"/>'
+             f'<stop offset="0.55" stop-color="{white}" stop-opacity="0.08"/><stop offset="1" stop-color="{white}" stop-opacity="0"/></radialGradient>'
+             f'<filter id="soften" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="{2*S}"/></filter>')
+
+    add("clouds", f'<rect width="{W}" height="{H*0.8:.0f}" filter="url(#murk)"/>', True,
+        colour("#151A22", 0.7), colour("#3A423F", 0.65), colour("#B9BFBB", 0.6), colour("#2E1B1B", 0.7),
+        defs=f'<filter id="murk" x="0" y="0" width="100%" height="100%">'
+             f'<feTurbulence type="fractalNoise" baseFrequency="{0.0014/S} {0.0035/S}" numOctaves="5" seed="41"/>'
+             f'<feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.1"/></filter>')
+
+    trng = random.Random(3)
+    far_trees = "".join(bare_tree(trng, x, hy - 120 * S + 6 * S, trng.uniform(150, 240) * S, white, 0.8)
+                        for x in [W * f for f in (0.05, 0.13, 0.22, 0.31, 0.42, 0.50, 0.61, 0.69, 0.88, 0.96)])
+    add("far_trees", f'<path d="{far}" fill="{white}"/>' + far_trees, True,
+        colour("#070A10"), colour("#2C332F"), colour("#6F7773"), colour("#2C1A18"))
+
+    # The house on its knoll: a gable, a chimney, a porch, dead trees either side.
+    k = 4.2 * S
+    hx = house_x
+    house = [f'<rect x="{hx - 30*k:.1f}" y="{ground - 22*k:.1f}" width="{60*k:.1f}" height="{23*k:.1f}" fill="{white}"/>',
+             f'<polygon points="{hx - 34*k:.1f},{ground - 22*k:.1f} {hx + 34*k:.1f},{ground - 22*k:.1f} {hx:.1f},{ground - 46*k:.1f}" fill="{white}"/>',
+             f'<rect x="{hx + 14*k:.1f}" y="{ground - 44*k:.1f}" width="{6*k:.1f}" height="{14*k:.1f}" fill="{white}"/>',
+             f'<rect x="{hx - 40*k:.1f}" y="{ground - 9*k:.1f}" width="{80*k:.1f}" height="{1.2*k:.1f}" fill="{white}"/>',
+             f'<rect x="{hx - 40*k:.1f}" y="{ground - 9*k:.1f}" width="{1.2*k:.1f}" height="{9*k:.1f}" fill="{white}"/>',
+             f'<rect x="{hx + 38.8*k:.1f}" y="{ground - 9*k:.1f}" width="{1.2*k:.1f}" height="{9*k:.1f}" fill="{white}"/>']
+    house_trees = bare_tree(trng, hx - 70 * k, ground + 2, 260 * S, white) + bare_tree(trng, hx + 62 * k, ground + 4, 220 * S, white, 0.9)
+    add("hill_house", f'<path d="{mid}" fill="{white}"/>' + "".join(house) + house_trees, True,
+        colour("#04060A"), colour("#1B211E"), colour("#4C5450"), colour("#1A0E0E"))
+
+    add("window", f'<rect x="{hx - 14*k:.1f}" y="{ground - 17*k:.1f}" width="{8*k:.1f}" height="{9*k:.1f}" fill="{white}"/>'
+                  f'<rect x="{hx - 14*k:.1f}" y="{ground - 17*k:.1f}" width="{8*k:.1f}" height="{9*k:.1f}" fill="{white}" filter="url(#soft)" opacity="0.7"/>', True,
+        colour("#FFC66B", 1.0), colour("#FFC66B", 0.5), colour("#FFC66B", 0.15), colour("#FFC66B", 0.9),
+        defs=f'<filter id="soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="{8*S}"/></filter>')
+
+    near_trees = "".join(bare_tree(trng, x, hy + 330 * S + 10 * S, trng.uniform(300, 420) * S, white, 1.2)
+                         for x in [W * f for f in (0.47, 0.58, 0.72, 0.93)])
+    add("near_trees", f'<path d="{near}" fill="{white}"/>' + near_trees, True,
+        colour("#020305"), colour("#0F1412"), colour("#2E3532"), colour("#0C0708"))
+
+    fog = f'<rect x="0" y="{hy - 260*S:.0f}" width="{W}" height="{H - (hy - 260*S):.0f}" fill="url(#fog)"/>'
+    add("fog", fog, False,
+        colour("#6B7388", 0.22), colour("#B9C0B6", 0.35), colour("#E4E8E4", 0.35), colour("#6E5654", 0.3), size=VGRAD,
+        defs='<linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+             '<stop offset="0.45" stop-color="#fff" stop-opacity="1"/><stop offset="0.8" stop-color="#fff" stop-opacity="0.85"/>'
+             '<stop offset="1" stop-color="#fff" stop-opacity="0.6"/></linearGradient>')
+
+    add("vignette", f'<rect width="{W}" height="{H}" fill="url(#vig)"/>', False,
+        colour("#000000", 0.8), colour("#000000", 0.6), colour("#000000", 0.45), colour("#000000", 0.7), size=HALF,
+        defs=f'<radialGradient id="vig" cx="0.62" cy="0.5" r="0.75"><stop offset="0.35" stop-color="#fff" stop-opacity="0"/>'
+             f'<stop offset="1" stop-color="#fff" stop-opacity="1"/></radialGradient>')
+    return layers
+
+
 THEMES = {"fantasy": ("Fantasy", "Fantasy Scene", fantasy),
-          "shooter": ("Shooter", "Shooter Scene", shooter)}
+          "shooter": ("Shooter", "Shooter Scene", shooter),
+          "horror":  ("Horror",  "Horror Scene",  horror)}
 
 
 def write_once(path, text):

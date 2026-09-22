@@ -27,7 +27,7 @@ UIPilot window, all made in Unity 6000.3.11f1 (dark skin). Replace them if the l
 changes. The builder inserts figures after these headings, so keep them:
 "3. Quick start", "4. What UIPilot creates", "5.4 Themes", "7. Click Debugger", "Scan & Repair" and "Manual", and before "What it checks" (the UI Health figure).
 
-The eight `Theme_*.png` images are 960 x 540 renders of the main menu in each preset
+The nine `Theme_*.png` images are 960 x 540 renders of the main menu in each preset
 theme, and `Theme_Fantasy_Hours.png` is Fantasy RPG's scene at midnight, dawn, noon and
 dusk (the genre ones over their scenes from `tools/store/genre_backdrops.py`; Pixel Retro
 halved with nearest-neighbour so its pixels stay sharp). `Click_Window.png` is the Click

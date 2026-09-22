@@ -22,6 +22,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             (UIPilotLabels.Theme.PixelAsset,   PixelRetro),
             (UIPilotLabels.Theme.SciFiAsset,   SciFiHud),
             (UIPilotLabels.Theme.ShooterAsset, MilitaryShooter),
+            (UIPilotLabels.Theme.HorrorAsset,  SurvivalHorror),
         };
 
         // Gen X soft club / PS3-era adverts: airy blue wash, cobalt glass, hairlines,
@@ -331,6 +332,53 @@ namespace UIPilot.Editor.Modules.UIGenerator
             theme.ruleHeight = 12f;
             theme.meterTrack = new Color32(0xFF, 0xFF, 0xFF, 0x33);
             theme.meterFill  = new Color32(0xF2, 0xA3, 0x3A, 0xFF);           // the amber of the edge bar
+            return theme;
+        }
+
+        // Quiet dread: a black that thins into the dark rather than a slab, a thin
+        // serif spaced wide, small typewriter items, one rough red mark for the
+        // chosen line, and a scene of dead trees, fog and a house with one lit
+        // window, the vignette closing in at night.
+        internal static UIPilotTheme SurvivalHorror()
+        {
+            var theme = Bare();
+
+            theme.sceneLayers = SceneLayers(UIGeneratorContent.Art.HorrorScene);
+            theme.timeOfDay   = 0f;                             // midnight
+
+            theme.wash      = new Color32(0x00, 0x00, 0x00, 0x66);
+            theme.panel     = Color.white;
+            theme.panelArt  = UIGeneratorArt.Sprite(UIGeneratorContent.Art.HorrorPanel);
+
+            theme.font          = UIGeneratorArt.Font(UIGeneratorContent.Art.DmMono);
+            theme.titleFont     = UIGeneratorArt.Font(UIGeneratorContent.Art.Italiana);
+            theme.text          = new Color32(0xD9, 0xD4, 0xCC, 0xFF);   // old paper
+            theme.textSoft      = new Color32(0x8A, 0x84, 0x7A, 0xFF);
+            theme.titleCase     = UIPilotTextCase.Uppercase;
+            theme.titleBold     = false;
+            theme.titleTracking = 14f;
+            theme.titleSize     = 58f;
+            theme.icons         = false;
+            theme.itemCase      = UIPilotTextCase.Uppercase;
+            theme.itemTracking  = 4f;
+            theme.itemSize      = 24f;
+            theme.valueSize     = 20f;
+            theme.smallSize     = 14f;
+
+            theme.focusStyle    = UIPilotFocusStyle.Marker;
+            theme.focusArt      = UIGeneratorArt.Sprite(UIGeneratorContent.Art.HorrorMark);
+            theme.markerSize    = new Vector2(22f, 22f);
+            theme.focusIdle     = new Color32(0xB4, 0x16, 0x1B, 0x00);
+            theme.focusHover    = new Color32(0xD9, 0xD4, 0xCC, 0x73);
+            theme.focusSelected = new Color32(0xB4, 0x16, 0x1B, 0xFF);   // the one red thing
+            theme.focusPressed  = new Color32(0x7A, 0x0F, 0x12, 0xFF);
+            theme.focusDisabled = new Color32(0xD9, 0xD4, 0xCC, 0x1F);
+
+            theme.rule       = Color.white;
+            theme.ruleArt    = UIGeneratorArt.Sprite(UIGeneratorContent.Art.HorrorRule);
+            theme.ruleHeight = 10f;
+            theme.meterTrack = new Color32(0xD9, 0xD4, 0xCC, 0x33);
+            theme.meterFill  = new Color32(0xB4, 0x16, 0x1B, 0xFF);
             return theme;
         }
 

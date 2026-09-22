@@ -97,6 +97,9 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string ShooterPanel = "uipilot_shooter_panel";
             internal const string ShooterFocus = "uipilot_shooter_focus";
             internal const string ShooterRule  = "uipilot_shooter_rule";
+            internal const string HorrorPanel  = "uipilot_horror_panel";
+            internal const string HorrorMark   = "uipilot_horror_mark";
+            internal const string HorrorRule   = "uipilot_horror_rule";
 
             internal const string YoungSerif       = "Young Serif SDF";
             internal const string CrimsonPro       = "Crimson Pro Bold SDF";
@@ -107,6 +110,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string Tektur           = "Tektur SDF";
             internal const string TekturGlow       = "Tektur SDF Glow";
             internal const string BigShoulders     = "Big Shoulders Bold SDF";
+            internal const string Italiana         = "Italiana SDF";
+            internal const string DmMono           = "DM Mono SDF";
 
             // A theme's scene, back to front: each layer's white sprite and the
             // UIPilot/Scene Layer material that colours it through the day.
@@ -137,6 +142,20 @@ namespace UIPilot.Editor.Modules.UIGenerator
                 ("uipilot_shooter_scene_07_near_ridge", "Shooter Scene 07 Near Ridge"),
                 ("uipilot_shooter_scene_08_mist", "Shooter Scene 08 Mist"),
                 ("uipilot_shooter_scene_09_overlay", "Shooter Scene 09 Overlay")
+            };
+
+            internal static readonly (string Sprite, string Material)[] HorrorScene =
+            {
+                ("uipilot_horror_scene_01_sky_base", "Horror Scene 01 Sky Base"),
+                ("uipilot_horror_scene_02_sky_top", "Horror Scene 02 Sky Top"),
+                ("uipilot_horror_scene_03_moon", "Horror Scene 03 Moon"),
+                ("uipilot_horror_scene_04_clouds", "Horror Scene 04 Clouds"),
+                ("uipilot_horror_scene_05_far_trees", "Horror Scene 05 Far Trees"),
+                ("uipilot_horror_scene_06_hill_house", "Horror Scene 06 Hill House"),
+                ("uipilot_horror_scene_07_window", "Horror Scene 07 Window"),
+                ("uipilot_horror_scene_08_near_trees", "Horror Scene 08 Near Trees"),
+                ("uipilot_horror_scene_09_fog", "Horror Scene 09 Fog"),
+                ("uipilot_horror_scene_10_vignette", "Horror Scene 10 Vignette")
             };
         }
 

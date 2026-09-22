@@ -116,7 +116,7 @@ on `UIPilot_GameManager`: `UIPilot_Btn_Play` calls `OnPlayPressed`, and so on.
 | File | Purpose |
 |---|---|
 | `Assets/UIPilot_GameManager.cs` | **Your script.** One method per button, plus the code that shows and hides the panels. Edit it freely. |
-| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD and Military Shooter. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
+| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD, Military Shooter and Survival Horror. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
 | `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons, fonts, the scenes and their shader. The generated menus use these files, so keep this folder in your project (you may move it). The Soft Club sprites are white, so you recolour them in the Inspector instead of repainting. The genre themes' artwork is in `Art/Themes` and carries its own colours; each scene's layers and materials are in a folder of their own there. |
 
 ### In Edit mode, all panels are visible at once
@@ -220,7 +220,7 @@ All of this lives in `ApplySettings()` in `UIPilot_GameManager.cs`, which is you
 
 A **theme** is one asset that decides how every generated menu looks: the colours, the
 lettering, the artwork, the scene behind the menu, and which decorations are switched
-on. UIPilot ships eight, in `Assets/UIPilot/Themes`:
+on. UIPilot ships nine, in `Assets/UIPilot/Themes`:
 
 | Theme | The look |
 |---|---|
@@ -232,6 +232,7 @@ on. UIPilot ships eight, in `Assets/UIPilot/Themes`:
 | **Pixel Retro** | 8-bit: a black window with a white stepped border drawn in true pixels, pixel capitals, a yellow arrow cursor, faint CRT lines. The window and cursor are drawn at exactly 4 screen pixels per art pixel at 1080p. |
 | **Sci-Fi HUD** | A starship console: a glass slab with cut corners edged in glowing cyan, instrument ticks, a scanning focus bar, technical capitals with a faint glow. |
 | **Military Shooter** | The modern shooter's menu: a near-black slab with one amber edge, condensed capitals, hazard stripes under the title, a tactical overlay over a grey valley with a radar station and a helicopter. The scene changes with the time of day. |
+| **Survival Horror** | Quiet dread: a black that thins into the dark instead of a slab, a thin serif spaced wide, small typewriter items, one rough red mark on the chosen line, and a scene of dead trees, fog and a house with one lit window, the dark closing in at night. Its scene changes with the time of day too. |
 
 **To choose a theme:** in the **Build** section, drop it into the **Theme** field (or click
 the circle beside the field and pick one), then click **Build UI**.
@@ -248,7 +249,7 @@ Pick your copy in the **Theme** field and click **Apply Theme to Existing Menus*
 (Right-click in the Project window and choose **Create > UIPilot > Theme** to make a new
 one. It starts as a full copy of Soft Club, font and title glow included.)
 
-**To get a default theme back:** if one of the eight is missing from the
+**To get a default theme back:** if one of the nine is missing from the
 project, a line under the **Theme** field says which, next to a **Restore Default Themes**
 button. Click it and the missing themes are recreated in `Assets/UIPilot/Themes`, exactly as
 they shipped. It never changes a theme that is still there, so to reset a default theme you
@@ -280,8 +281,8 @@ Things worth knowing when you edit a theme:
   *UIPilot/Scene Layer* material that gives it a colour at night, dawn, day and dusk, and
   a **Rise** for a sun or moon. To change a layer's colours, duplicate its material and
   edit the four colours; the materials are shared, so editing one changes every theme
-  that uses it. Fantasy RPG and Military Shooter ship with a scene; the other themes show
-  your game.
+  that uses it. Fantasy RPG, Military Shooter and Survival Horror ship with a scene; the
+  other themes show your game.
 - **Time Of Day** is the hour the scene is designed for: 0 is midnight, 0.25 dawn, 0.5
   noon, 0.75 dusk. Drag it and the scene changes in the Scene view at once. See *Time of
   day in your game*, below.
@@ -495,8 +496,8 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 - **What ends up in your build:** `UIPilot_GameManager.cs` and only the artwork in
   `Assets/UIPilot/Art` that your menus use: about 300 KB for Soft Club, about 2 MB for
   Fantasy RPG's parchment, and a theme's scene adds its layers and the scene shader
-  (about 7 MB of textures for Fantasy RPG, 6 MB for Military Shooter; flat and gradient
-  layers are tiny textures stretched to the screen). All of UIPilot's own code is inside
+  (about 7 MB of textures for Fantasy RPG, 6 MB for Military Shooter, 6 MB for Survival
+  Horror; flat and gradient layers are tiny textures stretched to the screen). All of UIPilot's own code is inside
   an `Editor` folder, which Unity never includes in builds.
 
 ---

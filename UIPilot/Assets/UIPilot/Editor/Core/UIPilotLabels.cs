@@ -24,6 +24,7 @@ namespace UIPilot.Editor.Core
             internal const string PixelAsset   = "Pixel Retro";
             internal const string SciFiAsset   = "Sci-Fi HUD";
             internal const string ShooterAsset = "Military Shooter";
+            internal const string HorrorAsset  = "Survival Horror";
             internal const string PresetFolder = "Assets/UIPilot/Themes";
 
             internal const string FieldLabel   = "Theme";

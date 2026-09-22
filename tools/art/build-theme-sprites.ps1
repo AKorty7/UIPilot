@@ -32,7 +32,10 @@ $sprites = @(
     @('uipilot_scifi_rule',     1040, 728,  960,   32, @(  0,  0,  0,  0), 200, 1, 0),
     @('uipilot_shooter_panel',  1040, 780,  384,  384, @( 96, 96, 96, 96), 200, 1, 0),
     @('uipilot_shooter_focus',  1440, 780,  512,  112, @( 64,  0,192,  0), 200, 1, 0),
-    @('uipilot_shooter_rule',   1040,1180,  960,   24, @(  0,  0,  0,  0), 200, 1, 0)
+    @('uipilot_shooter_rule',   1040,1180,  960,   24, @(  0,  0,  0,  0), 200, 1, 0),
+    @('uipilot_horror_panel',   1040,1220,  384,  384, @(128,128,128,128), 200, 1, 0),
+    @('uipilot_horror_mark',    1440,1220,   40,   40, @(  0,  0,  0,  0), 200, 1, 0),
+    @('uipilot_horror_rule',    1040,1620,  960,   24, @(  0,  0,  0,  0), 200, 1, 0)
 )
 
 # Pixel art, one character per pixel. Drawn at Pixels Per Unit 100 with point
@@ -205,14 +208,14 @@ function Write-MetaOnce([string]$png, [int[]]$border, [int]$ppu, [int]$filter, [
 $uri = ([System.Uri]$html).AbsoluteUri
 $p = Start-Process -FilePath $edge -PassThru -Wait -ArgumentList @(
     '--headless=new', '--disable-gpu', '--hide-scrollbars',
-    '--force-device-scale-factor=1', '--window-size=2016,1536',
+    '--force-device-scale-factor=1', '--window-size=2016,2048',
     '--default-background-color=00000000', '--virtual-time-budget=4000',
     "--screenshot=`"$sheet`"", "`"$uri`"")
 if (-not (Test-Path $sheet)) { throw "Edge did not write the sheet (exit $($p.ExitCode))" }
 
 $source = [System.Drawing.Bitmap]::FromFile($sheet)
 try {
-    "sheet: $($source.Width)x$($source.Height), corner alpha = $($source.GetPixel(2015,1535).A) (0 = transparent)"
+    "sheet: $($source.Width)x$($source.Height), corner alpha = $($source.GetPixel(2015,2047).A) (0 = transparent)"
     foreach ($s in $sprites) {
         $rect = New-Object System.Drawing.Rectangle($s[1], $s[2], $s[3], $s[4])
         $cut  = $source.Clone($rect, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)

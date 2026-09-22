@@ -37,8 +37,8 @@ headline, one line and three bullets on the left, and a large product image on t
 
    Set the environment variables `UIPILOT_STORE_OUT` and `UIPILOT_STORE_BACKDROPS` first.
    - `unity/UIPilotThemeRender.cs` (`UIPilotThemeRender.Run`, batch mode, same two variables)
-     renders all eight themes over their backdrops (a theme with a scene of its own,
-     Fantasy RPG and Military Shooter, draws that scene over the backdrop): main menu and settings at 1080p, the
+     renders all nine themes over their backdrops (a theme with a scene of its own,
+     Fantasy RPG, Military Shooter and Survival Horror, draws that scene over the backdrop): main menu and settings at 1080p, the
      pause menu at Steam Deck size, and a 2400 x 1600 main menu for the genre themes. The
      theme pictures in the user guide come from it.
 3. **Compose.** Run `compose.py <pages> <renders> <editor> <pdf pages> <repo root>`, then

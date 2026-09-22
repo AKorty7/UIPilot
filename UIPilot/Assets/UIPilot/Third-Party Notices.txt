@@ -88,6 +88,26 @@ Licence:   SIL Open Font License, Version 1.1
            Full text: Art/Fonts/BigShoulders-OFL.txt, and https://openfontlicense.org
 Used by:   Military Shooter theme.
 
+Italiana (typeface)
+-------------------
+Files:     Art/Fonts/Italiana-Regular.ttf
+           Art/Fonts/Italiana SDF.asset                (TextMeshPro font asset built from it)
+Copyright: Copyright (c) 2011, Santiago Orozco (hi@typemade.mx),
+           with Reserved Font Name "Italiana"
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Italiana-OFL.txt, and https://openfontlicense.org
+Used by:   Survival Horror theme: titles.
+
+DM Mono (typeface)
+------------------
+Files:     Art/Fonts/DMMono-Regular.ttf
+           Art/Fonts/DM Mono SDF.asset                 (TextMeshPro font asset built from it)
+Copyright: Copyright 2020 The DM Mono Project Authors
+           (https://www.github.com/googlefonts/dm-mono)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/DMMono-OFL.txt, and https://openfontlicense.org
+Used by:   Survival Horror theme: menu items and values.
+
 The same terms apply to each of these: use them in your own games, commercial or not, and
 redistribute them with them; do not sell a font by itself; a modified font stays under the
 OFL and may not use the font's name. Any font asset can be removed: menus built with a

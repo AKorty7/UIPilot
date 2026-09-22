@@ -48,6 +48,7 @@ public static class UIPilotThemeRender
         ("pixel",    "Pixel Retro",     "pixel",     "Pixel Quest",   true),
         ("scifi",    "Sci-Fi HUD",      "space",     "Deep Orbit",    true),
         ("shooter",  "Military Shooter", "none",     "Blackline",     true),   // its scene is in the theme
+        ("horror",   "Survival Horror",  "none",     "The Hollow",    true),
     };
 
     public static void Run()
