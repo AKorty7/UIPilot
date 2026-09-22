@@ -29,7 +29,10 @@ $sprites = @(
     @('uipilot_fantasy_focus',  1040, 400,  512,  112, @( 96,  0,192,  0), 200, 1, 0),
     @('uipilot_scifi_focus',    1040, 528,  512,  112, @( 64,  0,192,  0), 200, 1, 0),
     @('uipilot_fantasy_rule',   1040, 656,  960,   56, @(  0,  0,  0,  0), 200, 1, 0),
-    @('uipilot_scifi_rule',     1040, 728,  960,   32, @(  0,  0,  0,  0), 200, 1, 0)
+    @('uipilot_scifi_rule',     1040, 728,  960,   32, @(  0,  0,  0,  0), 200, 1, 0),
+    @('uipilot_shooter_panel',  1040, 780,  384,  384, @( 96, 96, 96, 96), 200, 1, 0),
+    @('uipilot_shooter_focus',  1440, 780,  512,  112, @( 64,  0,192,  0), 200, 1, 0),
+    @('uipilot_shooter_rule',   1040,1180,  960,   24, @(  0,  0,  0,  0), 200, 1, 0)
 )
 
 # Pixel art, one character per pixel. Drawn at Pixels Per Unit 100 with point

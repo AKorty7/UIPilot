@@ -400,5 +400,71 @@
   <rect x="330" y="11" width="8" height="8" fill="none" stroke="#9AF6FF" stroke-width="1.4"/>
 </svg>
 
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     uipilot_shooter_panel  384x384 @ (1040,780)  border 96 all round
+     A slab of dark matte: 1 px grey edge, an amber bar down the left, thin
+     corner brackets top-left and bottom-right, hazard ticks in the top-right.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<svg style="left:1040px;top:780px" width="384" height="384" viewBox="0 0 384 384">
+  <rect x="1" y="1" width="382" height="382" fill="#0C0F12" fill-opacity="0.94"/>
+  <rect x="1.5" y="1.5" width="381" height="381" fill="none" stroke="#2E353C" stroke-width="1"/>
+  <rect x="1" y="1" width="4" height="382" fill="#F2A33A"/>
+  <g stroke="#B8C0C8" stroke-width="2" fill="none" stroke-linecap="square">
+    <polyline points="14,54 14,14 54,14"/>
+    <polyline points="370,330 370,370 330,370"/>
+  </g>
+  <g fill="#F2A33A">
+    <polygon points="318,6 326,6 336,16 328,16"/>
+    <polygon points="334,6 342,6 352,16 344,16"/>
+    <polygon points="350,6 358,6 368,16 360,16"/>
+  </g>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     uipilot_shooter_focus  512x112 @ (1440,780)  border L64 R192
+     The chosen line: an amber bar at the left, a light field fading out.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<svg style="left:1440px;top:780px" width="512" height="112" viewBox="0 0 512 112">
+  <defs>
+    <linearGradient id="shField" x1="0" y1="0" x2="512" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0"     stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="0.125" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="0.625" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="1"     stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="shLine" x1="0" y1="0" x2="512" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0"     stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="0.625" stop-color="#FFFFFF" stop-opacity="0.30"/>
+      <stop offset="1"     stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="14" y="12" width="498" height="88" fill="url(#shField)"/>
+  <rect x="14" y="11" width="498" height="1" fill="url(#shLine)"/>
+  <rect x="14" y="100" width="498" height="1" fill="url(#shLine)"/>
+  <rect x="8" y="12" width="6" height="88" fill="#F2A33A"/>
+</svg>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     uipilot_shooter_rule  960x24 @ (1040,1180)  — drawn to size, not sliced
+     A run of amber hazard stripes, then a thin grey line fading out.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<svg style="left:1040px;top:1180px" width="960" height="24" viewBox="0 0 960 24">
+  <defs>
+    <linearGradient id="shRule" x1="150" y1="0" x2="960" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8A939C" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#8A939C" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="shStripes"><rect x="0" y="8" width="132" height="8"/></clipPath>
+  </defs>
+  <g clip-path="url(#shStripes)" fill="#F2A33A">
+    <polygon points="0,16 8,16 16,8 8,8"/>   <polygon points="16,16 24,16 32,8 24,8"/>
+    <polygon points="32,16 40,16 48,8 40,8"/> <polygon points="48,16 56,16 64,8 56,8"/>
+    <polygon points="64,16 72,16 80,8 72,8"/> <polygon points="80,16 88,16 96,8 88,8"/>
+    <polygon points="96,16 104,16 112,8 104,8"/> <polygon points="112,16 120,16 128,8 120,8"/>
+    <polygon points="128,16 136,16 144,8 136,8"/>
+  </g>
+  <rect x="150" y="11.5" width="810" height="1" fill="url(#shRule)"/>
+</svg>
+
 </body>
 </html>

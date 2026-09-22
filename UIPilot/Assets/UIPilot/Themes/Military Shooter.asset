@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: Military Shooter
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers:
+  - sprite: {fileID: 21300000, guid: f2e4a54cb13243879f9ccd23d46ff283, type: 3}
+    material: {fileID: 2100000, guid: afbac4ef00254d20bed2b94417d0230a, type: 2}
+  - sprite: {fileID: 21300000, guid: 036ed03f666b40e0871d43f6885e175b, type: 3}
+    material: {fileID: 2100000, guid: 52c96a9e4bcf463b9de3d831febea5bd, type: 2}
+  - sprite: {fileID: 21300000, guid: abc0deb5cc96463f8013599029ebc096, type: 3}
+    material: {fileID: 2100000, guid: 00d945ee44c04f36acdd5e7557ac21f3, type: 2}
+  - sprite: {fileID: 21300000, guid: d8589f0b4fc84a6a84d67b37dcca3d80, type: 3}
+    material: {fileID: 2100000, guid: e177738161cd4d51af7f1fb4f1457710, type: 2}
+  - sprite: {fileID: 21300000, guid: 67cdb88fff794906a329426d9862b587, type: 3}
+    material: {fileID: 2100000, guid: c663f3ff7f98442390d2fce6fb8a133d, type: 2}
+  - sprite: {fileID: 21300000, guid: f272f7010f18436e80404f24a881a70c, type: 3}
+    material: {fileID: 2100000, guid: f03249c172f54d58b7db407911705b03, type: 2}
+  - sprite: {fileID: 21300000, guid: 70520e23d4064077b1a7298968e044ba, type: 3}
+    material: {fileID: 2100000, guid: f59e02cc1906470187dd2afdb9b707f6, type: 2}
+  - sprite: {fileID: 21300000, guid: ceb3d5e4ed184679aaefd5bef565beac, type: 3}
+    material: {fileID: 2100000, guid: 9810c121dd0344a4a25298ebed768300, type: 2}
+  - sprite: {fileID: 21300000, guid: f970cb4cb6b348c9a0a5449202cb62df, type: 3}
+    material: {fileID: 2100000, guid: 1fb451313b7641ffb9c24dc6c94cfcae, type: 2}
+  timeOfDay: 0.55
+  wash: {r: 0.019607844, g: 0.02745098, b: 0.039215688, a: 0.4509804}
+  blooms: 0
+  bloomTopLeft: {r: 0.7019608, g: 0.6509804, b: 0.96862745, a: 0.54901963}
+  bloomBottomRight: {r: 0.47843137, g: 0.84313726, b: 0.9254902, a: 0.6}
+  bloomTopRight: {r: 0.8235294, g: 0.96862745, b: 0.9254902, a: 0.5019608}
+  bloomCentre: {r: 1, g: 1, b: 1, a: 0.34901962}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 0
+  sceneFrameColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  sceneScanlines: 0
+  sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: b623d37d948f4e2eb8c91fac0035c0a1, type: 3}
+  panelArtScale: 1
+  panelScanlines: 0
+  panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.050980393}
+  panelFrame: 0
+  panelFrameColor: {r: 0.72156864, g: 0.7529412, b: 0.78431374, a: 1}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 1
+  font: {fileID: 11400000, guid: 0b528a30aad96114db9f4586fccae811, type: 2}
+  titleFont: {fileID: 0}
+  titleMaterial: {fileID: 0}
+  textMaterial: {fileID: 0}
+  text: {r: 0.9098039, g: 0.91764706, b: 0.92941177, a: 1}
+  textSoft: {r: 0.6039216, g: 0.6392157, b: 0.6784314, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 1
+  titleSize: 64
+  icons: 1
+  itemCase: 2
+  itemTracking: 2
+  itemSize: 30
+  valueSize: 25
+  smallSize: 16
+  focusStyle: 1
+  focusArt: {fileID: 21300000, guid: 0dbb2da04adc49c1a980546217f06d29, type: 3}
+  focusReach: 24
+  markerSize: {x: 32, y: 32}
+  focusIdle: {r: 1, g: 1, b: 1, a: 0}
+  focusHover: {r: 1, g: 1, b: 1, a: 0.5}
+  focusSelected: {r: 1, g: 1, b: 1, a: 1}
+  focusPressed: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  focusDisabled: {r: 1, g: 1, b: 1, a: 0.12}
+  rule: {r: 1, g: 1, b: 1, a: 1}
+  ruleArt: {fileID: 21300000, guid: a726abe5d5e04f878ef39c89301f23fa, type: 3}
+  ruleHeight: 12
+  meterTrack: {r: 1, g: 1, b: 1, a: 0.2}
+  meterFill: {r: 0.9490196, g: 0.6392157, b: 0.22745098, a: 1}

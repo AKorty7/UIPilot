@@ -21,6 +21,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             (UIPilotLabels.Theme.JrpgAsset,    JrpgWindow),
             (UIPilotLabels.Theme.PixelAsset,   PixelRetro),
             (UIPilotLabels.Theme.SciFiAsset,   SciFiHud),
+            (UIPilotLabels.Theme.ShooterAsset, MilitaryShooter),
         };
 
         // Gen X soft club / PS3-era adverts: airy blue wash, cobalt glass, hairlines,
@@ -289,6 +290,48 @@ namespace UIPilot.Editor.Modules.UIGenerator
                 layers[i].material = UIGeneratorArt.Material(names[i].Material);
             }
             return layers;
+        }
+
+        // The modern military shooter: a near-black slab with one amber edge,
+        // condensed capitals, hazard stripes, a tactical overlay over a grey
+        // valley. Nothing glows; the slickness is in the restraint.
+        internal static UIPilotTheme MilitaryShooter()
+        {
+            var theme = Bare();
+
+            theme.sceneLayers = SceneLayers(UIGeneratorContent.Art.ShooterScene);
+            theme.timeOfDay   = 0.55f;                          // an overcast afternoon
+
+            theme.wash              = new Color32(0x05, 0x07, 0x0A, 0x73);
+            theme.registrationMarks = true;
+            theme.panelFrameColor   = new Color32(0xB8, 0xC0, 0xC8, 0xFF);   // colours the marks
+
+            theme.panel     = Color.white;
+            theme.panelArt  = UIGeneratorArt.Sprite(UIGeneratorContent.Art.ShooterPanel);
+
+            theme.font          = UIGeneratorArt.Font(UIGeneratorContent.Art.BigShoulders);
+            theme.text          = new Color32(0xE8, 0xEA, 0xED, 0xFF);
+            theme.textSoft      = new Color32(0x9A, 0xA3, 0xAD, 0xFF);
+            theme.titleCase     = UIPilotTextCase.Uppercase;
+            theme.titleBold     = false;                        // the face is already bold
+            theme.titleTracking = 1f;
+            theme.titleSize     = 64f;
+            theme.itemCase      = UIPilotTextCase.Uppercase;
+            theme.itemTracking  = 2f;
+            theme.itemSize      = 30f;
+            theme.valueSize     = 25f;
+            theme.smallSize     = 16f;
+
+            theme.focusStyle = UIPilotFocusStyle.Bar;
+            theme.focusArt   = UIGeneratorArt.Sprite(UIGeneratorContent.Art.ShooterFocus);
+            SetFocusTint(theme, 0.5f);
+
+            theme.rule       = Color.white;
+            theme.ruleArt    = UIGeneratorArt.Sprite(UIGeneratorContent.Art.ShooterRule);
+            theme.ruleHeight = 12f;
+            theme.meterTrack = new Color32(0xFF, 0xFF, 0xFF, 0x33);
+            theme.meterFill  = new Color32(0xF2, 0xA3, 0x3A, 0xFF);           // the amber of the edge bar
+            return theme;
         }
 
         // Every decoration off: the starting point for a theme that brings its own.

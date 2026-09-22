@@ -64,18 +64,21 @@ namespace UIPilot.Editor.Modules.UIGenerator
             UIPilotScenePreview.SetHour(theme.timeOfDay);
         }
 
+        // Layers share one 16:9 frame whatever their texture's size, so a flat sky
+        // can be a 4 x 4 texture and a gradient a 4 x 720 one.
         private static void StyleLayer(Transform cover, UIPilotTheme theme, int index)
         {
             var hasLayer = theme.picture == null && theme.sceneLayers != null && index < theme.sceneLayers.Length;
             var sprite   = hasLayer ? theme.sceneLayers[index].sprite   : null;
             var material = hasLayer ? theme.sceneLayers[index].material : null;
-            StyleCover(cover, sprite, material);
+            StyleCover(cover, sprite, material, false);
         }
 
-        // A full-screen image that keeps its own proportions. Hidden when empty,
-        // so the game scene shows through. The fitter only sizes an active object,
-        // so a hidden one is put back to its built size by hand.
-        private static void StyleCover(Transform cover, Sprite art, Material material)
+        // A full-screen image that keeps its proportions: the sprite's own for a
+        // picture, the reference screen's for a layer. Hidden when empty, so the
+        // game scene shows through. The fitter only sizes an active object, so a
+        // hidden one is put back to its built size by hand.
+        private static void StyleCover(Transform cover, Sprite art, Material material, bool ownAspect = true)
         {
             var image = cover.GetComponent<Image>();
             if (image == null) return;
@@ -87,7 +90,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             var fitter = cover.GetComponent<AspectRatioFitter>();
             if (fitter != null)
-                fitter.aspectRatio = art != null && art.rect.height > 0f ? art.rect.width / art.rect.height : DefaultCoverAspect;
+                fitter.aspectRatio = ownAspect && art != null && art.rect.height > 0f ? art.rect.width / art.rect.height : DefaultCoverAspect;
             if (art == null)
                 ((RectTransform)cover).sizeDelta = Vector2.zero;
         }

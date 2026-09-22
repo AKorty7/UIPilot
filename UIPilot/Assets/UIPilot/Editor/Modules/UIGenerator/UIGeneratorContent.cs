@@ -94,6 +94,9 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string SciFiPanel   = "uipilot_scifi_panel";
             internal const string SciFiFocus   = "uipilot_scifi_focus";
             internal const string SciFiRule    = "uipilot_scifi_rule";
+            internal const string ShooterPanel = "uipilot_shooter_panel";
+            internal const string ShooterFocus = "uipilot_shooter_focus";
+            internal const string ShooterRule  = "uipilot_shooter_rule";
 
             internal const string YoungSerif       = "Young Serif SDF";
             internal const string CrimsonPro       = "Crimson Pro Bold SDF";
@@ -103,6 +106,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string SilkscreenShadow = "Silkscreen SDF Shadow";
             internal const string Tektur           = "Tektur SDF";
             internal const string TekturGlow       = "Tektur SDF Glow";
+            internal const string BigShoulders     = "Big Shoulders Bold SDF";
 
             // A theme's scene, back to front: each layer's white sprite and the
             // UIPilot/Scene Layer material that colours it through the day.
@@ -120,6 +124,19 @@ namespace UIPilot.Editor.Modules.UIGenerator
                 ("uipilot_fantasy_scene_10_mid_hills", "Fantasy Scene 10 Mid Hills"),
                 ("uipilot_fantasy_scene_11_near_hills", "Fantasy Scene 11 Near Hills"),
                 ("uipilot_fantasy_scene_12_mist", "Fantasy Scene 12 Mist")
+            };
+
+            internal static readonly (string Sprite, string Material)[] ShooterScene =
+            {
+                ("uipilot_shooter_scene_01_sky_base", "Shooter Scene 01 Sky Base"),
+                ("uipilot_shooter_scene_02_sky_top", "Shooter Scene 02 Sky Top"),
+                ("uipilot_shooter_scene_03_clouds", "Shooter Scene 03 Clouds"),
+                ("uipilot_shooter_scene_04_far_ridge", "Shooter Scene 04 Far Ridge"),
+                ("uipilot_shooter_scene_05_mid_ridge_station", "Shooter Scene 05 Mid Ridge Station"),
+                ("uipilot_shooter_scene_06_helicopter", "Shooter Scene 06 Helicopter"),
+                ("uipilot_shooter_scene_07_near_ridge", "Shooter Scene 07 Near Ridge"),
+                ("uipilot_shooter_scene_08_mist", "Shooter Scene 08 Mist"),
+                ("uipilot_shooter_scene_09_overlay", "Shooter Scene 09 Overlay")
             };
         }
 

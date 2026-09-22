@@ -78,11 +78,22 @@ Licence:   SIL Open Font License, Version 1.1
            Full text: Art/Fonts/Tektur-OFL.txt, and https://openfontlicense.org
 Used by:   Sci-Fi HUD theme.
 
+Big Shoulders (typeface)
+------------------------
+Files:     Art/Fonts/BigShoulders-Bold.ttf
+           Art/Fonts/Big Shoulders Bold SDF.asset       (TextMeshPro font asset built from it)
+Copyright: Copyright 2019 The Big Shoulders Project Authors
+           (https://github.com/xotypeco/big_shoulders)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/BigShoulders-OFL.txt, and https://openfontlicense.org
+Used by:   Military Shooter theme.
+
 The same terms apply to each of these: use them in your own games, commercial or not, and
 redistribute them with them; do not sell a font by itself; a modified font stays under the
 OFL and may not use the font's name. Any font asset can be removed: menus built with a
 theme whose font is missing fall back to TextMeshPro's default font.
 
 
-Everything else in Art/ (sprites, icons and the genre theme artwork in Art/Themes) was
-created for UIPilot and is original work.
+Everything else in Art/ (sprites, icons, the genre theme artwork and scene layers in
+Art/Themes, and the scene shader in Art/Shaders) was created for UIPilot and is
+original work.

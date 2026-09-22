@@ -211,10 +211,18 @@ def colour(hex6, alpha=1.0):
     return f"{{r: {r:.4f}, g: {g:.4f}, b: {b:.4f}, a: {alpha:.3f}}}"
 
 
-def page(body, defs=""):
+# Texture sizes. A layer is always stretched to the 16:9 frame in Unity, so a flat
+# colour needs 4 x 4 pixels and a vertical gradient 4 x 720; only drawn detail
+# needs the full frame. Sizes are (width, height) of the PNG; the drawing stays
+# in the 1280 x 720 frame and is scaled (non-uniformly, for the thin ones).
+FULL, HALF, FLAT, VGRAD = (W, H), (W // 2, H // 2), (4, 4), (4, H)
+
+
+def page(body, defs="", size=FULL):
+    w, h = size
     return (f'<!doctype html><html><head><meta charset="utf-8"><style>html,body{{margin:0;background:transparent}}'
-            f'svg{{display:block}}</style></head><body><svg xmlns="http://www.w3.org/2000/svg" width="{W}" '
-            f'height="{H}" viewBox="0 0 {W} {H}"><defs>{defs}</defs>{body}</svg></body></html>')
+            f'svg{{display:block}}</style></head><body><svg xmlns="http://www.w3.org/2000/svg" width="{w}" '
+            f'height="{h}" viewBox="0 0 {W} {H}" preserveAspectRatio="none"><defs>{defs}</defs>{body}</svg></body></html>')
 
 
 # ── Fantasy: the ember valley, taken apart ───────────────────────────────────
@@ -246,15 +254,15 @@ def fantasy():
 
     layers = []
 
-    def add(key, body, compressed, night, dawn, day, dusk, rise=0.0, defs=""):
-        layers.append((key, page(body, defs), compressed, dict(night=night, dawn=dawn, day=day, dusk=dusk, rise=rise)))
+    def add(key, body, compressed, night, dawn, day, dusk, rise=0.0, defs="", size=FULL):
+        layers.append((key, page(body, defs, size), compressed, size, dict(night=night, dawn=dawn, day=day, dusk=dusk, rise=rise)))
 
     white = "#FFFFFF"
     add("sky_base", f'<rect width="{W}" height="{H}" fill="{white}"/>', False,
-        colour("#232B60"), colour("#F5B48C"), colour("#BFE0F7"), colour("#F0A24E"))
+        colour("#232B60"), colour("#F5B48C"), colour("#BFE0F7"), colour("#F0A24E"), size=FLAT)
 
     add("sky_top", f'<rect width="{W}" height="{H}" fill="url(#zenith)"/>', False,
-        colour("#05061A"), colour("#6B5FA8"), colour("#3E7FD6"), colour("#4A2645"),
+        colour("#05061A"), colour("#6B5FA8"), colour("#3E7FD6"), colour("#4A2645"), size=VGRAD,
         defs='<linearGradient id="zenith" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="1"/>'
              '<stop offset="0.62" stop-color="#fff" stop-opacity="0"/></linearGradient>')
 
@@ -285,11 +293,11 @@ def fantasy():
     sx, sy = W * 0.73, H * 0.52
     add("sun", f'<circle cx="{sx}" cy="{sy}" r="{240*S:.0f}" fill="{white}" opacity="0.28" filter="url(#halo)"/>'
                f'<circle cx="{sx}" cy="{sy}" r="{95*S:.0f}" fill="{white}" filter="url(#soft)"/>', False,
-        colour("#FFD27A", 0.0), colour("#FFD9A0", 1.0), colour("#FFF8E0", 1.0), colour("#FFD27A", 1.0), rise=0.35,
+        colour("#FFD27A", 0.0), colour("#FFD9A0", 1.0), colour("#FFF8E0", 1.0), colour("#FFD27A", 1.0), rise=0.35, size=HALF,
         defs=f'<filter id="halo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="{70*S}"/></filter>'
              f'<filter id="soft"><feGaussianBlur stdDeviation="{6*S}"/></filter>')
 
-    add("clouds", f'<rect width="{W}" height="{H*0.66:.0f}" filter="url(#clouds)"/>', False,
+    add("clouds", f'<rect width="{W}" height="{H*0.66:.0f}" filter="url(#clouds)"/>', True,
         colour("#2A2E58", 0.3), colour("#F7C9A8", 0.6), colour("#FFFFFF", 0.55), colour("#F0A24E", 0.55),
         defs=f'<filter id="clouds" x="0" y="0" width="100%" height="100%">'
              f'<feTurbulence type="fractalNoise" baseFrequency="{0.0009/S} {0.004/S}" numOctaves="5" seed="12"/>'
@@ -315,13 +323,118 @@ def fantasy():
     mist = "".join(f'<rect x="0" y="{y0 - 60*S:.0f}" width="{W}" height="{260*S:.0f}" fill="url(#mist)" opacity="{op}"/>'
                    for (y0, op) in [(hy - 160 * S, 0.55), (hy - 40 * S, 0.43), (hy + 150 * S, 0.31)])
     add("mist", mist, False,
-        colour("#4A5A9A", 0.15), colour("#F7C9A8", 0.5), colour("#FFFFFF", 0.35), colour("#F7B267", 0.5),
+        colour("#4A5A9A", 0.15), colour("#F7C9A8", 0.5), colour("#FFFFFF", 0.35), colour("#F7B267", 0.5), size=VGRAD,
         defs='<linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
              '<stop offset="0.5" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
     return layers
 
 
-THEMES = {"fantasy": ("Fantasy", "Fantasy Scene", fantasy)}
+# ── Shooter: an overcast valley, a radar station on the ridge, the overlay ──
+def shooter():
+    """Desaturated and cold: the tactical-overlay look. A radar station stands on the
+    mid ridge where the fantasy castle would; a helicopter holds over the valley."""
+    S = gb.S
+    rng = random.Random(17)
+    hy = H * 0.60
+    station_x, station_k = W * 0.78, 4.6 * S
+
+    def shoulder(x):
+        d = max(0.0, abs(x - station_x) - 120 * S)
+        return 300 * S * max(0.0, 1 - d / (900 * S)) ** 1.5
+
+    ridges = [
+        ("far_ridge",  hy - 150 * S, 110 * S, None, None),
+        ("mid_ridge",  hy - 20 * S, 150 * S, shoulder, (station_x, 70 * S, hy - 20 * S - 300 * S, 90 * S)),
+        ("near_ridge", hy + 380 * S, 180 * S, lambda x: 160 * S * math.exp(-((x - W * 0.12) / (520 * S)) ** 2), None),
+    ]
+    paths = {k: gb.ridge(rng, y0, amp, 0.55, 14 * S, lift=lift, flatten=flat) for (k, y0, amp, lift, flat) in ridges}
+    ground = hy - 20 * S - 300 * S
+
+    layers = []
+
+    def add(key, body, compressed, night, dawn, day, dusk, rise=0.0, defs="", size=FULL):
+        layers.append((key, page(body, defs, size), compressed, size, dict(night=night, dawn=dawn, day=day, dusk=dusk, rise=rise)))
+
+    white = "#FFFFFF"
+    add("sky_base", f'<rect width="{W}" height="{H}" fill="{white}"/>', False,
+        colour("#1B2230"), colour("#6E6F78"), colour("#9AA7B5"), colour("#7D6A5C"), size=FLAT)
+    add("sky_top", f'<rect width="{W}" height="{H}" fill="url(#zenith)"/>', False,
+        colour("#080B12"), colour("#2C3140"), colour("#5C6E85"), colour("#2E2A33"), size=VGRAD,
+        defs='<linearGradient id="zenith" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="1"/>'
+             '<stop offset="0.7" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+    add("clouds", f'<rect width="{W}" height="{H*0.7:.0f}" filter="url(#overcast)"/>', True,
+        colour("#2A3140", 0.5), colour("#8C8A90", 0.6), colour("#D3D8DE", 0.7), colour("#8A7566", 0.6),
+        defs=f'<filter id="overcast" x="0" y="0" width="100%" height="100%">'
+             f'<feTurbulence type="fractalNoise" baseFrequency="{0.0012/S} {0.003/S}" numOctaves="5" seed="31"/>'
+             f'<feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.2 0 0 0 -0.95"/></filter>')
+    add("far_ridge", f'<path d="{paths["far_ridge"]}" fill="{white}"/>', True,
+        colour("#151B27"), colour("#4E5160"), colour("#6E7C8C"), colour("#5A4E4C"))
+
+    # The radar station: a blockhouse, a lattice mast, a dish on top, a fence line.
+    k = station_k
+    cx = station_x
+    st = [f'<rect x="{cx - 26*k:.1f}" y="{ground - 9*k:.1f}" width="{30*k:.1f}" height="{10*k:.1f}" fill="{white}"/>',
+          f'<rect x="{cx - 22*k:.1f}" y="{ground - 13*k:.1f}" width="{10*k:.1f}" height="{4.5*k:.1f}" fill="{white}"/>',
+          f'<polygon points="{cx + 6*k:.1f},{ground + 1:.1f} {cx + 14*k:.1f},{ground + 1:.1f} {cx + 11.2*k:.1f},{ground - 44*k:.1f} {cx + 8.8*k:.1f},{ground - 44*k:.1f}" fill="{white}"/>',
+          f'<rect x="{cx + 9.4*k:.1f}" y="{ground - 52*k:.1f}" width="{1.2*k:.1f}" height="{9*k:.1f}" fill="{white}"/>',
+          f'<path d="M{cx + 3*k:.1f} {ground - 44*k:.1f} A{9*k:.1f} {9*k:.1f} 0 0 1 {cx + 17*k:.1f} {ground - 52*k:.1f} L{cx + 10*k:.1f} {ground - 46*k:.1f} Z" fill="{white}"/>',
+          f'<rect x="{cx - 34*k:.1f}" y="{ground - 3.2*k:.1f}" width="{60*k:.1f}" height="{0.5*k:.1f}" fill="{white}"/>']
+    for i in range(9):
+        st.append(f'<rect x="{cx - 34*k + i*7.5*k:.1f}" y="{ground - 3.2*k:.1f}" width="{0.5*k:.1f}" height="{3.2*k:.1f}" fill="{white}"/>')
+    for i in range(1, 6):
+        y = ground - 44 * k + i * 7 * k
+        st.append(f'<rect x="{cx + 6.2*k:.1f}" y="{y:.1f}" width="{7.6*k:.1f}" height="{0.45*k:.1f}" fill="{white}"/>')
+    add("mid_ridge_station", f'<path d="{paths["mid_ridge"]}" fill="{white}"/>' + "".join(st), True,
+        colour("#0E121B"), colour("#3B3E4B"), colour("#556372"), colour("#3F3736"))
+
+    # A helicopter holding over the valley, rotor as a thin blur.
+    hx, hyy, hk = W * 0.58, H * 0.30, 2.6 * S
+    heli = (f'<ellipse cx="{hx}" cy="{hyy}" rx="{22*hk:.1f}" ry="{8*hk:.1f}" fill="{white}"/>'
+            f'<rect x="{hx + 14*hk:.1f}" y="{hyy - 2.5*hk:.1f}" width="{40*hk:.1f}" height="{4*hk:.1f}" fill="{white}"/>'
+            f'<rect x="{hx + 50*hk:.1f}" y="{hyy - 12*hk:.1f}" width="{3*hk:.1f}" height="{14*hk:.1f}" fill="{white}"/>'
+            f'<rect x="{hx - 2*hk:.1f}" y="{hyy - 14*hk:.1f}" width="{4*hk:.1f}" height="{7*hk:.1f}" fill="{white}"/>'
+            f'<rect x="{hx - 60*hk:.1f}" y="{hyy - 15*hk:.1f}" width="{120*hk:.1f}" height="{1.6*hk:.1f}" fill="{white}" opacity="0.7"/>'
+            f'<rect x="{hx - 10*hk:.1f}" y="{hyy + 9*hk:.1f}" width="{26*hk:.1f}" height="{1.6*hk:.1f}" fill="{white}"/>')
+    add("helicopter", heli, True,
+        colour("#0A0D14"), colour("#2A2E3A"), colour("#3E4956"), colour("#2C2726"))
+
+    add("near_ridge", f'<path d="{paths["near_ridge"]}" fill="{white}"/>', True,
+        colour("#070910"), colour("#1F222B"), colour("#2F3A44"), colour("#221E1E"))
+
+    mist = "".join(f'<rect x="0" y="{y0 - 60*S:.0f}" width="{W}" height="{260*S:.0f}" fill="url(#mist)" opacity="{op}"/>'
+                   for (y0, op) in [(hy - 150 * S, 0.5), (hy - 20 * S, 0.4)])
+    add("mist", mist, False,
+        colour("#39445A", 0.25), colour("#B9B5BA", 0.45), colour("#E6EAEE", 0.4), colour("#B39C8C", 0.4), size=VGRAD,
+        defs='<linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+             '<stop offset="0.5" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+
+    # The tactical overlay: brackets, a tick ruler, a faint reticle. Constant, cool grey.
+    ox0, ox1 = W * 0.44, W * 0.96
+    oy0, oy1 = H * 0.10, H * 0.90
+    L = 34 * S * 3
+    ov = [f'<g fill="none" stroke="{white}" stroke-width="{1.6:.1f}" stroke-linecap="square">'
+          f'<polyline points="{ox0},{oy0 + L} {ox0},{oy0} {ox0 + L},{oy0}"/>'
+          f'<polyline points="{ox1 - L},{oy0} {ox1},{oy0} {ox1},{oy0 + L}"/>'
+          f'<polyline points="{ox0},{oy1 - L} {ox0},{oy1} {ox0 + L},{oy1}"/>'
+          f'<polyline points="{ox1 - L},{oy1} {ox1},{oy1} {ox1},{oy1 - L}"/>'
+          f'<line x1="{ox0 + L*1.6:.0f}" y1="{oy0 + 26*S*3:.0f}" x2="{ox1 - L*1.6:.0f}" y2="{oy0 + 26*S*3:.0f}"/>'
+          f'<circle cx="{W*0.72:.0f}" cy="{H*0.56:.0f}" r="{H*0.17:.0f}"/></g>']
+    for i in range(0, 41):
+        x = ox0 + L * 1.6 + (ox1 - ox0 - L * 3.2) * i / 40
+        h = 10 if i % 5 == 0 else 5
+        ov.append(f'<rect x="{x:.1f}" y="{oy0 + 26*S*3:.0f}" width="1.4" height="{h}" fill="{white}"/>')
+    rc, rr = (W * 0.72, H * 0.56), H * 0.17
+    for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+        ov.append(f'<rect x="{rc[0] + dx*rr - (14 if dx else 0.7):.1f}" y="{rc[1] + dy*rr - (14 if dy else 0.7):.1f}" '
+                  f'width="{28 if dx else 1.4}" height="{28 if dy else 1.4}" fill="{white}"/>')
+    ov.append(f'<circle cx="{rc[0]}" cy="{rc[1]}" r="2.2" fill="{white}"/>')
+    add("overlay", "".join(ov), True,
+        colour("#C9D2DB", 0.55), colour("#C9D2DB", 0.45), colour("#C9D2DB", 0.5), colour("#C9D2DB", 0.5))
+    return layers
+
+
+THEMES = {"fantasy": ("Fantasy", "Fantasy Scene", fantasy),
+          "shooter": ("Shooter", "Shooter Scene", shooter)}
 
 
 def write_once(path, text):
@@ -342,7 +455,7 @@ def build(key):
     if write_once(SHADER_PATH + ".meta", SHADER_META):
         print("shader .meta written")
 
-    for i, (name, html, compressed, mat) in enumerate(make(), start=1):
+    for i, (name, html, compressed, size, mat) in enumerate(make(), start=1):
         stem = f"uipilot_{key}_scene_{i:02d}_{name}"
         html_path = os.path.join(work, stem + ".html")
         png_path = os.path.join(out, stem + ".png")
@@ -352,7 +465,7 @@ def build(key):
             os.remove(png_path)
         for _ in range(3):
             subprocess.run([EDGE, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=1",
-                            f"--window-size={W},{H}", "--default-background-color=00000000", "--virtual-time-budget=4000",
+                            f"--window-size={size[0]},{size[1]}", "--default-background-color=00000000", "--virtual-time-budget=4000",
                             f"--screenshot={png_path}", "file:///" + html_path.replace("\\", "/")],
                            check=False, capture_output=True)
             if os.path.exists(png_path):

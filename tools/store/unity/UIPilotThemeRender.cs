@@ -47,6 +47,7 @@ public static class UIPilotThemeRender
         ("jrpg",     "JRPG Window",     "overworld", "Skyward Tales", true),
         ("pixel",    "Pixel Retro",     "pixel",     "Pixel Quest",   true),
         ("scifi",    "Sci-Fi HUD",      "space",     "Deep Orbit",    true),
+        ("shooter",  "Military Shooter", "none",     "Blackline",     true),   // its scene is in the theme
     };
 
     public static void Run()
