@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.UIGenerator;
 
 namespace UIPilot.Editor.Modules.ScriptSetup
@@ -173,7 +174,9 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 UIGeneratorContent.GameObjects.MainMenuFootnote,
                 UIGeneratorContent.Settings.VersionFormat,
                 UIGeneratorContent.Settings.On,
-                UIGeneratorContent.Settings.Off);
+                UIGeneratorContent.Settings.Off,
+                UIPilotLabels.Scene.TimeOfDayProperty,
+                ScriptSetupContent.GameObjects.TimeOfDayField);
         }
 
         private static string GetPanelName(string prefix)

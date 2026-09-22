@@ -1,0 +1,4 @@
+
+# Build folders of the art tools (Edge screenshots of layer pages)
+tools/art/build/
+__pycache__/

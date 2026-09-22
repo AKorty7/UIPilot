@@ -116,6 +116,21 @@ def castle_svg(cx, ground, k, fill, lit, lit_side, window=None):
             + "".join(glow) + "</g>")
 
 
+def castle_windows_svg(cx, ground, k, colour):
+    """Only the castle's lit windows and gate, for a layer of their own."""
+    parts = []
+    for (x, y) in CASTLE_WINDOWS:
+        parts.append(f'<rect x="{cx + (x - 0.65)*k:.1f}" y="{ground - (y + 2.4)*k:.1f}" width="{1.3*k:.1f}" '
+                     f'height="{2.4*k:.1f}" rx="{0.65*k:.1f}" fill="{colour}"/>')
+    gl, gw, gh = CASTLE_GATE
+    r = gw / 2
+    parts.append(f'<path d="M{cx + gl*k:.1f} {ground:.1f} V{ground - (gh - r)*k:.1f} '
+                 f'A{r*k:.1f} {r*k:.1f} 0 0 1 {cx + (gl + gw)*k:.1f} {ground - (gh - r)*k:.1f} '
+                 f'V{ground:.1f} Z" fill="{colour}"/>')
+    glow = "".join(parts)
+    return f'<g filter="url(#blur2)" opacity="0.9">{glow}</g>{glow}'
+
+
 def castle_pixels(put, cx, ground, fill, lit, window):
     """The same castle, one unit to one pixel, lit from the right."""
     for (left, width, height) in CASTLE_BLOCKS:

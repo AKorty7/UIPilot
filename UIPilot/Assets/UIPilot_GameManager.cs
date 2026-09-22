@@ -32,8 +32,21 @@ public class UIPilot_GameManager : MonoBehaviour
     private TMP_Text _fullscreenValue;
     private TMP_Text _qualityValue;
 
+    [Header("Scene")]
+    [Tooltip("The hour the menu's scene shows, for themes that have one: 0 = midnight, 0.25 = dawn, 0.5 = noon, 0.75 = dusk. Change it from your code with SetTimeOfDay.")]
+    [Range(0f, 1f)] public float timeOfDay = 0.5f;
+
+    [Tooltip("Seconds for one full day, when the scene should run on its own. 0 = it stays at Time Of Day.")]
+    public float dayLengthSeconds = 0f;
+
+    // The one value every scene layer reads; UIPilot's shader looks it up by this name.
+    private const string TimeOfDayProperty = "_UIPilotTimeOfDay";
+    private float _hourFrom, _hourStep, _hourBlend = 1f, _hourSeconds;
+
     private void Awake()
     {
+        Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);
+
         _mainMenuPanelGO = FindObject(MainMenuPanel);
         _pauseMenuPanelGO = FindObject(PauseMenuPanel);
         _settingsPanelGO = FindObject(SettingsPanel);
@@ -59,6 +72,45 @@ public class UIPilot_GameManager : MonoBehaviour
     private void Start()
     {
         ShowPanel(MainMenuPanel);
+    }
+
+    // Turns the scene's clock: a running day, or one blend asked for by SetTimeOfDay.
+    // Unscaled time, so the scene keeps moving behind a pause menu.
+    private void Update()
+    {
+        if (dayLengthSeconds > 0f)
+        {
+            timeOfDay = Mathf.Repeat(timeOfDay + Time.unscaledDeltaTime / dayLengthSeconds, 1f);
+            _hourBlend = 1f;
+        }
+        else if (_hourBlend < 1f)
+        {
+            _hourBlend = Mathf.Min(1f, _hourBlend + Time.unscaledDeltaTime / _hourSeconds);
+            var eased = _hourBlend * _hourBlend * (3f - 2f * _hourBlend);
+            timeOfDay = Mathf.Repeat(_hourFrom + _hourStep * eased, 1f);
+        }
+
+        Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);
+    }
+
+    // Sets the scene's hour (0 = midnight, 0.5 = noon), at once or blended over
+    // some seconds, the short way round the clock. Call it from your own code:
+    // FindAnyObjectByType<UIPilot_GameManager>().SetTimeOfDay(0.75f, 3f);
+    public void SetTimeOfDay(float hour, float seconds = 0f)
+    {
+        hour = Mathf.Repeat(hour, 1f);
+        if (seconds <= 0f)
+        {
+            timeOfDay = hour;
+            _hourBlend = 1f;
+            Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);
+            return;
+        }
+
+        _hourFrom = timeOfDay;
+        _hourStep = Mathf.Repeat(hour - timeOfDay + 0.5f, 1f) - 0.5f;
+        _hourSeconds = seconds;
+        _hourBlend = 0f;
     }
 
     // Finds an object even when it, or its panel, is switched off.

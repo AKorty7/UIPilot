@@ -123,6 +123,14 @@ namespace UIPilot.Editor.Core
             internal const string EditorPrefsOpen = "UIPilot_ClickDebugOpen";
         }
 
+        internal static class Scene
+        {
+            // The one global the scene layers read; the generated GameManager sets it too.
+            internal const string TimeOfDayProperty = "_UIPilotTimeOfDay";
+            internal const string SessionHourKey    = "UIPilot_SceneHour";
+            internal const float  DefaultHour       = 0.5f;
+        }
+
         internal static class EventSystem
         {
             internal const string ObjectName = "EventSystem";

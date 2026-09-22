@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UIPilot.Editor.Core;
+using UIPilot.Editor.Modules.ScriptSetup;
 
 namespace UIPilot.Editor.Modules.UIGenerator
 {
@@ -75,7 +76,36 @@ namespace UIPilot.Editor.Modules.UIGenerator
                 restyled++;
             }
 
+            if (restyled > 0) SetSceneHour(resolved);
             return restyled;
+        }
+
+        // The game starts its scene at the theme's hour: the generated GameManager's
+        // Time Of Day field takes the theme's value. The component is the developer's
+        // own type, so the field is reached by its serialized name (its name and the
+        // object's are ScriptSetup's constants, read here, not a call into it). Build
+        // UI calls this once the GameManager exists; Apply Theme calls it too.
+        internal static void SetSceneHour(UIPilotTheme theme)
+        {
+            var resolved = ResolveTheme(theme);
+            var manager  = GameObject.Find(ScriptSetupContent.GameObjects.ManagerName);
+            if (manager == null) return;
+
+            foreach (var component in manager.GetComponents<MonoBehaviour>())
+            {
+                if (component == null) continue;   // a missing-script slot
+
+                var serialized = new SerializedObject(component);
+                var hour       = serialized.FindProperty(ScriptSetupContent.GameObjects.TimeOfDayField);
+                if (hour == null || hour.propertyType != SerializedPropertyType.Float) continue;
+
+                if (!Mathf.Approximately(hour.floatValue, resolved.timeOfDay))
+                {
+                    hour.floatValue = resolved.timeOfDay;
+                    serialized.ApplyModifiedProperties();   // undoable with the apply
+                }
+                return;
+            }
         }
 
         // The preset the window selects when the developer has not chosen a theme.

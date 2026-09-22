@@ -107,11 +107,16 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             var theme = Bare();
 
-            theme.wash             = new Color32(0x14, 0x0C, 0x06, 0x9E);
+            // The valley at dusk: castle on its crag, windows just lit. The layers
+            // carry the light, so the wash is a light veil, not the mood.
+            theme.sceneLayers = SceneLayers(UIGeneratorContent.Art.FantasyScene);
+            theme.timeOfDay   = 0.75f;
+
+            theme.wash             = new Color32(0x14, 0x0C, 0x06, 0x4D);
             theme.blooms           = true;
-            theme.bloomTopLeft     = new Color32(0xFF, 0xB2, 0x5B, 0x4D);
-            theme.bloomBottomRight = new Color32(0xFF, 0x7A, 0x2E, 0x33);
-            theme.bloomTopRight    = new Color32(0xFF, 0xDD, 0x9E, 0x40);
+            theme.bloomTopLeft     = new Color32(0xFF, 0xB2, 0x5B, 0x26);   // faint: the scene lights itself
+            theme.bloomBottomRight = new Color32(0xFF, 0x7A, 0x2E, 0x1A);
+            theme.bloomTopRight    = new Color32(0xFF, 0xDD, 0x9E, 0x20);
             theme.bloomCentre      = new Color32(0xFF, 0xE8, 0xC0, 0x00);
 
             theme.panel     = Color.white;                      // the parchment carries its own colour
@@ -273,6 +278,17 @@ namespace UIPilot.Editor.Modules.UIGenerator
             theme.meterTrack = new Color32(0x37, 0xE0, 0xFF, 0x33);
             theme.meterFill  = cyan;
             return theme;
+        }
+
+        private static UIPilotSceneLayer[] SceneLayers((string Sprite, string Material)[] names)
+        {
+            var layers = new UIPilotSceneLayer[names.Length];
+            for (var i = 0; i < names.Length; i++)
+            {
+                layers[i].sprite   = UIGeneratorArt.Sprite(names[i].Sprite);
+                layers[i].material = UIGeneratorArt.Material(names[i].Material);
+            }
+            return layers;
         }
 
         // Every decoration off: the starting point for a theme that brings its own.

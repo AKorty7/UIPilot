@@ -15,6 +15,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string BandSuffix         = "_Band";
             internal const string SceneSuffix        = "_Scene";
             internal const string PictureChild       = "Picture";
+            internal const string LayerChild         = "Layer";
+            internal const int    SceneLayerSlots    = 12;   // every menu has this many, most unused
             internal const string WashSuffix         = "_Wash";
             internal const string BackdropSuffix     = "_Backdrop";
             internal const string BloomChild         = "Bloom";
@@ -101,6 +103,24 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string SilkscreenShadow = "Silkscreen SDF Shadow";
             internal const string Tektur           = "Tektur SDF";
             internal const string TekturGlow       = "Tektur SDF Glow";
+
+            // A theme's scene, back to front: each layer's white sprite and the
+            // UIPilot/Scene Layer material that colours it through the day.
+            internal static readonly (string Sprite, string Material)[] FantasyScene =
+            {
+                ("uipilot_fantasy_scene_01_sky_base", "Fantasy Scene 01 Sky Base"),
+                ("uipilot_fantasy_scene_02_sky_top", "Fantasy Scene 02 Sky Top"),
+                ("uipilot_fantasy_scene_03_stars", "Fantasy Scene 03 Stars"),
+                ("uipilot_fantasy_scene_04_moon", "Fantasy Scene 04 Moon"),
+                ("uipilot_fantasy_scene_05_sun", "Fantasy Scene 05 Sun"),
+                ("uipilot_fantasy_scene_06_clouds", "Fantasy Scene 06 Clouds"),
+                ("uipilot_fantasy_scene_07_far_hills", "Fantasy Scene 07 Far Hills"),
+                ("uipilot_fantasy_scene_08_crag_castle", "Fantasy Scene 08 Crag Castle"),
+                ("uipilot_fantasy_scene_09_windows", "Fantasy Scene 09 Windows"),
+                ("uipilot_fantasy_scene_10_mid_hills", "Fantasy Scene 10 Mid Hills"),
+                ("uipilot_fantasy_scene_11_near_hills", "Fantasy Scene 11 Near Hills"),
+                ("uipilot_fantasy_scene_12_mist", "Fantasy Scene 12 Mist")
+            };
         }
 
         // Title text on each panel. The main menu has no constant: its title is

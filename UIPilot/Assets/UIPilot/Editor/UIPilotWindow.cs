@@ -585,6 +585,7 @@ namespace UIPilot.Editor
             var selections = BuildAutoSelections(buttons, actions);
 
             BindingModule.ApplyBindings(selections, actions);
+            UIGeneratorModule.SetSceneHour(LoadSavedTheme());   // static: this may run after a reload
             ValidationModule.Validate();
 
             Debug.Log(UIPilotLabels.QuickBuild.ConsoleComplete);

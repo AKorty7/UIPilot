@@ -112,9 +112,11 @@ namespace UIPilot.Editor.Modules.UIGenerator
         }
 
         // ── Scene: what the menu is seen against ────────────────────────────
-        // The developer's own picture, under everything. It covers the screen and
-        // keeps its shape (an AspectRatioFitter crops it), so it looks right on any
-        // aspect ratio without a script. The mask hides what the crop pushes out.
+        // The developer's own picture, then the theme's layers, back to front, all
+        // under everything else. Each covers the screen and keeps its shape (an
+        // AspectRatioFitter crops it), so it looks right on any aspect ratio without
+        // a script. The mask hides what the crop pushes out. Every menu gets the full
+        // set of layer slots; a theme fills the ones it needs.
 
         private static void CreateScene(GameObject parent, string objectName)
         {
@@ -123,6 +125,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
             go.AddComponent<RectMask2D>();
 
             CreateCover(go, UIGeneratorContent.GameObjects.PictureChild);
+            for (var i = 0; i < UIGeneratorContent.GameObjects.SceneLayerSlots; i++)
+                CreateCover(go, UIGeneratorContent.GameObjects.LayerChild);
         }
 
         private static Image CreateCover(GameObject parent, string objectName)

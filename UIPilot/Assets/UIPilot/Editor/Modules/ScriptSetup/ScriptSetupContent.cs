@@ -25,6 +25,8 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             //   {5} {6}      fullscreen value text, quality value text
             //   {7} {8}      version footnote object, its "Version {0}" format
             //   {9} {10}     the words shown for fullscreen on / off
+            //   {11}         the global shader property the scene layers read
+            //   {12}         the Time Of Day field, named once below so the theme can set it
             internal const string Header =
                 "using TMPro;\n" +
                 "using UnityEngine;\n" +
@@ -54,8 +56,21 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 "    private TMP_Text _fullscreenValue;\n" +
                 "    private TMP_Text _qualityValue;\n" +
                 "\n" +
+                "    [Header(\"Scene\")]\n" +
+                "    [Tooltip(\"The hour the menu's scene shows, for themes that have one: 0 = midnight, 0.25 = dawn, 0.5 = noon, 0.75 = dusk. Change it from your code with SetTimeOfDay.\")]\n" +
+                "    [Range(0f, 1f)] public float {12} = 0.5f;\n" +
+                "\n" +
+                "    [Tooltip(\"Seconds for one full day, when the scene should run on its own. 0 = it stays at Time Of Day.\")]\n" +
+                "    public float dayLengthSeconds = 0f;\n" +
+                "\n" +
+                "    // The one value every scene layer reads; UIPilot's shader looks it up by this name.\n" +
+                "    private const string TimeOfDayProperty = \"{11}\";\n" +
+                "    private float _hourFrom, _hourStep, _hourBlend = 1f, _hourSeconds;\n" +
+                "\n" +
                 "    private void Awake()\n" +
                 "    {{\n" +
+                "        Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);\n" +
+                "\n" +
                 "        _mainMenuPanelGO = FindObject(MainMenuPanel);\n" +
                 "        _pauseMenuPanelGO = FindObject(PauseMenuPanel);\n" +
                 "        _settingsPanelGO = FindObject(SettingsPanel);\n" +
@@ -81,6 +96,45 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 "    private void Start()\n" +
                 "    {{\n" +
                 "        ShowPanel(MainMenuPanel);\n" +
+                "    }}\n" +
+                "\n" +
+                "    // Turns the scene's clock: a running day, or one blend asked for by SetTimeOfDay.\n" +
+                "    // Unscaled time, so the scene keeps moving behind a pause menu.\n" +
+                "    private void Update()\n" +
+                "    {{\n" +
+                "        if (dayLengthSeconds > 0f)\n" +
+                "        {{\n" +
+                "            timeOfDay = Mathf.Repeat(timeOfDay + Time.unscaledDeltaTime / dayLengthSeconds, 1f);\n" +
+                "            _hourBlend = 1f;\n" +
+                "        }}\n" +
+                "        else if (_hourBlend < 1f)\n" +
+                "        {{\n" +
+                "            _hourBlend = Mathf.Min(1f, _hourBlend + Time.unscaledDeltaTime / _hourSeconds);\n" +
+                "            var eased = _hourBlend * _hourBlend * (3f - 2f * _hourBlend);\n" +
+                "            timeOfDay = Mathf.Repeat(_hourFrom + _hourStep * eased, 1f);\n" +
+                "        }}\n" +
+                "\n" +
+                "        Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);\n" +
+                "    }}\n" +
+                "\n" +
+                "    // Sets the scene's hour (0 = midnight, 0.5 = noon), at once or blended over\n" +
+                "    // some seconds, the short way round the clock. Call it from your own code:\n" +
+                "    // FindAnyObjectByType<UIPilot_GameManager>().SetTimeOfDay(0.75f, 3f);\n" +
+                "    public void SetTimeOfDay(float hour, float seconds = 0f)\n" +
+                "    {{\n" +
+                "        hour = Mathf.Repeat(hour, 1f);\n" +
+                "        if (seconds <= 0f)\n" +
+                "        {{\n" +
+                "            timeOfDay = hour;\n" +
+                "            _hourBlend = 1f;\n" +
+                "            Shader.SetGlobalFloat(TimeOfDayProperty, timeOfDay);\n" +
+                "            return;\n" +
+                "        }}\n" +
+                "\n" +
+                "        _hourFrom = timeOfDay;\n" +
+                "        _hourStep = Mathf.Repeat(hour - timeOfDay + 0.5f, 1f) - 0.5f;\n" +
+                "        _hourSeconds = seconds;\n" +
+                "        _hourBlend = 0f;\n" +
                 "    }}\n" +
                 "\n" +
                 "    // Finds an object even when it, or its panel, is switched off.\n" +
@@ -224,6 +278,8 @@ namespace UIPilot.Editor.Modules.ScriptSetup
         internal static class GameObjects
         {
             internal const string ManagerName = "UIPilot_GameManager";
+            // The serialized field Apply Theme writes the theme's hour into.
+            internal const string TimeOfDayField = "timeOfDay";
         }
 
         internal static class Messages

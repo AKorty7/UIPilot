@@ -46,24 +46,43 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         // ── Scene ────────────────────────────────────────────────────────────
 
+        // The picture, if any, replaces the layers. The hour is shown at once and
+        // kept for the session, so the Editor and the game agree on what is seen.
         private static void StyleScene(Transform scene, UIPilotTheme theme)
         {
             if (scene == null) return;
 
-            var picture = scene.Find(UIGeneratorContent.GameObjects.PictureChild);
-            if (picture != null) StyleCover(picture, theme.picture);
+            var layer = 0;
+            foreach (Transform child in scene)
+            {
+                if (child.name == UIGeneratorContent.GameObjects.PictureChild)
+                    StyleCover(child, theme.picture, null);
+                else if (child.name == UIGeneratorContent.GameObjects.LayerChild)
+                    StyleLayer(child, theme, layer++);
+            }
+
+            UIPilotScenePreview.SetHour(theme.timeOfDay);
+        }
+
+        private static void StyleLayer(Transform cover, UIPilotTheme theme, int index)
+        {
+            var hasLayer = theme.picture == null && theme.sceneLayers != null && index < theme.sceneLayers.Length;
+            var sprite   = hasLayer ? theme.sceneLayers[index].sprite   : null;
+            var material = hasLayer ? theme.sceneLayers[index].material : null;
+            StyleCover(cover, sprite, material);
         }
 
         // A full-screen image that keeps its own proportions. Hidden when empty,
         // so the game scene shows through. The fitter only sizes an active object,
         // so a hidden one is put back to its built size by hand.
-        private static void StyleCover(Transform cover, Sprite art)
+        private static void StyleCover(Transform cover, Sprite art, Material material)
         {
             var image = cover.GetComponent<Image>();
             if (image == null) return;
 
             SetArt(image, art, Image.Type.Simple, 1f);
-            image.color = Color.white;
+            image.color    = Color.white;
+            image.material = art != null ? material : null;
             Show(cover, art != null);
 
             var fitter = cover.GetComponent<AspectRatioFitter>();

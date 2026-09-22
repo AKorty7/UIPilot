@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
   m_Name: Pixel Retro
   m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers: []
+  timeOfDay: 0.5
   wash: {r: 0.015686275, g: 0.015686275, b: 0.047058824, a: 0.6}
   blooms: 0
   bloomTopLeft: {r: 0.7019608, g: 0.6509804, b: 0.96862745, a: 0.54901963}

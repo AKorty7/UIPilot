@@ -33,12 +33,18 @@ namespace UIPilot.Editor.Core
     // UIGeneratorModule, which starts from the full preset, not a [CreateAssetMenu].
     public sealed class UIPilotTheme : ScriptableObject
     {
-        [Header("Picture — behind everything, instead of your game scene")]
-        [Tooltip("Your own picture behind the menu: key art, a screenshot, a painting. It covers the screen and keeps its shape (the edges are cropped on other aspect ratios). Empty = the game scene shows through.")]
+        [Header("Scene — behind everything, instead of your game scene")]
+        [Tooltip("Your own picture behind the menu: key art, a screenshot, a painting. It covers the screen and keeps its shape (the edges are cropped on other aspect ratios). A picture replaces the theme's scene layers. Empty = the layers, or your game, show through.")]
         public Sprite picture;
 
+        [Tooltip("A scene drawn in layers, back to front, that changes with the time of day: sky, stars, sun, hills, a landmark, mist. Up to 12. Empty = your game shows through.")]
+        public UIPilotSceneLayer[] sceneLayers = new UIPilotSceneLayer[0];
+
+        [Tooltip("The hour the scene is designed for: 0 = midnight, 0.25 = dawn, 0.5 = noon, 0.75 = dusk. Previewed in the Editor and set as the starting hour on the generated UIPilot_GameManager; your game changes it at runtime with SetTimeOfDay.")]
+        [Range(0f, 1f)] public float timeOfDay = 0.5f;
+
         [Header("Atmosphere — drawn over the scene, behind the menu")]
-        [Tooltip("A veil over the whole screen. Its alpha decides how much of the scene or picture shows through.")]
+        [Tooltip("A veil over the whole screen. Its alpha decides how much of the scene, picture or game shows through.")]
         public Color wash = new Color32(0x9D, 0xB6, 0xF2, 0xB8);
 
         [Tooltip("Four huge soft blooms of colour that drift across the screen.")]
@@ -151,5 +157,11 @@ namespace UIPilot.Editor.Core
         public float ruleHeight = 1f;
         public Color meterTrack = new Color32(0xFF, 0xFF, 0xFF, 0x40);
         public Color meterFill  = new Color32(0xF4, 0xFB, 0xFF, 0xFF);
+
+        // Dragging Time Of Day in the Inspector shows the scene at that hour at once.
+        private void OnValidate()
+        {
+            UIPilotScenePreview.SetHour(timeOfDay);
+        }
     }
 }

@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
   m_Name: Soft Club Night
   m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers: []
+  timeOfDay: 0.5
   wash: {r: 0.023529412, g: 0.039215688, b: 0.14117648, a: 0.93333334}
   blooms: 1
   bloomTopLeft: {r: 0.41568628, g: 0.27058825, b: 0.9411765, a: 0.7019608}
