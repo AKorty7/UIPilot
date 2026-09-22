@@ -26,6 +26,7 @@ namespace UIPilot.Editor
         // ── Collapse All state ───────────────────────────────────────────────
         private bool _allCollapsed   = false;
         private bool _savedHealthOpen;
+        private bool _savedClickOpen;
         private bool _savedBuildOpen;
         private bool _savedScanOpen;
         private bool _savedManualOpen;
@@ -116,9 +117,11 @@ namespace UIPilot.Editor
             _manualFoldout     = EditorPrefs.GetBool(UIPilotLabels.Window.EditorPrefsManualOpen, false);
             _healthFoldout       = EditorPrefs.GetBool(UIPilotLabels.Health.EditorPrefsOpen,       true);
             _healthChecksFoldout = EditorPrefs.GetBool(UIPilotLabels.Health.EditorPrefsChecksOpen, false);
+            _clickFoldout        = EditorPrefs.GetBool(UIPilotLabels.ClickDebug.EditorPrefsOpen,   true);
             _theme             = LoadSavedTheme();
             RefreshMissingPresets();
             UIPilotHealthMonitor.Changed += Repaint;
+            UIPilotClickMonitor.Changed  += Repaint;
 
             // A Quick Build that had to wait for script compilation resumes here:
             // OnEnable runs again after the domain reload, delayCall does not survive it.
@@ -132,6 +135,7 @@ namespace UIPilot.Editor
         private void OnDisable()
         {
             UIPilotHealthMonitor.Changed -= Repaint;
+            UIPilotClickMonitor.Changed  -= Repaint;
         }
 
         // A preset deleted or restored in the Project window shows up here at once.
@@ -164,6 +168,7 @@ namespace UIPilot.Editor
                 DrawHeader();
                 EditorGUILayout.Space(4f);
                 DrawHealthSection();
+                DrawClickSection();
                 DrawBuildSection();
                 DrawScanRepairSection();
                 DrawManualSection();
@@ -242,10 +247,12 @@ namespace UIPilot.Editor
             if (!_allCollapsed)
             {
                 _savedHealthOpen   = _healthFoldout;
+                _savedClickOpen    = _clickFoldout;
                 _savedBuildOpen    = _buildFoldout;
                 _savedScanOpen     = _scanRepairFoldout;
                 _savedManualOpen   = _manualFoldout;
                 _healthFoldout     = false;
+                _clickFoldout      = false;
                 _buildFoldout      = false;
                 _scanRepairFoldout = false;
                 _manualFoldout     = false;
@@ -253,6 +260,7 @@ namespace UIPilot.Editor
             else
             {
                 _healthFoldout     = _savedHealthOpen;
+                _clickFoldout      = _savedClickOpen;
                 _buildFoldout      = _savedBuildOpen;
                 _scanRepairFoldout = _savedScanOpen;
                 _manualFoldout     = _savedManualOpen;

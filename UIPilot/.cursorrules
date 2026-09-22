@@ -24,9 +24,15 @@ ARCHITECTURE RULES — NEVER BREAK THESE
 - No runtime MonoBehaviours ever
 - No hardcoded strings — all strings in Labels/Content files
 - No logic inside UIPilotWindow.cs — UI layer only
-- Modules never call each other except via UIPilotWindow, or via
-  UIPilotHealthMonitor, the one coordinator that runs with the window
-  closed (approved 2026-09-19). Nothing else may call a module.
+- Modules never call each other except via UIPilotWindow, or via one of
+  the two coordinators that run with the window closed:
+  UIPilotHealthMonitor (UI Health, approved 2026-09-19) and
+  UIPilotClickMonitor (Click Debugger, built 2026-09-19 at the
+  developer's request). Nothing else may call a module.
+- UIPilotClickMonitor adds ONE step to the player loop (public
+  UnityEngine.LowLevel.PlayerLoop API), only in the Editor's Play mode,
+  and removes it when Play mode ends. It is Editor code, never a
+  MonoBehaviour, and nothing of it reaches a build. It only reads.
 - Scope: UIPilot may READ any UI in the scene (UI Health), but may
   CHANGE an object that is not UIPilot_ only when the developer clicks
   that row's Fix, as one undoable step. Checks never modify a scene.
@@ -62,8 +68,9 @@ Assets/UIPilot/Editor/
       UIGeneratorMenuBuilder.cs   (STRUCTURE only — never sets a look)
       UIGeneratorStyler.cs        (the ONLY code that sets appearance;
                                    used by Build UI and Apply Theme)
-      UIGeneratorThemePresets.cs  (Soft Club, Soft Club Night, Ink)
-      UIGeneratorArt.cs           (finds the shipped sprites and font)
+      UIGeneratorThemePresets.cs  (Soft Club, Soft Club Night, Ink, Fantasy RPG,
+                                   JRPG Window, Pixel Retro, Sci-Fi HUD)
+      UIGeneratorArt.cs           (finds the shipped sprites, fonts, materials)
     Health/                 (UI Health: read-only checks of ANY UI)
       HealthModule.cs       (entry: CheckOpenScenes, CheckSceneForBuild, RunFix)
       HealthScope.cs        (gathers scene objects once per run)
@@ -72,6 +79,13 @@ Assets/UIPilot/Editor/
       HealthHandheldChecks.cs (gamepad navigation, Steam Deck text size)
       HealthCheck.cs / HealthSeverity.cs / HealthIssue.cs
       HealthContent.cs / HealthSettings.cs (per user, UserSettings/)
+    ClickDebug/             (Click Debugger: explains one click in Play mode)
+      ClickDebugModule.cs   (entry: Inspect(position), Describe, Word)
+      ClickHandlers.cs      (what a handled click does: listeners, Interactable)
+      ClickDiagnosis.cs     (why a control under the pointer was not hit)
+      ClickPointer.cs       (reads the pointer; call it from the player loop)
+      ClickReport.cs / ClickVerdict.cs
+      ClickDebugContent.cs / ClickDebugSettings.cs (per user, UserSettings/)
     ActionDiscovery/
       DiscoveredAction.cs
       ActionDiscoveryModule.cs
@@ -90,9 +104,14 @@ Assets/UIPilot/Editor/
     UIPilotHierarchyLamps.cs (UI Health lamps in the Hierarchy)
   UIPilotWindow.cs
   UIPilotWindow.Health.cs   (the UI Health section, partial class)
+  UIPilotWindow.ClickDebug.cs (the Click Debugger section, partial class)
   UIPilotHealthMonitor.cs   (coordinator: runs checks, window open or not)
+  UIPilotClickMonitor.cs    (coordinator: watches clicks in Play mode)
   UIPilotHealthBuildCheck.cs (IProcessSceneWithReport: warns per build scene)
-Assets/UIPilot/Art/       (white tintable sprites + Michroma font, shipped)
+Assets/UIPilot/Art/       (white tintable sprites + fonts, shipped)
+  Themes/                 (genre theme sprites; carry their own colours.
+                           Source: tools/art/theme-sprites.html +
+                           build-theme-sprites.ps1, which writes the .metas)
 Assets/UIPilot/Themes/    (the preset theme assets buyers pick from)
 
 ═══════════════════════════════════════════
