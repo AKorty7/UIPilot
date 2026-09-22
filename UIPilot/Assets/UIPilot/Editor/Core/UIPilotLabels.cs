@@ -35,11 +35,24 @@ namespace UIPilot.Editor.Core
                 "Restyles the menus already in the scene with the selected theme. Layout, names and button wiring are untouched. Undo is supported.";
             internal const string BuiltInHint  =
                 "No theme selected: Build UI uses the built-in Soft Club look.";
+            // Under the field: the picker button is small and easy to miss, and
+            // clicking the field's name only highlights the theme in the Project window.
+            internal const string PickHint     =
+                "Pick another with the ○ button at the end of the field, or drag one in from Assets/UIPilot/Themes.";
 
             internal const string UndoApply      = "Apply UIPilot Theme";
             internal const string ConsoleApplied = "UIPilot: Theme \"{0}\" applied to {1} menu(s).";
             internal const string ConsoleNoMenus = "UIPilot: No generated menus in the scene to restyle. Click Build UI first.";
             internal const string BuiltInName    = "Soft Club (built-in)";
+
+            // Shown in the Build card after Apply Theme, so the outcome — and which
+            // theme it used — is visible without the Console.
+            internal const string StatusApplied  = "\"{0}\" applied to {1} menu(s).";
+            internal const string StatusAppliedDetail =
+                "The Game view shows the new look. Ctrl+Z puts the old one back.";
+            internal const string StatusNoMenus  = "No generated menus in the scene to restyle.";
+            internal const string StatusNoMenusDetail =
+                "Click Build UI first: it builds the menus with the theme picked above.";
 
             internal const string MissingHint    = "Missing: {0}.";
             internal const string ListSeparator  = ", ";

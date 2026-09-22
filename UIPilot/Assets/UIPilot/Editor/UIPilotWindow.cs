@@ -46,6 +46,13 @@ namespace UIPilot.Editor
         // changes, not per repaint: finding them is an AssetDatabase search.
         private List<string> _missingPresets = new List<string>();
 
+        // The last Apply Theme outcome, shown under the button until the next
+        // build, apply or clear. Not serialized: after a domain reload the scene
+        // may no longer show what the row would claim.
+        [NonSerialized] private string _applyStatus;
+        [NonSerialized] private string _applyDetail;
+        [NonSerialized] private bool   _applyOk;
+
         // ── Scan & Repair state ──────────────────────────────────────────────
         private bool                                    _scanRepairFoldout = false;
         private List<SceneAuditResult>                  _auditResults      = null;
@@ -314,11 +321,14 @@ namespace UIPilot.Editor
                 if (GUILayout.Button(ContentApplyTheme))
                     ApplyTheme();
 
+                DrawApplyStatus();
+
                 EditorGUILayout.Space(8f);
 
                 if (GUILayout.Button(ContentClearQuick))
                 {
                     ExecuteQuickClear();
+                    _applyStatus   = null;
                     _auditResults  = null;
                     _repairResults = null;
                     GUIUtility.ExitGUI();
@@ -348,8 +358,8 @@ namespace UIPilot.Editor
                 SaveTheme();
             }
 
-            if (_theme == null)
-                GUILayout.Label(UIPilotLabels.Theme.BuiltInHint, UIPilotStyles.Description);
+            GUILayout.Label(_theme == null ? UIPilotLabels.Theme.BuiltInHint : UIPilotLabels.Theme.PickHint,
+                UIPilotStyles.Description);
 
             DrawMissingPresets();
         }
@@ -419,13 +429,38 @@ namespace UIPilot.Editor
             var restyled = UIGeneratorModule.ApplyTheme(_theme);
             if (restyled == 0)
             {
+                SetApplyStatus(false, UIPilotLabels.Theme.StatusNoMenus, UIPilotLabels.Theme.StatusNoMenusDetail);
                 Debug.Log(UIPilotLabels.Theme.ConsoleNoMenus);
                 return;
             }
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-            Debug.Log(string.Format(UIPilotLabels.Theme.ConsoleApplied,
-                _theme != null ? _theme.name : UIPilotLabels.Theme.BuiltInName, restyled));
+            // In Edit mode the Game view redraws only when something asks it to;
+            // the restyle should show the moment the button is released.
+            EditorApplication.QueuePlayerLoopUpdate();
+
+            var themeName = _theme != null ? _theme.name : UIPilotLabels.Theme.BuiltInName;
+            SetApplyStatus(true, string.Format(UIPilotLabels.Theme.StatusApplied, themeName, restyled),
+                UIPilotLabels.Theme.StatusAppliedDetail);
+            Debug.Log(string.Format(UIPilotLabels.Theme.ConsoleApplied, themeName, restyled));
+        }
+
+        private void SetApplyStatus(bool ok, string status, string detail)
+        {
+            _applyOk     = ok;
+            _applyStatus = status;
+            _applyDetail = detail;
+        }
+
+        private void DrawApplyStatus()
+        {
+            if (string.IsNullOrEmpty(_applyStatus)) return;
+
+            EditorGUILayout.Space(4f);
+            DrawStatusRow(
+                _applyOk ? UIPilotStyles.LampOk : UIPilotStyles.LampCaution,
+                _applyOk ? UIPilotLabels.Status.Ready : UIPilotLabels.Status.Warning,
+                _applyStatus, _applyDetail);
         }
 
         // Build UI finishes on a later editor tick — after a recompile, the first
@@ -503,6 +538,7 @@ namespace UIPilot.Editor
 
         private void ExecuteQuickBuild()
         {
+            _applyStatus   = null;
             _auditResults  = null;
             _repairResults = null;
             SessionState.EraseBool(UIPilotLabels.QuickBuild.SessionBuildDone);

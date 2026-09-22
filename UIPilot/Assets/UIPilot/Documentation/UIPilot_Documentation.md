@@ -238,7 +238,8 @@ on. UIPilot ships nine, in `Assets/UIPilot/Themes`:
 the circle beside the field and pick one), then click **Build UI**.
 
 **To change the theme of menus you have already built:** pick the theme, then click
-**Apply Theme to Existing Menus**. Only the appearance changes. Your layout, object names,
+**Apply Theme to Existing Menus**. A line under the button says which theme was applied
+and to how many menus. Only the appearance changes. Your layout, object names,
 button order and button wiring are left exactly as they are, and one **Ctrl+Z** undoes it.
 Apply overwrites colours and fonts you changed by hand on those menus, so if you like
 tweaking by hand, tweak the theme instead.
