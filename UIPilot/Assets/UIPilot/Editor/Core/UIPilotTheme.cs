@@ -33,8 +33,12 @@ namespace UIPilot.Editor.Core
     // UIGeneratorModule, which starts from the full preset, not a [CreateAssetMenu].
     public sealed class UIPilotTheme : ScriptableObject
     {
-        [Header("Atmosphere — drawn over your scene, behind the menu")]
-        [Tooltip("A veil over the whole screen. Its alpha decides how much of the game shows through.")]
+        [Header("Picture — behind everything, instead of your game scene")]
+        [Tooltip("Your own picture behind the menu: key art, a screenshot, a painting. It covers the screen and keeps its shape (the edges are cropped on other aspect ratios). Empty = the game scene shows through.")]
+        public Sprite picture;
+
+        [Header("Atmosphere — drawn over the scene, behind the menu")]
+        [Tooltip("A veil over the whole screen. Its alpha decides how much of the scene or picture shows through.")]
         public Color wash = new Color32(0x9D, 0xB6, 0xF2, 0xB8);
 
         [Tooltip("Four huge soft blooms of colour that drift across the screen.")]

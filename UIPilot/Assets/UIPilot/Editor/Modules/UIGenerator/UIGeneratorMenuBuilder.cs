@@ -57,7 +57,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
             var panelGO = CreateUIObject(prefix + UIGeneratorContent.GameObjects.PanelSuffix, canvas);
             SetStretch((RectTransform)panelGO.transform);
 
-            // The wash veils the scene and stops clicks from reaching it.
+            // Invisible, but it stops clicks from reaching the game behind the menu.
+            // (The wash is a child, so the scene can be drawn under it.)
             panelGO.AddComponent<Image>();
 
             // A left-aligned column. Children keep their preferred width instead of
@@ -72,6 +73,9 @@ namespace UIPilot.Editor.Modules.UIGenerator
             vlg.childForceExpandWidth  = false;
             vlg.childForceExpandHeight = false;
 
+            // Drawn in this order: the scene, the wash over it, then the decorations.
+            CreateScene(panelGO, prefix + UIGeneratorContent.GameObjects.SceneSuffix);
+            CreateWash(panelGO, prefix + UIGeneratorContent.GameObjects.WashSuffix);
             CreateBackdrop(panelGO, prefix + UIGeneratorContent.GameObjects.BackdropSuffix);
             CreatePanel(panelGO, prefix + UIGeneratorContent.GameObjects.BandSuffix);
 
@@ -105,6 +109,42 @@ namespace UIPilot.Editor.Modules.UIGenerator
             if (menuType == MenuType.MainMenu)
                 CreateFootnote(panelGO, UIGeneratorContent.GameObjects.MainMenuFootnote,
                     string.Format(UIGeneratorContent.Settings.VersionFormat, PlayerSettings.bundleVersion));
+        }
+
+        // ── Scene: what the menu is seen against ────────────────────────────
+        // The developer's own picture, under everything. It covers the screen and
+        // keeps its shape (an AspectRatioFitter crops it), so it looks right on any
+        // aspect ratio without a script. The mask hides what the crop pushes out.
+
+        private static void CreateScene(GameObject parent, string objectName)
+        {
+            var go = CreateDecor(parent, objectName);
+            SetStretch((RectTransform)go.transform);
+            go.AddComponent<RectMask2D>();
+
+            CreateCover(go, UIGeneratorContent.GameObjects.PictureChild);
+        }
+
+        private static Image CreateCover(GameObject parent, string objectName)
+        {
+            var go = CreateUIObject(objectName, parent);
+            SetStretch((RectTransform)go.transform);
+
+            var image = go.AddComponent<Image>();
+            image.raycastTarget = false;
+
+            var fitter = go.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode  = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fitter.aspectRatio = 16f / 9f;
+            return image;
+        }
+
+        // The veil between the scene and the menu.
+        private static void CreateWash(GameObject parent, string objectName)
+        {
+            var go = CreateDecor(parent, objectName);
+            SetStretch((RectTransform)go.transform);
+            go.AddComponent<Image>().raycastTarget = false;
         }
 
         // ── Backdrop: blooms, frames, scanline band, ribbon ──────────────────

@@ -13,6 +13,9 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string Canvas             = "UIPilot_Canvas";
             internal const string PanelSuffix        = "_Panel";
             internal const string BandSuffix         = "_Band";
+            internal const string SceneSuffix        = "_Scene";
+            internal const string PictureChild       = "Picture";
+            internal const string WashSuffix         = "_Wash";
             internal const string BackdropSuffix     = "_Backdrop";
             internal const string BloomChild         = "Bloom";
             internal const string WaveChild          = "Wave";

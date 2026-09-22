@@ -26,13 +26,15 @@ namespace UIPilot.Editor.Modules.UIGenerator
         private const float RuleCentre  = 12.5f;
         // A cursor ends this far before the item's words, whatever its size.
         private const float MarkerGap   = 8f;
+        // What an empty cover slot is shaped for: the reference screen.
+        private const float DefaultCoverAspect = 16f / 9f;
 
         internal static void Apply(GameObject panelGO, UIPilotTheme theme)
         {
             var panel = panelGO.transform;
 
-            SetImageColor(panelGO, theme.wash);
-
+            StyleScene(FindBySuffix(panel, UIGeneratorContent.GameObjects.SceneSuffix), theme);
+            StyleWash(panelGO, FindBySuffix(panel, UIGeneratorContent.GameObjects.WashSuffix), theme);
             StyleBackdrop(FindBySuffix(panel, UIGeneratorContent.GameObjects.BackdropSuffix), theme);
             StylePanel(FindBySuffix(panel, UIGeneratorContent.GameObjects.BandSuffix), theme);
             StyleRule(FindBySuffix(panel, UIGeneratorContent.GameObjects.RuleSuffix), theme);
@@ -40,6 +42,48 @@ namespace UIPilot.Editor.Modules.UIGenerator
             StyleLettering(panel, theme);
             StyleButtons(panel, theme);
             StyleDetails(panel, theme);
+        }
+
+        // ── Scene ────────────────────────────────────────────────────────────
+
+        private static void StyleScene(Transform scene, UIPilotTheme theme)
+        {
+            if (scene == null) return;
+
+            var picture = scene.Find(UIGeneratorContent.GameObjects.PictureChild);
+            if (picture != null) StyleCover(picture, theme.picture);
+        }
+
+        // A full-screen image that keeps its own proportions. Hidden when empty,
+        // so the game scene shows through. The fitter only sizes an active object,
+        // so a hidden one is put back to its built size by hand.
+        private static void StyleCover(Transform cover, Sprite art)
+        {
+            var image = cover.GetComponent<Image>();
+            if (image == null) return;
+
+            SetArt(image, art, Image.Type.Simple, 1f);
+            image.color = Color.white;
+            Show(cover, art != null);
+
+            var fitter = cover.GetComponent<AspectRatioFitter>();
+            if (fitter != null)
+                fitter.aspectRatio = art != null && art.rect.height > 0f ? art.rect.width / art.rect.height : DefaultCoverAspect;
+            if (art == null)
+                ((RectTransform)cover).sizeDelta = Vector2.zero;
+        }
+
+        // Menus built before the wash had its own object carry it on the panel.
+        private static void StyleWash(GameObject panelGO, Transform wash, UIPilotTheme theme)
+        {
+            if (wash == null)
+            {
+                SetImageColor(panelGO, theme.wash);
+                return;
+            }
+
+            SetImageColor(panelGO, Color.clear);
+            SetImageColor(wash.gameObject, theme.wash);
         }
 
         // ── Atmosphere ───────────────────────────────────────────────────────
