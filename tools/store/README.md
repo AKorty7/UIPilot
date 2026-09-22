@@ -21,7 +21,11 @@ headline, one line and three bullets on the left, and a large product image on t
 ## How they are made
 
 1. **Backdrops.** `backdrop.py` draws the Soft Signal world (a measured floor, six pearls, one
-   ring) in day, night and ink lights. Headless Edge screenshots each page at 3900 x 2600.
+   ring) in day, night and ink lights. `genre_backdrops.py` draws a scene for each genre
+   theme: ember (a valley at dusk), overworld (sky and sea), pixel (a 300 x 200 pixel night)
+   and space (a ringed planet and a station). The three with a building share one castle,
+   drawn once in the script, standing on ground levelled for it and coloured and lit by
+   its scene. Headless Edge screenshots each page at 3900 x 2600.
 2. **Unity renders.** `unity/UIPilotStoreRender.cs` is copied into
    `UIPilot/Assets/_UIPilotStore/Editor/` for one run, then deleted.
    - `RenderGame` (batch mode) builds the real menus in each theme over the backdrops. It
@@ -32,6 +36,10 @@ headline, one line and three bullets on the left, and a large product image on t
      preference and hides the toolbar lamp again.
 
    Set the environment variables `UIPILOT_STORE_OUT` and `UIPILOT_STORE_BACKDROPS` first.
+   - `unity/UIPilotThemeRender.cs` (`UIPilotThemeRender.Run`, batch mode, same two variables)
+     renders all seven themes over their backdrops: main menu and settings at 1080p, the
+     pause menu at Steam Deck size, and a 2400 x 1600 main menu for the genre themes. The
+     theme pictures in the user guide come from it.
 3. **Compose.** Run `compose.py <pages> <renders> <editor> <pdf pages> <repo root>`, then
    `render-pages.ps1 -Pages <pages> -Out out`. The PDF pages are the user guide rendered at
    2000 px wide.

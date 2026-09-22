@@ -19,6 +19,10 @@ namespace UIPilot.Editor.Core
             internal const string DefaultAsset = "Soft Club";
             internal const string NightAsset   = "Soft Club Night";
             internal const string InkAsset     = "Ink";
+            internal const string FantasyAsset = "Fantasy RPG";
+            internal const string JrpgAsset    = "JRPG Window";
+            internal const string PixelAsset   = "Pixel Retro";
+            internal const string SciFiAsset   = "Sci-Fi HUD";
             internal const string PresetFolder = "Assets/UIPilot/Themes";
 
             internal const string FieldLabel   = "Theme";
@@ -94,6 +98,29 @@ namespace UIPilot.Editor.Core
             internal const string ToolbarOk        = "UIPilot UI Health: all clear.";
             internal const string ToolbarIssues    = "UIPilot UI Health: {0}. Click to see them.";
             internal const string ToolbarIdle      = "UIPilot UI Health checks the open scenes in Edit mode.";
+        }
+
+        internal static class ClickDebug
+        {
+            internal const string Section         = "Click Debugger";
+            internal const string Idle            = "Ready for Play mode";
+            internal const string IdleDetail      = "Press Play, then click anywhere in the Game view. Each click shows here: what took it, and why.";
+            internal const string Watching        = "Watching clicks";
+            internal const string WatchingDetail  = "Click anywhere in the Game view.";
+            internal const string Off             = "Not watching";
+            internal const string OffDetail       = "Turn on Watch clicks in Play mode, below.";
+            internal const string LastClick       = "Last click";
+            internal const string Earlier         = "Earlier";
+            internal const string AfterPlay       = "From the last Play session. Objects the game created are gone now.";
+
+            internal const string Watch           = "Watch clicks in Play mode";
+            internal const string WatchTip        = "Looks at a click only when the mouse button goes down in Play mode. Costs nothing otherwise.";
+            internal const string LogToConsole    = "Log each click to the Console";
+            internal const string LogToConsoleTip = "One line per click, and clicking the line selects the object. Works with this window closed.";
+            internal const string SelectTarget    = "Select what took each click";
+            internal const string SelectTargetTip = "Selects it in the Hierarchy and Inspector as you play.";
+
+            internal const string EditorPrefsOpen = "UIPilot_ClickDebugOpen";
         }
 
         internal static class EventSystem

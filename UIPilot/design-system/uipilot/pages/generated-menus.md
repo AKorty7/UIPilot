@@ -21,6 +21,16 @@ already exist with **Apply Theme to Existing Menus**.
 | **Soft Club** (default) | the look specified in the rest of this file | `UIGeneratorThemePresets.SoftClub()` = the theme's own field defaults + Michroma + glow material |
 | **Soft Club Night** | the same artwork in a dark key: navy wash `#060A24` @ 93%, panel `#091036` @ 98%, violet and cyan blooms | `SoftClubNight()` |
 | **Ink** | MASTER's ink-and-teal look as a menu: opaque `#121826` panel, teal `#0C7C7E` focus **bar**, neutral `#2A3550` hover bar, TMP default font, uppercase bold title, every decoration off | `Ink()` |
+| **Fantasy RPG** | parchment page in a gilt frame (`uipilot_fantasy_panel`, 9-sliced 160), Young Serif titles over Crimson Pro Bold items in iron-gall ink `#3A2514` (secondary `#553A20`, 4.5:1 even on the scorched edge), gold-leaf **bar** with a garnet lozenge, gilt rule, warm candle blooms, icons off | `FantasyRpg()` |
+| **JRPG Window** | blue gradient window with a white double rim (`uipilot_jrpg_panel`, sliced 48), Work Sans Bold capitals with a drop-shadow material, pointing-glove **marker**, icons off | `JrpgWindow()` |
+| **Pixel Retro** | 16 px pixel-art window (`uipilot_pixel_panel`, Pixels Per Unit 100, point filter, drawn at 0.25 = 4 screen px per art px at 1080p), Silkscreen with a hard shadow on titles, 5x8 arrow **marker** at 4x, CRT lines in the window, icons off | `PixelRetro()` |
+| **Sci-Fi HUD** | clipped-corner glass slab edged in cyan `#37E0FF` (`uipilot_scifi_panel`, sliced 120), Tektur capitals with a glow material, scanning **bar**, tick-scale rule, scene frames, scanlines, registration marks | `SciFiHud()` |
+
+The genre sprites are drawn in `tools/art/theme-sprites.html` (pixel art in
+`build-theme-sprites.ps1`) and carry their own colours: their themes tint them white.
+Everything along a 9-sliced edge is the same all the way along it, ornaments sit inside the
+slice border, and a panel gradient is drawn only between the slice lines so it stays linear
+at any panel height. The backdrops used to judge them are `tools/store/genre_backdrops.py`.
 
 Rules that keep this working. Break one and Apply Theme stops being safe:
 
@@ -34,21 +44,31 @@ Rules that keep this working. Break one and Apply Theme stops being safe:
 3. **The styler finds objects by name** (the `UIGeneratorContent` names) and skips what
    is missing, so a buyer who deleted a decoration gets no error.
 4. **A new theme field needs three things:** a default equal to Soft Club, a tooltip, and
-   a line in the styler. Then regenerate the preset assets: delete the three in
-   `Assets/UIPilot/Themes` and click **Restore Default Themes** in the window, which
-   rebuilds each one from its factory. (Keep the shipped `.meta` files if the GUIDs matter.)
+   a line in the styler that sets it on every apply, back to its default when the theme
+   leaves it empty. Then regenerate the preset assets from their factories, in place, so
+   their GUIDs survive (`EditorUtility.CopySerialized` from a fresh factory instance onto
+   each existing asset, or delete them and click **Restore Default Themes**).
 5. **A new preset** is a factory in `UIGeneratorThemePresets`, its asset-name constant in
    `UIPilotLabels.Theme`, an entry in `UIGeneratorThemePresets.All` (Restore reads that
    list), and its saved asset. Render all three menus over a bright scene before shipping
    it: a dark translucent wash reads as grey in Linear colour space, so dark themes need a
    near-opaque wash and panel.
 6. Every preset must pass the MASTER checks on its own: text 4.5:1 on the composed
-   panel, focus visible without relying on hue alone (Soft Club: a frame appears; Ink: a
-   solid bar appears), hover distinct from focus.
+   panel (measure it on a render, over the panel art's darkest part), focus visible
+   without relying on hue alone (a frame, a bar or a cursor appears), hover distinct from
+   focus. Verify Apply Theme against a fresh build for every pair of presets, with a
+   control pair that must differ.
 7. Themes are Editor-only assets. No scene references one, so none reaches a build.
 8. **New themes start from the full Soft Club preset.** Create > UIPilot > Theme is a
    [MenuItem] in UIGeneratorModule, not a [CreateAssetMenu]: a field default cannot
    reference the font asset, so a plain new asset would lose Michroma.
+9. **Focus styles.** *Frame* stretches the focus art (default `uipilot_focus`) around the
+   item, `focusReach` past its edges. *Bar* stretches it behind the item from the icon's
+   left, and a Bar without art is a flat colour. *Marker* draws the art at `markerSize`,
+   ending 8 units before the words (`UIGeneratorMenuBuilder.LabelInset`), so a wide cursor
+   reaches back past the item's edge instead of crowding the text. On the settings step
+   arrows a Marker theme uses the hairline frame, as the arrows are too small for a cursor.
+   A Marker theme turns **icons** off: the cursor takes their place.
 
 The sections below specify **Soft Club**, the default. The "Do not" list at the end is
 Soft Club's; another preset may use bold or a second typeface if its own spec says so.

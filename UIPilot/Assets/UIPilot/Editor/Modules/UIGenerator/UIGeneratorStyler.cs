@@ -10,17 +10,22 @@ namespace UIPilot.Editor.Modules.UIGenerator
     // one both end here, so an applied theme is identical to a freshly built one.
     //
     // It only ever touches appearance — colours, sprites, fonts, which decorations
-    // are switched on. It never creates, deletes, renames, moves or rewires anything,
-    // which is why a theme can be applied over a menu the developer has rearranged.
-    // Objects are found by the names UIGeneratorMenuBuilder gave them; anything the
-    // developer deleted is simply skipped.
+    // are switched on, and the size of decorations that sit outside the layout (the
+    // focus plate, the rule's line). It never creates, deletes, renames, moves or
+    // rewires anything, which is why a theme can be applied over a menu the developer
+    // has rearranged. Objects are found by the names UIGeneratorMenuBuilder gave them;
+    // anything the developer deleted is simply skipped.
+    //
+    // Every property a theme can set is set on every apply, back to its default when
+    // the theme leaves it empty, so switching themes never leaves the last one behind.
     internal static class UIGeneratorStyler
     {
-        // The focus frame sprite carries a transparent halo margin around its
-        // visible frame, so the plate is larger than the button by this much.
-        internal const float HaloMargin = 24f;
         // On a menu item the frame starts a little left of the icon.
         internal const float FramePad   = 16f;
+        // Where the builder draws the rule's line: its centre, below the holder's top.
+        private const float RuleCentre  = 12.5f;
+        // A cursor ends this far before the item's words, whatever its size.
+        private const float MarkerGap   = 8f;
 
         internal static void Apply(GameObject panelGO, UIPilotTheme theme)
         {
@@ -83,6 +88,8 @@ namespace UIPilot.Editor.Modules.UIGenerator
             if (band == null) return;
 
             SetImageColor(band.gameObject, theme.panel);
+            var surface = band.GetComponent<Image>();
+            if (surface != null) SetArt(surface, theme.panelArt, Image.Type.Sliced, theme.panelArtScale);
 
             foreach (Transform child in band)
             {
@@ -109,7 +116,20 @@ namespace UIPilot.Editor.Modules.UIGenerator
             if (rule == null) return;
 
             var line = rule.Find(UIGeneratorContent.GameObjects.RuleBarChild);
-            if (line != null) SetImageColor(line.gameObject, theme.rule);
+            if (line == null) return;
+
+            var image = line.GetComponent<Image>();
+            if (image == null) return;
+
+            // Plain line or ornament, it stays centred where the builder drew the line.
+            image.color = theme.rule;
+            SetArt(image, theme.ruleArt, Image.Type.Simple, 1f);
+            image.preserveAspect = theme.ruleArt != null;
+
+            var height = Mathf.Max(1f, theme.ruleHeight);
+            var rect   = (RectTransform)line;
+            rect.sizeDelta        = new Vector2(0f, height);
+            rect.anchoredPosition = new Vector2(0f, height * 0.5f - RuleCentre);
         }
 
         // Registration marks live in two places (the panel's corners, the end of
@@ -129,17 +149,24 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         private static void StyleLettering(Transform panel, UIPilotTheme theme)
         {
-            var font = theme.font != null ? theme.font : TMP_Settings.defaultFontAsset;
+            var font      = theme.font != null ? theme.font : TMP_Settings.defaultFontAsset;
+            var titleFont = theme.titleFont != null ? theme.titleFont : font;
 
             foreach (var tmp in panel.GetComponentsInChildren<TMP_Text>(true))
             {
-                // Assigning the font also resets the material to that font's own,
-                // which is what clears a previous theme's title material.
-                tmp.font = font;
-
                 if (tmp.name.EndsWith(UIGeneratorContent.GameObjects.TitleSuffix, StringComparison.Ordinal))
-                    StyleTitle(tmp, theme);
-                else if (tmp.name.EndsWith(UIGeneratorContent.GameObjects.FootnoteSuffix, StringComparison.Ordinal))
+                {
+                    StyleTitle(tmp, titleFont, theme);
+                    continue;
+                }
+
+                // Assigning the font also resets the material to that font's own,
+                // which is what clears a previous theme's material preset.
+                tmp.font = font;
+                if (theme.font != null && theme.textMaterial != null)
+                    tmp.fontSharedMaterial = theme.textMaterial;
+
+                if (tmp.name.EndsWith(UIGeneratorContent.GameObjects.FootnoteSuffix, StringComparison.Ordinal))
                     StyleText(tmp, theme.smallSize, theme.textSoft, UIPilotTextCase.Uppercase, false, theme.itemTracking * 3f);
                 else if (tmp.name.EndsWith(UIGeneratorContent.GameObjects.RowValueChild, StringComparison.Ordinal))
                     StyleText(tmp, theme.valueSize, theme.textSoft, theme.itemCase, false, theme.itemTracking * 0.5f);
@@ -148,16 +175,18 @@ namespace UIPilot.Editor.Modules.UIGenerator
             }
         }
 
-        private static void StyleTitle(TMP_Text tmp, UIPilotTheme theme)
+        private static void StyleTitle(TMP_Text tmp, TMP_FontAsset font, UIPilotTheme theme)
         {
+            tmp.font = font;
             StyleText(tmp, theme.titleSize, theme.text, theme.titleCase, theme.titleBold, theme.titleTracking);
 
             // The title auto-sizes: a long name shrinks from the theme's size.
             tmp.fontSizeMax = theme.titleSize;
             tmp.fontSizeMin = theme.titleSize * 0.5f;
 
-            // A material preset only fits the font it was made from.
-            if (theme.font != null && theme.titleMaterial != null)
+            // A material preset only fits the font it was made from, and a theme
+            // without its own font is on TextMeshPro's default.
+            if (font != TMP_Settings.defaultFontAsset && theme.titleMaterial != null)
                 tmp.fontSharedMaterial = theme.titleMaterial;
         }
 
@@ -178,8 +207,6 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         private static void StyleButtons(Transform panel, UIPilotTheme theme)
         {
-            var frameSprite = theme.focusFrame ? UIGeneratorArt.Sprite(UIGeneratorContent.Art.Focus) : null;
-
             var colors = ColorBlock.defaultColorBlock;
             colors.normalColor      = theme.focusIdle;
             colors.highlightedColor = theme.focusHover;
@@ -198,33 +225,78 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
                 // Menu items are laid out by the column and carry a LayoutElement;
                 // the little step buttons inside a settings row do not.
-                var pad = button.GetComponent<LayoutElement>() != null ? FramePad : 0f;
-                StylePlate(plate, frameSprite, pad);
+                if (button.GetComponent<LayoutElement>() != null)
+                    StyleItemPlate(plate, theme);
+                else
+                    StyleStepPlate(plate, theme);
             }
         }
 
-        // With the frame sprite: a glowing hairline frame, larger than the button
-        // because its halo spills past it. Without: a flat bar the button's size.
-        private static void StylePlate(Image plate, Sprite frameSprite, float padLeft)
+        private static void StyleItemPlate(Image plate, UIPilotTheme theme)
         {
+            switch (theme.focusStyle)
+            {
+                case UIPilotFocusStyle.Frame:
+                    var frame = theme.focusArt != null ? theme.focusArt : UIGeneratorArt.Sprite(UIGeneratorContent.Art.Focus);
+                    StretchPlate(plate, frame, FramePad + theme.focusReach, theme.focusReach);
+                    break;
+                case UIPilotFocusStyle.Marker when theme.focusArt != null:
+                    PlaceMarker(plate, theme.focusArt, theme.markerSize);
+                    break;
+                default:
+                    StretchPlate(plate, theme.focusArt, FramePad, 0f);
+                    break;
+            }
+        }
+
+        // The step arrows are too small for a marker beside them: a marker theme
+        // frames them with UIPilot's hairline instead, other themes as their items.
+        private static void StyleStepPlate(Image plate, UIPilotTheme theme)
+        {
+            switch (theme.focusStyle)
+            {
+                case UIPilotFocusStyle.Frame:
+                    var frame = theme.focusArt != null ? theme.focusArt : UIGeneratorArt.Sprite(UIGeneratorContent.Art.Focus);
+                    StretchPlate(plate, frame, theme.focusReach, theme.focusReach);
+                    break;
+                case UIPilotFocusStyle.Marker:
+                    StretchPlate(plate, UIGeneratorArt.Sprite(UIGeneratorContent.Art.Frame), 0f, 0f);
+                    plate.fillCenter = false;
+                    break;
+                default:
+                    StretchPlate(plate, theme.focusArt, 0f, 0f);
+                    break;
+            }
+        }
+
+        // Covers the button, reaching past its left edge by padLeft and past every
+        // other edge by reach. With no art: a flat bar.
+        private static void StretchPlate(Image plate, Sprite art, float padLeft, float reach)
+        {
+            SetArt(plate, art, Image.Type.Sliced, 1f);
+
             var rect = (RectTransform)plate.transform;
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
+            rect.pivot     = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = new Vector2(-padLeft, -reach);
+            rect.offsetMax = new Vector2(reach, reach);
+        }
 
-            if (frameSprite != null)
-            {
-                plate.sprite   = frameSprite;
-                plate.type     = Image.Type.Sliced;
-                rect.offsetMin = new Vector2(-(padLeft + HaloMargin), -HaloMargin);
-                rect.offsetMax = new Vector2(HaloMargin, HaloMargin);
-            }
-            else
-            {
-                plate.sprite   = null;
-                plate.type     = Image.Type.Simple;
-                rect.offsetMin = new Vector2(-padLeft, 0f);
-                rect.offsetMax = Vector2.zero;
-            }
+        // A cursor where the item's icon would be, drawn at its own proportions and
+        // ending MarkerGap before the words: a wide one reaches back past the item's
+        // left edge rather than crowding the text.
+        private static void PlaceMarker(Image plate, Sprite art, Vector2 size)
+        {
+            SetArt(plate, art, Image.Type.Simple, 1f);
+            plate.preserveAspect = true;
+
+            var rect = (RectTransform)plate.transform;
+            rect.anchorMin        = new Vector2(0f, 0.5f);
+            rect.anchorMax        = new Vector2(0f, 0.5f);
+            rect.pivot            = new Vector2(0f, 0.5f);
+            rect.sizeDelta        = size;
+            rect.anchoredPosition = new Vector2(UIGeneratorMenuBuilder.LabelInset - MarkerGap - size.x, 0f);
         }
 
         // ── Details ──────────────────────────────────────────────────────────
@@ -233,10 +305,22 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             foreach (var image in panel.GetComponentsInChildren<Image>(true))
             {
-                if (image.name == UIGeneratorContent.GameObjects.IconChild)        image.color = theme.text;
+                if (image.name == UIGeneratorContent.GameObjects.IconChild)        StyleIcon(image, theme);
                 else if (image.name == UIGeneratorContent.GameObjects.VolumeTrack) image.color = theme.meterTrack;
                 else if (image.name == UIGeneratorContent.GameObjects.VolumeFill)  image.color = theme.meterFill;
             }
+        }
+
+        // The Icons switch hides the icons that label items and rows. The arrows of
+        // a settings stepper are the buttons themselves, so they always stay.
+        private static void StyleIcon(Image icon, UIPilotTheme theme)
+        {
+            icon.color = theme.text;
+
+            var owner    = icon.transform.parent;
+            var isArrow  = owner != null && owner.GetComponent<Button>() != null
+                           && owner.GetComponent<LayoutElement>() == null;
+            Show(icon.transform, theme.icons || isArrow);
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
@@ -259,6 +343,17 @@ namespace UIPilot.Editor.Modules.UIGenerator
         {
             var image = go.GetComponent<Image>();
             if (image != null) image.color = color;
+        }
+
+        // Artwork on an image, or none. Every property the art changes is set back
+        // when it goes, so a flat theme applied after a drawn one matches a fresh build.
+        private static void SetArt(Image image, Sprite art, Image.Type drawnType, float borderScale)
+        {
+            image.sprite                  = art;
+            image.type                    = art != null ? drawnType : Image.Type.Simple;
+            image.fillCenter              = true;
+            image.preserveAspect          = false;
+            image.pixelsPerUnitMultiplier = art != null ? Mathf.Max(0.01f, borderScale) : 1f;
         }
 
         private static void SetRawImageColor(GameObject go, Color color)

@@ -25,6 +25,8 @@ MonoBehaviour:
   sceneScanlines: 0
   sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
   panel: {r: 0.07058824, g: 0.09411765, b: 0.14901961, a: 1}
+  panelArt: {fileID: 0}
+  panelArtScale: 1
   panelScanlines: 0
   panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.050980393}
   panelFrame: 1
@@ -33,24 +35,32 @@ MonoBehaviour:
   panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
   registrationMarks: 0
   font: {fileID: 0}
+  titleFont: {fileID: 0}
   titleMaterial: {fileID: 0}
+  textMaterial: {fileID: 0}
   text: {r: 0.9529412, g: 0.9607843, b: 0.972549, a: 1}
   textSoft: {r: 0.5921569, g: 0.6313726, b: 0.7019608, a: 1}
   titleCase: 2
   titleBold: 1
   titleTracking: 8
   titleSize: 60
+  icons: 1
   itemCase: 0
   itemTracking: 0
   itemSize: 30
   valueSize: 24
   smallSize: 18
-  focusFrame: 0
+  focusStyle: 1
+  focusArt: {fileID: 0}
+  focusReach: 24
+  markerSize: {x: 32, y: 32}
   focusIdle: {r: 0.16470589, g: 0.20784314, b: 0.3137255, a: 0}
   focusHover: {r: 0.16470589, g: 0.20784314, b: 0.3137255, a: 1}
   focusSelected: {r: 0.047058824, g: 0.4862745, b: 0.49411765, a: 1}
   focusPressed: {r: 0.03529412, g: 0.37254903, b: 0.38039216, a: 1}
   focusDisabled: {r: 0.047058824, g: 0.0627451, b: 0.101960786, a: 1}
   rule: {r: 0.047058824, g: 0.4862745, b: 0.49411765, a: 1}
+  ruleArt: {fileID: 0}
+  ruleHeight: 1
   meterTrack: {r: 0.16470589, g: 0.20784314, b: 0.3137255, a: 1}
   meterFill: {r: 0.047058824, g: 0.4862745, b: 0.49411765, a: 1}

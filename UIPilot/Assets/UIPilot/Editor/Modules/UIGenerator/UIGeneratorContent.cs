@@ -77,6 +77,27 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
             internal const string FontAsset        = "Michroma SDF";
             internal const string FontGlowMaterial = "Michroma SDF Glow";
+
+            // Genre themes: their artwork (in Art/Themes) and fonts (in Art/Fonts).
+            internal const string FantasyPanel = "uipilot_fantasy_panel";
+            internal const string FantasyFocus = "uipilot_fantasy_focus";
+            internal const string FantasyRule  = "uipilot_fantasy_rule";
+            internal const string JrpgPanel    = "uipilot_jrpg_panel";
+            internal const string JrpgCursor   = "uipilot_jrpg_cursor";
+            internal const string PixelPanel   = "uipilot_pixel_panel";
+            internal const string PixelCursor  = "uipilot_pixel_cursor";
+            internal const string SciFiPanel   = "uipilot_scifi_panel";
+            internal const string SciFiFocus   = "uipilot_scifi_focus";
+            internal const string SciFiRule    = "uipilot_scifi_rule";
+
+            internal const string YoungSerif       = "Young Serif SDF";
+            internal const string CrimsonPro       = "Crimson Pro Bold SDF";
+            internal const string WorkSans         = "Work Sans Bold SDF";
+            internal const string WorkSansShadow   = "Work Sans Bold SDF Shadow";
+            internal const string Silkscreen       = "Silkscreen SDF";
+            internal const string SilkscreenShadow = "Silkscreen SDF Shadow";
+            internal const string Tektur           = "Tektur SDF";
+            internal const string TekturGlow       = "Tektur SDF Glow";
         }
 
         // Title text on each panel. The main menu has no constant: its title is

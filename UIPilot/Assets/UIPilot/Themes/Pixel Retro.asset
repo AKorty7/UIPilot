@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: Pixel Retro
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  wash: {r: 0.015686275, g: 0.015686275, b: 0.047058824, a: 0.6}
+  blooms: 0
+  bloomTopLeft: {r: 0.7019608, g: 0.6509804, b: 0.96862745, a: 0.54901963}
+  bloomBottomRight: {r: 0.47843137, g: 0.84313726, b: 0.9254902, a: 0.6}
+  bloomTopRight: {r: 0.8235294, g: 0.96862745, b: 0.9254902, a: 0.5019608}
+  bloomCentre: {r: 1, g: 1, b: 1, a: 0.34901962}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 0
+  sceneFrameColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  sceneScanlines: 0
+  sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: 0b9ebabf830f481c8869b60f40eab001, type: 3}
+  panelArtScale: 0.25
+  panelScanlines: 1
+  panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.039215688}
+  panelFrame: 0
+  panelFrameColor: {r: 1, g: 1, b: 1, a: 0.8509804}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 0
+  font: {fileID: 11400000, guid: 6e929cb63b8c2db4a8a52de4bbcc9212, type: 2}
+  titleFont: {fileID: 0}
+  titleMaterial: {fileID: 2100000, guid: 26e1577d076f37b45a8206c2aa0393b9, type: 2}
+  textMaterial: {fileID: 0}
+  text: {r: 0.95686275, g: 0.94509804, b: 0.9098039, a: 1}
+  textSoft: {r: 0.65882355, g: 0.65882355, b: 0.7529412, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 4
+  titleSize: 48
+  icons: 0
+  itemCase: 2
+  itemTracking: 2
+  itemSize: 26
+  valueSize: 22
+  smallSize: 16
+  focusStyle: 2
+  focusArt: {fileID: 21300000, guid: b81a04d18e874f26a01aa5c3790291ac, type: 3}
+  focusReach: 24
+  markerSize: {x: 20, y: 32}
+  focusIdle: {r: 0.972549, g: 0.8156863, b: 0.1882353, a: 0}
+  focusHover: {r: 0.95686275, g: 0.94509804, b: 0.9098039, a: 0.4509804}
+  focusSelected: {r: 0.972549, g: 0.8156863, b: 0.1882353, a: 1}
+  focusPressed: {r: 1, g: 0.9411765, b: 0.627451, a: 1}
+  focusDisabled: {r: 0.95686275, g: 0.94509804, b: 0.9098039, a: 0.12156863}
+  rule: {r: 0.95686275, g: 0.94509804, b: 0.9098039, a: 1}
+  ruleArt: {fileID: 0}
+  ruleHeight: 4
+  meterTrack: {r: 0.95686275, g: 0.94509804, b: 0.9098039, a: 0.2509804}
+  meterFill: {r: 0.972549, g: 0.8156863, b: 0.1882353, a: 1}

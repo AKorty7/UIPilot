@@ -34,7 +34,7 @@ namespace UIPilot.Editor.Modules.UIGenerator
 
         private const float RowHeight      = 56f;
         private const float IconSize       = 24f;
-        private const float LabelInset     = 40f;   // icon + gap
+        internal const float LabelInset    = 40f;   // icon + gap; the styler places cursors by it
         private const float ValueInset     = 16f;
 
         private const float StepSize       = 40f;

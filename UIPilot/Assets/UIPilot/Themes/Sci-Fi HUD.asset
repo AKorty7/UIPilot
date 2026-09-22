@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: Sci-Fi HUD
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  wash: {r: 0.003921569, g: 0.023529412, b: 0.050980393, a: 0.76862746}
+  blooms: 1
+  bloomTopLeft: {r: 0.12156863, g: 0.78431374, b: 0.9098039, a: 0.21960784}
+  bloomBottomRight: {r: 0.05882353, g: 0.6392157, b: 0.69411767, a: 0.2509804}
+  bloomTopRight: {r: 0.21568628, g: 0.8784314, b: 1, a: 0.12156863}
+  bloomCentre: {r: 0.21568628, g: 0.8784314, b: 1, a: 0}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 1
+  sceneFrameColor: {r: 0.21568628, g: 0.8784314, b: 1, a: 0.34901962}
+  sceneScanlines: 1
+  sceneScanlineColor: {r: 0.21568628, g: 0.8784314, b: 1, a: 0.101960786}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: 26d9f7953faf4c5db79b77db092a39ff, type: 3}
+  panelArtScale: 1
+  panelScanlines: 1
+  panelScanlineColor: {r: 0.21568628, g: 0.8784314, b: 1, a: 0.050980393}
+  panelFrame: 0
+  panelFrameColor: {r: 0.21568628, g: 0.8784314, b: 1, a: 1}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 1
+  font: {fileID: 11400000, guid: 6128ebabb71e2574b8bb6e038348ca0b, type: 2}
+  titleFont: {fileID: 0}
+  titleMaterial: {fileID: 2100000, guid: fb83be8acbfbb8c479144373edaac906, type: 2}
+  textMaterial: {fileID: 0}
+  text: {r: 0.89411765, g: 0.9843137, b: 1, a: 1}
+  textSoft: {r: 0.5254902, g: 0.8509804, b: 0.9019608, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 8
+  titleSize: 50
+  icons: 1
+  itemCase: 2
+  itemTracking: 4
+  itemSize: 25
+  valueSize: 21
+  smallSize: 15
+  focusStyle: 1
+  focusArt: {fileID: 21300000, guid: cb2009da5b9848ed9b8f826acf10c76a, type: 3}
+  focusReach: 24
+  markerSize: {x: 32, y: 32}
+  focusIdle: {r: 1, g: 1, b: 1, a: 0}
+  focusHover: {r: 1, g: 1, b: 1, a: 0.4}
+  focusSelected: {r: 1, g: 1, b: 1, a: 1}
+  focusPressed: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  focusDisabled: {r: 1, g: 1, b: 1, a: 0.12}
+  rule: {r: 1, g: 1, b: 1, a: 1}
+  ruleArt: {fileID: 21300000, guid: 479f21aa8b1c4a029bd88f4560808604, type: 3}
+  ruleHeight: 16
+  meterTrack: {r: 0.21568628, g: 0.8784314, b: 1, a: 0.2}
+  meterFill: {r: 0.21568628, g: 0.8784314, b: 1, a: 1}

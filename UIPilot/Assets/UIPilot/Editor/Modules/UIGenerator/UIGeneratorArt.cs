@@ -21,14 +21,25 @@ namespace UIPilot.Editor.Modules.UIGenerator
             return Load<Texture2D>(assetName, UIGeneratorContent.Art.TextureFilter);
         }
 
+        // Michroma, the Soft Club lettering.
         internal static TMP_FontAsset Font()
         {
-            return Load<TMP_FontAsset>(UIGeneratorContent.Art.FontAsset, UIGeneratorContent.Art.FontFilter);
+            return Font(UIGeneratorContent.Art.FontAsset);
         }
 
         internal static Material GlowMaterial()
         {
-            return Load<Material>(UIGeneratorContent.Art.FontGlowMaterial, UIGeneratorContent.Art.MaterialFilter);
+            return Material(UIGeneratorContent.Art.FontGlowMaterial);
+        }
+
+        internal static TMP_FontAsset Font(string assetName)
+        {
+            return Load<TMP_FontAsset>(assetName, UIGeneratorContent.Art.FontFilter);
+        }
+
+        internal static Material Material(string assetName)
+        {
+            return Load<Material>(assetName, UIGeneratorContent.Art.MaterialFilter);
         }
 
         private static T Load<T>(string assetName, string typeFilter) where T : UnityEngine.Object

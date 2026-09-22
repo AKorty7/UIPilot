@@ -10,13 +10,22 @@ namespace UIPilot.Editor.Core
         Uppercase
     }
 
+    // How the selected button is shown.
+    public enum UIPilotFocusStyle
+    {
+        Frame,   // a frame around the item; its artwork may glow past the edges
+        Bar,     // a bar behind the item, flat or drawn
+        Marker   // a cursor beside the item, such as a pointing hand or an arrow
+    }
+
     // Everything that decides how a generated menu LOOKS, in one asset the developer
     // owns. Build UI reads it; Apply Theme pushes it onto menus that already exist.
     // Duplicate a preset (Assets/UIPilot/Themes) to make your own.
     //
     // A theme never changes structure: every menu has the same objects, and a theme
-    // only recolours them, swaps the lettering, and switches decorations on or off.
-    // That is what lets one theme be applied over another without rebuilding.
+    // only recolours them, swaps artwork and lettering, and switches decorations on or
+    // off. That is what lets one theme be applied over another without rebuilding.
+    // Every artwork slot is optional: empty means UIPilot's own look.
     //
     // Editor-only. The asset is never referenced by a scene, so it is not in builds.
     // Field defaults are the Soft Club look minus the font, which a field default
@@ -48,8 +57,14 @@ namespace UIPilot.Editor.Core
         public Color sceneScanlineColor = new Color32(0xFF, 0xFF, 0xFF, 0x1F);
 
         [Header("Panel — the surface the menu text is read on")]
-        [Tooltip("Keep this nearly opaque. If the scene shows through it, the scene decides your text contrast.")]
+        [Tooltip("Keep this nearly opaque. If the scene shows through it, the scene decides your text contrast. Tints the Panel Art, if any.")]
         public Color panel = new Color32(0x23, 0x43, 0xAE, 0xF2);
+
+        [Tooltip("Optional artwork for the panel, 9-sliced so its border keeps its shape (parchment, a window frame). Empty: a flat panel in the Panel colour.")]
+        public Sprite panelArt;
+
+        [Tooltip("Scales the Panel Art's border. 1 = as drawn. Pixel art drawn small uses less than 1 to make each pixel bigger.")]
+        public float panelArtScale = 1f;
 
         public bool panelScanlines = true;
         public Color panelScanlineColor = new Color32(0xFF, 0xFF, 0xFF, 0x0D);
@@ -69,8 +84,14 @@ namespace UIPilot.Editor.Core
         [Tooltip("Leave empty to use TextMeshPro's default font.")]
         public TMP_FontAsset font;
 
-        [Tooltip("Optional material preset of the font above, used for panel titles (for example a glow). Leave empty for the font's own material.")]
+        [Tooltip("Optional display font for panel titles only. Empty: titles use the font above.")]
+        public TMP_FontAsset titleFont;
+
+        [Tooltip("Optional material preset of the title's font (for example a glow). Leave empty for the font's own material.")]
         public Material titleMaterial;
+
+        [Tooltip("Optional material preset of the font above, used for every other text (for example a drop shadow).")]
+        public Material textMaterial;
 
         [Tooltip("All primary text and icons. Check it against the Panel colour: 4.5:1 or better.")]
         public Color text = new Color32(0xF4, 0xFB, 0xFF, 0xFF);
@@ -84,6 +105,9 @@ namespace UIPilot.Editor.Core
         [Tooltip("Largest title size. A long title shrinks from here to fit the column.")]
         public float titleSize     = 58f;
 
+        [Tooltip("The small icon beside each menu item. Settings arrows always stay.")]
+        public bool icons = true;
+
         public UIPilotTextCase itemCase = UIPilotTextCase.Lowercase;
         public float itemTracking = 6f;
         public float itemSize     = 24f;
@@ -91,8 +115,17 @@ namespace UIPilot.Editor.Core
         public float smallSize    = 15f;
 
         [Header("Focus — how the selected button is shown")]
-        [Tooltip("On: a glowing hairline frame appears around the button. Off: a flat solid bar.")]
-        public bool focusFrame = true;
+        [Tooltip("Frame: a frame around the item. Bar: a bar behind it. Marker: a cursor beside it, where the icon would be (switch Icons off).")]
+        public UIPilotFocusStyle focusStyle = UIPilotFocusStyle.Frame;
+
+        [Tooltip("Optional artwork: the frame, the bar or the cursor. Empty: UIPilot's glowing frame, a flat bar, or (Marker) a flat bar.")]
+        public Sprite focusArt;
+
+        [Tooltip("Frame only: how far the frame's artwork reaches past the item on every side.")]
+        public float focusReach = 24f;
+
+        [Tooltip("Marker only: the cursor's width and height.")]
+        public Vector2 markerSize = new Vector2(32f, 32f);
 
         [Tooltip("At rest. Keep the alpha at 0 and the colour equal to Hover, so the fade never passes through an off-colour.")]
         public Color focusIdle     = new Color(1f, 1f, 1f, 0f);
@@ -104,8 +137,14 @@ namespace UIPilot.Editor.Core
         public Color focusDisabled = new Color(1f, 1f, 1f, 0.12f);
 
         [Header("Details")]
-        [Tooltip("The hairline under each panel title.")]
+        [Tooltip("The line under each panel title. Tints the Rule Art, if any.")]
         public Color rule       = new Color32(0xFF, 0xFF, 0xFF, 0x99);
+
+        [Tooltip("Optional artwork for the line under each title (an ornament). Drawn at its own proportions across the column.")]
+        public Sprite ruleArt;
+
+        [Tooltip("The line's thickness, or the Rule Art's height.")]
+        public float ruleHeight = 1f;
         public Color meterTrack = new Color32(0xFF, 0xFF, 0xFF, 0x40);
         public Color meterFill  = new Color32(0xF4, 0xFB, 0xFF, 0xFF);
     }
