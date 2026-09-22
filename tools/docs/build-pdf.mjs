@@ -63,11 +63,20 @@ const themesFigure = `
   <div><img src="${img('Theme_SoftClubNight.png')}" alt="Soft Club Night theme"><figcaption><strong>Soft Club Night</strong></figcaption></div>
   <div><img src="${img('Theme_Ink.png')}" alt="Ink theme"><figcaption><strong>Ink</strong></figcaption></div>
 </figure>
-<figure class="duo">
-  <div><img src="${img('Theme_FantasyRPG.png')}" alt="Fantasy RPG theme"><figcaption><strong>Fantasy RPG</strong></figcaption></div>
+<figure class="trio">
+  <div><img src="${img('Theme_FantasyRPG.png')}" alt="Fantasy RPG theme"><figcaption><strong>Fantasy RPG</strong>, with its own scene at dusk</figcaption></div>
   <div><img src="${img('Theme_JRPGWindow.png')}" alt="JRPG Window theme"><figcaption><strong>JRPG Window</strong></figcaption></div>
   <div><img src="${img('Theme_PixelRetro.png')}" alt="Pixel Retro theme"><figcaption><strong>Pixel Retro</strong></figcaption></div>
-  <div><img src="${img('Theme_SciFiHUD.png')}" alt="Sci-Fi HUD theme"><figcaption><strong>Sci-Fi HUD</strong>. Each genre theme is shown over a scene drawn for it; the game names are made up.</figcaption></div>
+</figure>
+<figure class="duo">
+  <div><img src="${img('Theme_SciFiHUD.png')}" alt="Sci-Fi HUD theme"><figcaption><strong>Sci-Fi HUD</strong></figcaption></div>
+  <div><img src="${img('Theme_MilitaryShooter.png')}" alt="Military Shooter theme"><figcaption><strong>Military Shooter</strong>, with its own scene. The game names are made up; the JRPG, Pixel and Sci-Fi menus are shown over scenes drawn for them.</figcaption></div>
+</figure>`;
+
+const hoursFigure = `
+<figure class="single">
+  <img src="${img('Theme_Fantasy_Hours.png')}" alt="The Fantasy RPG scene at midnight, dawn, noon and dusk">
+  <figcaption><strong>One scene, four hours.</strong> Fantasy RPG's layers at midnight, dawn, noon and dusk: the moon, stars and lit windows fade in and out, the sun rises to noon, every hill takes the light of the hour. Your game sets the hour, or lets a day run.</figcaption>
 </figure>`;
 
 const clickFigure = sideShot('Click_Window.png', 'The Click Debugger section of the UIPilot window',
@@ -106,6 +115,7 @@ body = insertAfterHeading(body, 'h2', '4\\. What UIPilot creates', panelsFigure)
 body = insertAfterHeading(body, 'h3', 'Scan &amp; Repair', scanFigure);
 body = insertAfterHeading(body, 'h3', 'Manual', manualFigure);
 body = insertAfterHeading(body, 'h3', '5\\.4 Themes', themesFigure);
+body = insertBeforeHeading(body, 'h3', '5\\.5 Change the look', hoursFigure);
 body = insertAfterHeading(body, 'h2', '7\\. Click Debugger', clickFigure);
 // After the table under "Where you see it", so the section starts on the page it heads.
 body = insertBeforeHeading(body, 'h3', 'What it checks', healthFigure);
@@ -170,6 +180,7 @@ figure img { width: 100%; display: block; border: 0.2mm solid var(--rule); }
 .pair { display: grid; grid-template-columns: 58mm 1fr; gap: 6mm; align-items: start; }
 .duo  { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
 .trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; }
+.single img { width: 100%; }
 
 /* Screenshots of the editor window keep their own dark frame. */
 figure img.shot { border: 0.25mm solid #1F1F1F; }

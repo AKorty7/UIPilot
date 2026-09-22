@@ -25,6 +25,7 @@ already exist with **Apply Theme to Existing Menus**.
 | **JRPG Window** | blue gradient window with a white double rim (`uipilot_jrpg_panel`, sliced 48), Work Sans Bold capitals with a drop-shadow material, pointing-glove **marker**, icons off | `JrpgWindow()` |
 | **Pixel Retro** | 16 px pixel-art window (`uipilot_pixel_panel`, Pixels Per Unit 100, point filter, drawn at 0.25 = 4 screen px per art px at 1080p), Silkscreen with a hard shadow on titles, 5x8 arrow **marker** at 4x, CRT lines in the window, icons off | `PixelRetro()` |
 | **Sci-Fi HUD** | clipped-corner glass slab edged in cyan `#37E0FF` (`uipilot_scifi_panel`, sliced 120), Tektur capitals with a glow material, scanning **bar**, tick-scale rule, scene frames, scanlines, registration marks | `SciFiHud()` |
+| **Military Shooter** | near-black slab `#0C0F12` @ 94% with a 1 px `#2E353C` edge and an amber `#F2A33A` bar down the left (`uipilot_shooter_panel`, sliced 96), Big Shoulders Bold capitals, amber-edged light **bar**, hazard-stripe rule, registration marks, and a nine-layer scene: overcast sky, grey ridges, a radar station, a helicopter, the tactical overlay (brackets, tick ruler, reticle). Nothing glows. Reference: Modern Warfare's title overlay and Battlefield 2042's dark slab with one accent, from the Game UI Database | `MilitaryShooter()` |
 
 The genre sprites are drawn in `tools/art/theme-sprites.html` (pixel art in
 `build-theme-sprites.ps1`) and carry their own colours: their themes tint them white.
@@ -62,7 +63,20 @@ Rules that keep this working. Break one and Apply Theme stops being safe:
 8. **New themes start from the full Soft Club preset.** Create > UIPilot > Theme is a
    [MenuItem] in UIGeneratorModule, not a [CreateAssetMenu]: a field default cannot
    reference the font asset, so a plain new asset would lose Michroma.
-9. **Focus styles.** *Frame* stretches the focus art (default `uipilot_focus`) around the
+9. **Scenes.** A theme may carry a scene: `sceneLayers`, up to twelve `UIPilotSceneLayer`
+   entries (a white sprite, a `UIPilot/Scene Layer` material), drawn back to front in the
+   `_Scene` object's Layer slots, under the `_Wash`. The material holds the layer's colour
+   and alpha at Night, Dawn, Day and Dusk and a Rise; the shader eases between them by
+   one global float, `_UIPilotTimeOfDay` (0 midnight, 0.5 noon), which the Editor sets
+   for its preview (`UIPilotScenePreview`) and the generated GameManager sets in the game
+   (`timeOfDay`, `dayLengthSeconds`, `SetTimeOfDay`). No layer has a script. Layers share
+   the 16:9 frame whatever their texture size (flat colours are 4 x 4, gradients 4 x 720),
+   and are built by `tools/art/scene_layers.py`, which also writes the materials. A
+   `picture` on the theme replaces the layers. Colour rules: a landmark takes the colour
+   of the ground it stands on; a static wash over a scene stays light (Fantasy: 30%),
+   since the layers carry the mood; check the night key for contrast between landmark
+   and sky, and keep a moon or sun on the open side of the screen, clear of the panel.
+10. **Focus styles.** *Frame* stretches the focus art (default `uipilot_focus`) around the
    item, `focusReach` past its edges. *Bar* stretches it behind the item from the icon's
    left, and a Bar without art is a flat colour. *Marker* draws the art at `markerSize`,
    ending 8 units before the words (`UIGeneratorMenuBuilder.LabelInset`), so a wide cursor

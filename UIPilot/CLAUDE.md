@@ -16,10 +16,10 @@ they always load. They win over anything below.
 |---|---|
 | `Assets/UIPilot/Editor/` | All tool code. Layout is in `.cursorrules`. |
 | `Assets/UIPilot/Art/`, `Art/Themes/`, `Art/Fonts/` | Shipped sprites, genre artwork, OFL fonts. Every font is listed in `Third-Party Notices.txt`. |
-| `Assets/UIPilot/Themes/` | The seven preset theme assets. Regenerated from `UIGeneratorThemePresets` in place, so their GUIDs survive. |
+| `Assets/UIPilot/Themes/` | The eight preset theme assets. Regenerated from `UIGeneratorThemePresets` in place, so their GUIDs survive. |
 | `Assets/UIPilot/Documentation/` | The user guide: write `UIPilot_Documentation.md`, build the PDF with `../tools/docs`. |
 | `design-system/uipilot/` | The look of the window and the generated menus, and the theme rules (`pages/generated-menus.md`). Read before any visual change. |
-| `../tools/art/` | Vector sources and build scripts for every sprite (`build-sprites.ps1`, `build-theme-sprites.ps1`). |
+| `../tools/art/` | Vector sources and build scripts for every sprite (`build-sprites.ps1`, `build-theme-sprites.ps1`) and for the scenes (`scene_layers.py`: layer PNGs, .metas and materials). |
 | `../tools/store/` | Backdrops (`backdrop.py`, `genre_backdrops.py`), the render harness (`unity/`), store images. |
 | `../tools/docs/` | The PDF builder and the guide's figures. |
 
@@ -47,9 +47,16 @@ Dated so a later reader knows what was current.
   - **More genres, one strong theme each** (horror, racing/arcade, cosy/casual,
     clean-modern are candidates), rather than more variants of one genre. Buyers
     keep a theme's chrome and swap its backdrop.
+- **2026-09-22, built:** the Picture slot; the `_Scene` object with twelve Layer
+  slots under a `_Wash`; the `UIPilot/Scene Layer` shader and `_UIPilotTimeOfDay`
+  global; the GameManager's `timeOfDay`, `dayLengthSeconds` and `SetTimeOfDay`;
+  Fantasy RPG's twelve-layer scene and the Military Shooter theme with its nine.
+  Still open from the same decision: more genres, one theme each.
 - Every new theme still has to pass: 4.5:1 text contrast measured on a render,
   focus visible without hue alone, and Apply Theme == fresh build for every
-  theme pair with a control pair that differs.
+  theme pair with a control pair that differs. A scene is checked at midnight,
+  dawn, noon and dusk, and the harness must set the hour after building (the
+  build shows the theme's own hour).
 
 ## References
 

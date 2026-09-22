@@ -116,8 +116,8 @@ on `UIPilot_GameManager`: `UIPilot_Btn_Play` calls `OnPlayPressed`, and so on.
 | File | Purpose |
 |---|---|
 | `Assets/UIPilot_GameManager.cs` | **Your script.** One method per button, plus the code that shows and hides the panels. Edit it freely. |
-| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro and Sci-Fi HUD. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
-| `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons and fonts. The generated menus use these files, so keep this folder in your project (you may move it). The Soft Club sprites are white, so you recolour them in the Inspector instead of repainting. The genre themes' artwork is in `Art/Themes` and carries its own colours. |
+| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD and Military Shooter. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
+| `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons, fonts, the scenes and their shader. The generated menus use these files, so keep this folder in your project (you may move it). The Soft Club sprites are white, so you recolour them in the Inspector instead of repainting. The genre themes' artwork is in `Art/Themes` and carries its own colours; each scene's layers and materials are in a folder of their own there. |
 
 ### In Edit mode, all panels are visible at once
 
@@ -219,8 +219,8 @@ All of this lives in `ApplySettings()` in `UIPilot_GameManager.cs`, which is you
 ### 5.4 Themes
 
 A **theme** is one asset that decides how every generated menu looks: the colours, the
-lettering, the artwork, and which decorations are switched on. UIPilot ships seven, in
-`Assets/UIPilot/Themes`:
+lettering, the artwork, the scene behind the menu, and which decorations are switched
+on. UIPilot ships eight, in `Assets/UIPilot/Themes`:
 
 | Theme | The look |
 |---|---|
@@ -231,6 +231,7 @@ lettering, the artwork, and which decorations are switched on. UIPilot ships sev
 | **JRPG Window** | The console-RPG window: a blue gradient box with a white double border, bold capitals with a drop shadow, a pointing glove as the cursor. |
 | **Pixel Retro** | 8-bit: a black window with a white stepped border drawn in true pixels, pixel capitals, a yellow arrow cursor, faint CRT lines. The window and cursor are drawn at exactly 4 screen pixels per art pixel at 1080p. |
 | **Sci-Fi HUD** | A starship console: a glass slab with cut corners edged in glowing cyan, instrument ticks, a scanning focus bar, technical capitals with a faint glow. |
+| **Military Shooter** | The modern shooter's menu: a near-black slab with one amber edge, condensed capitals, hazard stripes under the title, a tactical overlay over a grey valley with a radar station and a helicopter. The scene changes with the time of day. |
 
 **To choose a theme:** in the **Build** section, drop it into the **Theme** field (or click
 the circle beside the field and pick one), then click **Build UI**.
@@ -247,7 +248,7 @@ Pick your copy in the **Theme** field and click **Apply Theme to Existing Menus*
 (Right-click in the Project window and choose **Create > UIPilot > Theme** to make a new
 one. It starts as a full copy of Soft Club, font and title glow included.)
 
-**To get a default theme back:** if one of the seven is missing from the
+**To get a default theme back:** if one of the eight is missing from the
 project, a line under the **Theme** field says which, next to a **Restore Default Themes**
 button. Click it and the missing themes are recreated in `Assets/UIPilot/Themes`, exactly as
 they shipped. It never changes a theme that is still there, so to reset a default theme you
@@ -271,10 +272,36 @@ Things worth knowing when you edit a theme:
   (Fantasy RPG pairs a display serif with a book face). **Title Material** and **Text
   Material** are optional material presets *of the font they go with*: a glow, a drop shadow.
 - **Icons** off hides the icons before item labels. Markers need that space.
+- **Picture** is your own image behind the menu: key art, a screenshot, a painting. It
+  covers the screen and keeps its shape, so on a screen of another shape its edges are
+  cropped, never stretched. A picture replaces the theme's scene layers.
+- **Scene Layers** are the theme's own scene, drawn in layers, back to front, under the
+  wash: sky, stars, sun, hills, a landmark, mist. Each layer is a white sprite and a
+  *UIPilot/Scene Layer* material that gives it a colour at night, dawn, day and dusk, and
+  a **Rise** for a sun or moon. To change a layer's colours, duplicate its material and
+  edit the four colours; the materials are shared, so editing one changes every theme
+  that uses it. Fantasy RPG and Military Shooter ship with a scene; the other themes show
+  your game.
+- **Time Of Day** is the hour the scene is designed for: 0 is midnight, 0.25 dawn, 0.5
+  noon, 0.75 dusk. Drag it and the scene changes in the Scene view at once. See *Time of
+  day in your game*, below.
 - A theme never adds or removes objects. Every menu contains every decoration; a theme
   only switches them on and off. That is why any theme can be applied over any other.
 - Themes are Editor-only assets. They are not included in your build. You can share one
   with a teammate or another project by copying the `.asset` file.
+
+**Time of day in your game.** Every scene layer reads one number, the hour, which the
+generated `UIPilot_GameManager` owns:
+
+| On the GameManager | What it does |
+|---|---|
+| **Time Of Day** | The hour the scene shows when the game starts. Build UI and Apply Theme set it to the theme's own hour; change it in the Inspector to start elsewhere. |
+| **Day Length Seconds** | Set it above 0 and the scene runs through a whole day in that many seconds, on its own, even behind a pause menu. 0 keeps the hour still. |
+| `SetTimeOfDay(hour, seconds)` | Call it from your code to move the scene to an hour, at once or blended over some seconds, the short way round the clock: `FindAnyObjectByType<UIPilot_GameManager>().SetTimeOfDay(0.75f, 3f);` |
+
+Themes without a scene ignore all three. The hour reaches the layers through a global
+shader value, `_UIPilotTimeOfDay`; if you remove the GameManager, set it yourself with
+`Shader.SetGlobalFloat("_UIPilotTimeOfDay", 0.5f)`, or the scene stays at midnight.
 
 ### 5.5 Change the look by hand
 
@@ -294,7 +321,8 @@ Theme to Existing Menus** sets colours and fonts again, so it replaces these han
 | The decorations | `Wave`, `Frame`, `Scanlines`, `Cross` objects | Delete any you do not want. Nothing depends on them. |
 | Button label | the `Text` child of a button | TextMeshPro > Text. Keep the GameObject's *name* unchanged. |
 | Where the menu sits | `UIPilot_..._Spacer` | The title block sits at the top of the glass panel and the buttons at the bottom. Delete the Spacer to bring the buttons up under the title. |
-| How much of the scene shows through | `UIPilot_..._Panel` | Image > Color (alpha). Lower it and the game behind the menu is clearer; raise it and the menu becomes a solid blue screen. |
+| How much of the scene shows through | `UIPilot_..._Wash` | Image > Color (alpha). Lower it and the scene behind the menu is clearer; raise it and the menu becomes a solid blue screen. |
+| The scene behind the menu | `Picture` and the `Layer` objects under `UIPilot_..._Scene` | Each is an Image that covers the screen. Swap a layer's sprite or material, or switch layers off. Menus built with an older UIPilot have no `_Scene` object: **Quick Clear**, then **Build UI**. |
 | Font | any text object | TextMeshPro > Font Asset. The themes use open-licence fonts from `Assets/UIPilot/Art/Fonts` (Michroma, Young Serif, Crimson Pro, Work Sans, Silkscreen, Tektur) that you may ship in your game; see `Third-Party Notices.txt`. |
 
 Your changes are safe. **Build UI never rebuilds a panel that already has all of
@@ -466,8 +494,10 @@ Use these only when you want to do one step by hand. Build UI does all of them f
   when you confirm Quick Clear, so that UIPilot's messages are easy to read.
 - **What ends up in your build:** `UIPilot_GameManager.cs` and only the artwork in
   `Assets/UIPilot/Art` that your menus use: about 300 KB for Soft Club, about 2 MB for
-  Fantasy RPG with its parchment. All of UIPilot's own code is inside an `Editor` folder,
-  which Unity never includes in builds.
+  Fantasy RPG's parchment, and a theme's scene adds its layers and the scene shader
+  (about 7 MB of textures for Fantasy RPG, 6 MB for Military Shooter; flat and gradient
+  layers are tiny textures stretched to the screen). All of UIPilot's own code is inside
+  an `Editor` folder, which Unity never includes in builds.
 
 ---
 
@@ -483,6 +513,8 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 | UI Health reports something you did on purpose | Every check follows common practice, and some projects differ. | Switch that check off under **Checks** in the UI Health section. |
 | Clicking **Settings** only logs a warning | The scene has no Settings panel. | Tick **Settings Menu** and click **Build UI**. |
 | The pause menu never appears | Nothing opens it yet. This is by design. | Add the script from section 5.2. |
+| The scene behind the menu is dark, or stuck at night, in a build | The hour is set by `UIPilot_GameManager` when the game starts, and nothing else set it. | Keep the GameManager in the scene, or set `_UIPilotTimeOfDay` yourself (section 5.4). |
+| A theme's scene does not appear on my menus | The menus were built with an older UIPilot and have no `_Scene` object. | **Quick Clear**, then **Build UI**. |
 | Scan Scene shows a *Button Listeners* warning | A button lost its connection, for example after the GameManager was deleted. | Click **Repair Scene**. |
 | After updating UIPilot, the menus still have the old look | Complete panels are never rebuilt, to protect your edits. | **Quick Clear**, then **Build UI**. |
 | Scan Scene says an object is missing, but it is in the scene | The object was renamed. | Restore its original `UIPilot_...` name (see section 5.6). |
@@ -507,6 +539,9 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 - The Click Debugger lists the listeners set in the Inspector. Listeners your scripts add
   with `AddListener` still run, but are not listed. It explains the left mouse button, a
   pen tip or a touch; other buttons are not watched.
+- A theme's scene and picture are drawn for a 16:9 screen and cropped, not stretched, on
+  other shapes. Scene layer colours live on shared materials, so a change to one shows
+  in every theme that uses that material; duplicate the material for a theme of your own.
 - Tested on Unity 6000.3.11f1 (Windows) with the Built-in Render Pipeline.
 
 ---

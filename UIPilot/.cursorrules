@@ -21,7 +21,10 @@ STACK
 ═══════════════════════════════════════════
 ARCHITECTURE RULES — NEVER BREAK THESE
 ═══════════════════════════════════════════
-- No runtime MonoBehaviours ever
+- No runtime MonoBehaviours ever. Runtime behaviour that a theme needs
+  goes in a shader (Art/Shaders: UIPilot/Scene Layer, driven by the
+  global _UIPilotTimeOfDay) or in the generated UIPilot_GameManager
+  (its timeOfDay, dayLengthSeconds and SetTimeOfDay).
 - No hardcoded strings — all strings in Labels/Content files
 - No logic inside UIPilotWindow.cs — UI layer only
 - Modules never call each other except via UIPilotWindow, or via one of
@@ -59,7 +62,10 @@ Assets/UIPilot/Editor/
                              picks the input module for the project)
     UIPilotSceneQuery.cs    (finds canvas children incl. inactive ones)
     UIPilotTheme.cs         (ScriptableObject: every colour, size and
-                             decoration switch of the generated menus)
+                             decoration switch of the generated menus,
+                             the picture, scene layers and time of day)
+    UIPilotSceneLayer.cs    (one scene layer: white sprite + Scene Layer material)
+    UIPilotScenePreview.cs  (keeps the preview hour across script reloads)
   Modules/
     UIGenerator/
       MenuType.cs
@@ -69,7 +75,8 @@ Assets/UIPilot/Editor/
       UIGeneratorStyler.cs        (the ONLY code that sets appearance;
                                    used by Build UI and Apply Theme)
       UIGeneratorThemePresets.cs  (Soft Club, Soft Club Night, Ink, Fantasy RPG,
-                                   JRPG Window, Pixel Retro, Sci-Fi HUD)
+                                   JRPG Window, Pixel Retro, Sci-Fi HUD,
+                                   Military Shooter)
       UIGeneratorArt.cs           (finds the shipped sprites, fonts, materials)
     Health/                 (UI Health: read-only checks of ANY UI)
       HealthModule.cs       (entry: CheckOpenScenes, CheckSceneForBuild, RunFix)
@@ -112,6 +119,11 @@ Assets/UIPilot/Art/       (white tintable sprites + fonts, shipped)
   Themes/                 (genre theme sprites; carry their own colours.
                            Source: tools/art/theme-sprites.html +
                            build-theme-sprites.ps1, which writes the .metas)
+    <Theme>/              (a theme's scene: white layer PNGs + one material
+                           each. Source: tools/art/scene_layers.py, which
+                           writes PNGs, .metas and materials)
+  Shaders/                (UIPilot/Scene Layer, the one shader; its .meta GUID
+                           is fixed in scene_layers.py, which writes materials)
 Assets/UIPilot/Themes/    (the preset theme assets buyers pick from)
 
 ═══════════════════════════════════════════

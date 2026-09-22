@@ -45,9 +45,15 @@ UIPilot does all of it in one click.
   panels with correctly configured Canvas, CanvasScaler, EventSystem,
   buttons, and a wired GameManager script. One click.
 - **Themes** — the look is one asset. Pick Soft Club, Soft Club Night,
-  Ink, Fantasy RPG, JRPG Window, Pixel Retro or Sci-Fi HUD, or duplicate
-  one and make your own. **Apply Theme to Existing Menus** restyles what
-  you already built without touching its layout or wiring.
+  Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD or Military
+  Shooter, or duplicate one and make your own. **Apply Theme to Existing
+  Menus** restyles what you already built without touching its layout or
+  wiring.
+- **Scenes and time of day** — a theme can put your own picture behind
+  the menu, or its own layered scene that turns with the hour: Fantasy
+  RPG's valley and Military Shooter's grey ridges go from midnight to
+  dusk. Your game sets the hour with one call, or lets a day run on its
+  own. No scripts on the layers: one shader, one global value.
 - **Scan & Repair** — audits every UIPilot object in your scene and
   reports missing or broken components. Repair Scene fixes everything
   it finds automatically.
