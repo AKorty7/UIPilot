@@ -37,13 +37,17 @@ UIPilot does all of it in one click.
   controls a gamepad can never reach, and text under the Steam Deck
   minimum. Lamps on the toolbar and in the Hierarchy; one-click, undoable
   fixes. Silent when everything is fine.
+- **Click Debugger** — in Play mode, click anywhere and see what took
+  the click and why: the method it calls, or the image drawn over the
+  button, the CanvasGroup switching it off, the missing raycaster, the
+  empty On Click. Works on any UI, with either input system.
 - **Quick Build** — generates MainMenu, PauseMenu, and SettingsMenu
   panels with correctly configured Canvas, CanvasScaler, EventSystem,
   buttons, and a wired GameManager script. One click.
-- **Themes** — the look is one asset. Pick Soft Club, Soft Club Night or
-  Ink, or duplicate one and make your own. **Apply Theme to Existing
-  Menus** restyles what you already built without touching its layout
-  or wiring.
+- **Themes** — the look is one asset. Pick Soft Club, Soft Club Night,
+  Ink, Fantasy RPG, JRPG Window, Pixel Retro or Sci-Fi HUD, or duplicate
+  one and make your own. **Apply Theme to Existing Menus** restyles what
+  you already built without touching its layout or wiring.
 - **Scan & Repair** — audits every UIPilot object in your scene and
   reports missing or broken components. Repair Scene fixes everything
   it finds automatically.

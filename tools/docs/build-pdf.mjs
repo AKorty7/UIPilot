@@ -62,7 +62,18 @@ const themesFigure = `
   <div><img src="${img('Theme_SoftClub.png')}" alt="Soft Club theme"><figcaption><strong>Soft Club</strong> (default)</figcaption></div>
   <div><img src="${img('Theme_SoftClubNight.png')}" alt="Soft Club Night theme"><figcaption><strong>Soft Club Night</strong></figcaption></div>
   <div><img src="${img('Theme_Ink.png')}" alt="Ink theme"><figcaption><strong>Ink</strong></figcaption></div>
+</figure>
+<figure class="duo">
+  <div><img src="${img('Theme_FantasyRPG.png')}" alt="Fantasy RPG theme"><figcaption><strong>Fantasy RPG</strong></figcaption></div>
+  <div><img src="${img('Theme_JRPGWindow.png')}" alt="JRPG Window theme"><figcaption><strong>JRPG Window</strong></figcaption></div>
+  <div><img src="${img('Theme_PixelRetro.png')}" alt="Pixel Retro theme"><figcaption><strong>Pixel Retro</strong></figcaption></div>
+  <div><img src="${img('Theme_SciFiHUD.png')}" alt="Sci-Fi HUD theme"><figcaption><strong>Sci-Fi HUD</strong>. Each genre theme is shown over a scene drawn for it; the game names are made up.</figcaption></div>
 </figure>`;
+
+const clickFigure = sideShot('Click_Window.png', 'The Click Debugger section of the UIPilot window',
+  `<strong>Three clicks on a generated main menu.</strong> Play runs its method. Settings has
+   nothing under On Click. Quit is covered by a HUD vignette with Raycast Target on, so the
+   vignette takes the click: the row names both, and lists what was under the pointer.`);
 
 const healthFigure = `
 <figure class="health">
@@ -95,6 +106,7 @@ body = insertAfterHeading(body, 'h2', '4\\. What UIPilot creates', panelsFigure)
 body = insertAfterHeading(body, 'h3', 'Scan &amp; Repair', scanFigure);
 body = insertAfterHeading(body, 'h3', 'Manual', manualFigure);
 body = insertAfterHeading(body, 'h3', '5\\.4 Themes', themesFigure);
+body = insertAfterHeading(body, 'h2', '7\\. Click Debugger', clickFigure);
 // After the table under "Where you see it", so the section starts on the page it heads.
 body = insertBeforeHeading(body, 'h3', 'What it checks', healthFigure);
 

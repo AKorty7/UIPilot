@@ -9,7 +9,9 @@ It also watches **all** the UI in your scenes as you work, not only its own. **U
 Health** (section 6) catches the mistakes that make a button silently do nothing
 (a click event pointing at a deleted method, a missing raycaster, an invisible
 image covering the button, a control a gamepad can never reach) and text too
-small for Steam Deck, and fixes most of them in one click.
+small for Steam Deck, and fixes most of them in one click. In Play mode, the **Click
+Debugger** (section 7) tells you what took each click and why, so "this button does
+nothing" takes one click to explain.
 
 Everything it creates is ordinary Unity UI that you edit in the Inspector.
 UIPilot's own code runs only in the Editor. The one runtime file is
@@ -114,8 +116,8 @@ on `UIPilot_GameManager`: `UIPilot_Btn_Play` calls `OnPlayPressed`, and so on.
 | File | Purpose |
 |---|---|
 | `Assets/UIPilot_GameManager.cs` | **Your script.** One method per button, plus the code that shows and hides the panels. Edit it freely. |
-| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night and Ink. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
-| `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons and the Michroma font. The generated menus use these files, so keep this folder in your project (you may move it). Every sprite is white, so you recolour in the Inspector instead of repainting. |
+| `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro and Sci-Fi HUD. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
+| `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons and fonts. The generated menus use these files, so keep this folder in your project (you may move it). The Soft Club sprites are white, so you recolour them in the Inspector instead of repainting. The genre themes' artwork is in `Art/Themes` and carries its own colours. |
 
 ### In Edit mode, all panels are visible at once
 
@@ -217,7 +219,7 @@ All of this lives in `ApplySettings()` in `UIPilot_GameManager.cs`, which is you
 ### 5.4 Themes
 
 A **theme** is one asset that decides how every generated menu looks: the colours, the
-lettering, and which decorations are switched on. UIPilot ships three, in
+lettering, the artwork, and which decorations are switched on. UIPilot ships seven, in
 `Assets/UIPilot/Themes`:
 
 | Theme | The look |
@@ -225,6 +227,10 @@ lettering, and which decorations are switched on. UIPilot ships three, in
 | **Soft Club** (default) | Airy blue wash over your scene, cobalt glass panel, hairline frames, a ribbon of light, wide lowercase lettering. |
 | **Soft Club Night** | The same artwork in a dark key: deep navy, violet and cyan light. |
 | **Ink** | Dark, flat and quiet: an opaque panel, a teal focus bar, the default font in capitals, no artwork. High contrast and genre-neutral. |
+| **Fantasy RPG** | A parchment page in a gilt frame with garnet-set corners, lit by candlelight. Serif lettering in ink brown, a gold-leaf band with a lozenge on the chosen line, a gilt divider under the title. |
+| **JRPG Window** | The console-RPG window: a blue gradient box with a white double border, bold capitals with a drop shadow, a pointing glove as the cursor. |
+| **Pixel Retro** | 8-bit: a black window with a white stepped border drawn in true pixels, pixel capitals, a yellow arrow cursor, faint CRT lines. The window and cursor are drawn at exactly 4 screen pixels per art pixel at 1080p. |
+| **Sci-Fi HUD** | A starship console: a glass slab with cut corners edged in glowing cyan, instrument ticks, a scanning focus bar, technical capitals with a faint glow. |
 
 **To choose a theme:** in the **Build** section, drop it into the **Theme** field (or click
 the circle beside the field and pick one), then click **Build UI**.
@@ -241,7 +247,7 @@ Pick your copy in the **Theme** field and click **Apply Theme to Existing Menus*
 (Right-click in the Project window and choose **Create > UIPilot > Theme** to make a new
 one. It starts as a full copy of Soft Club, font and title glow included.)
 
-**To get a default theme back:** if Soft Club, Soft Club Night or Ink is missing from the
+**To get a default theme back:** if one of the seven is missing from the
 project, a line under the **Theme** field says which, next to a **Restore Default Themes**
 button. Click it and the missing themes are recreated in `Assets/UIPilot/Themes`, exactly as
 they shipped. It never changes a theme that is still there, so to reset a default theme you
@@ -251,11 +257,20 @@ Things worth knowing when you edit a theme:
 
 - **Panel** is the surface the menu text is read on. Keep its alpha near 1, and check
   **Text** against it: aim for a contrast of 4.5:1 or better.
-- **Focus Frame** on = a glowing hairline frame around the selected button; off = a flat
-  solid bar. **Focus Selected** is its colour on the focused button, **Focus Hover** under the
-  mouse. Keep **Focus Idle** at alpha 0, in the same colour as Hover.
-- **Font** empty = TextMeshPro's default font. **Title Material** is an optional material
-  preset *of that same font* (Soft Club uses one for the glow on titles).
+- **Focus Style** decides how the chosen button is marked: **Frame** (a glowing frame
+  around it), **Bar** (a band behind it) or **Marker** (a cursor before its words, like the
+  JRPG glove). **Focus Art** is the sprite for it; empty gives UIPilot's own frame, or a flat
+  bar. **Focus Selected** tints it on the focused button, **Focus Hover** under the mouse.
+  Keep **Focus Idle** at alpha 0. A theme whose art carries its own colours uses white for
+  Selected, so the art shows as drawn.
+- **Panel Art** is an optional 9-sliced sprite drawn as the panel (the parchment, the JRPG
+  window). **Pixel Size** scales its border: the Pixel Retro window uses 0.25, so each art
+  pixel covers four screen pixels.
+- **Rule Art** replaces the thin line under the title with an ornament, at **Rule Height**.
+- **Font** empty = TextMeshPro's default font. **Title Font** gives titles their own font
+  (Fantasy RPG pairs a display serif with a book face). **Title Material** and **Text
+  Material** are optional material presets *of the font they go with*: a glow, a drop shadow.
+- **Icons** off hides the icons before item labels. Markers need that space.
 - A theme never adds or removes objects. Every menu contains every decoration; a theme
   only switches them on and off. That is why any theme can be applied over any other.
 - Themes are Editor-only assets. They are not included in your build. You can share one
@@ -280,7 +295,7 @@ Theme to Existing Menus** sets colours and fonts again, so it replaces these han
 | Button label | the `Text` child of a button | TextMeshPro > Text. Keep the GameObject's *name* unchanged. |
 | Where the menu sits | `UIPilot_..._Spacer` | The title block sits at the top of the glass panel and the buttons at the bottom. Delete the Spacer to bring the buttons up under the title. |
 | How much of the scene shows through | `UIPilot_..._Panel` | Image > Color (alpha). Lower it and the game behind the menu is clearer; raise it and the menu becomes a solid blue screen. |
-| Font | any text object | TextMeshPro > Font Asset. The menus use **Michroma** (`Assets/UIPilot/Art/Fonts`), an open-licence font you may ship in your game; see `Third-Party Notices.txt`. |
+| Font | any text object | TextMeshPro > Font Asset. The themes use open-licence fonts from `Assets/UIPilot/Art/Fonts` (Michroma, Young Serif, Crimson Pro, Work Sans, Silkscreen, Tektur) that you may ship in your game; see `Third-Party Notices.txt`. |
 
 Your changes are safe. **Build UI never rebuilds a panel that already has all of
 its buttons**, so clicking it again does not undo your styling.
@@ -343,11 +358,46 @@ These settings are saved for you in this project only; teammates keep their own.
 
 ---
 
-## 7. The UIPilot window
+## 7. Click Debugger: what took that click?
+
+When a button does nothing in Play mode, the reason is usually invisible: an image
+drawn over it, a switched-off CanvasGroup, a missing raycaster, an empty On Click. The
+Click Debugger shows it. Press **Play**, click anywhere in the Game view, and the **Click
+Debugger** section of **Tools > UIPilot** says what took the click and why:
+
+| You see | It means |
+|---|---|
+| **OK**, *On Click calls GameManager.OnPlayPressed()* | The click reached a control, and this is what it runs. |
+| **Empty** | A Button took the click, but nothing is set under On Click (or every entry is broken or switched Off). |
+| **Off** | The control has **Interactable** off, or sits inside a CanvasGroup that does. The row names which. |
+| **Blocked** | Something with Raycast Target on is drawn over a control and takes its clicks. The row names both. |
+| **Broken** | A control under the pointer cannot receive clicks at all: its Raycast Target is off, its canvas has no Graphic Raycaster, a CanvasGroup has Blocks Raycasts off, or a mask hides it there. Also shown when there is no EventSystem or input module. |
+| **—** | Nothing clickable was there: a background, or empty space. |
+
+The last click is shown in full, with the objects under the pointer from top to bottom;
+the five before it get a line each. Click a name to select that object. The clicks from
+your last Play session stay listed after you stop, until you press Play again.
+
+Three switches sit under the list. **Watch clicks in Play mode** is on by default. **Log
+each click to the Console** writes one line per click; clicking the line selects the
+object, and it works with the window closed. **Select what took each click** selects it as
+you play. Like UI Health's, these are saved for you in this project only.
+
+It works with any UI in the scene, not only UIPilot's, and with the Input System package
+or the old Input Manager. It only reads: nothing in your scene is changed, and nothing of
+it goes into your build.
+
+---
+
+## 8. The UIPilot window
 
 ### UI Health
 
 The first section. Everything in it is described in section 6.
+
+### Click Debugger
+
+The second section. Everything in it is described in section 7.
 
 ### Build
 
@@ -355,7 +405,7 @@ The first section. Everything in it is described in section 6.
 |---|---|
 | Menu checkboxes | Choose which menus **Build UI** creates. |
 | **Theme** | The look **Build UI** generates (section 5.4). Empty means the built-in Soft Club look. Your choice is remembered. |
-| **Restore Default Themes** | Only shown when one of the three default themes is missing from the project. Recreates the missing ones, exactly as shipped. Themes that still exist are never changed. |
+| **Restore Default Themes** | Only shown when one of the seven default themes is missing from the project. Recreates the missing ones, exactly as shipped. Themes that still exist are never changed. |
 | **Build UI** | Creates the canvas, the ticked menus, an EventSystem if the scene has none, the `UIPilot_GameManager` script and GameObject, and connects every button. Anything that already exists and is complete is left alone. The button is greyed out while Unity is compiling a build in progress, and the result appears in a status row beneath it. |
 | **Apply Theme to Existing Menus** | Restyles the menus already in the scene with the selected theme. Layout, names and wiring are untouched. Undo is supported. |
 | **Quick Clear** | After you confirm, removes `UIPilot_Canvas` and the `UIPilot_GameManager` GameObject from the scene. Your `UIPilot_GameManager.cs` file is **not** deleted. |
@@ -398,7 +448,7 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 
 ---
 
-## 8. What UIPilot changes, and how your work is protected
+## 9. What UIPilot changes, and how your work is protected
 
 - **It only edits its own objects.** UIPilot creates and modifies GameObjects whose
   names start with `UIPilot_`. Two exceptions, both deliberate: it adds an
@@ -414,20 +464,21 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 - **Scene changes can be undone** with Ctrl+Z. Writing the script file cannot.
 - **The Console is cleared** when you click Build UI, Scan Scene or Repair Scene, and
   when you confirm Quick Clear, so that UIPilot's messages are easy to read.
-- **What ends up in your build:** `UIPilot_GameManager.cs` and the artwork in `Assets/UIPilot/Art`
-  that the menus use (about 300 KB). All of UIPilot's own code is inside an `Editor` folder,
+- **What ends up in your build:** `UIPilot_GameManager.cs` and only the artwork in
+  `Assets/UIPilot/Art` that your menus use: about 300 KB for Soft Club, about 2 MB for
+  Fantasy RPG with its parchment. All of UIPilot's own code is inside an `Editor` folder,
   which Unity never includes in builds.
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | What you see | Why | What to do |
 |---|---|---|
 | Menu text is invisible, or a *TMP Importer* window pops up | TMP Essential Resources are not imported. | Window > TextMeshPro > Import TMP Essential Resources. Then **Quick Clear** and **Build UI**. |
 | "Waiting for Unity to compile..." and nothing more happens, or the window shows a red *Stalled* row | Another script in your project has a compile error, so Unity cannot finish compiling. | Fix the errors shown in the Console. The buttons are wired automatically after the next successful compile. |
 | "UIPilot_GameManager type could not be resolved" | The generated script is not in Unity's default assembly. | Keep `UIPilot_GameManager.cs` directly under `Assets/`, outside any folder that has an Assembly Definition, then click **Build UI** again. |
-| Buttons do not react in Play mode | Usually one of the problems UI Health checks for: a wrong input module, a missing raycaster, or something covering the buttons. | Open **Tools > UIPilot** and look at UI Health. Click **Fix** on the row it shows. |
+| Buttons do not react in Play mode | Usually one of the problems UI Health checks for: a wrong input module, a missing raycaster, or something covering the buttons. | Open **Tools > UIPilot** and look at UI Health. Click **Fix** on the row it shows. Still stuck? Click the button in Play mode and read the **Click Debugger** row (section 7). |
 | The UI Health lamp is not on the main toolbar | Unity hides toolbar items that packages add, until they are switched on. | Click **Show on Toolbar** in the UI Health section, or tick **Lamp on Unity's main toolbar** under **Checks**. If neither is there, a later Unity version has changed its toolbar: right-click an empty part of the main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
 | UI Health reports something you did on purpose | Every check follows common practice, and some projects differ. | Switch that check off under **Checks** in the UI Health section. |
 | Clicking **Settings** only logs a warning | The scene has no Settings panel. | Tick **Settings Menu** and click **Build UI**. |
@@ -438,7 +489,7 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 
 ---
 
-## 10. Limitations
+## 11. Limitations
 
 - UGUI only. UI Toolkit is not supported.
 - One `UIPilot_Canvas` per scene, with up to three menus: Main, Pause, Settings.
@@ -453,11 +504,14 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 - UI Health checks the scenes open in Edit mode, and every scene in a build. It does not
   see UI that your scripts create or change at runtime, or a prefab open in Prefab Mode.
   The blocked-button and text-size checks skip World Space canvases.
+- The Click Debugger lists the listeners set in the Inspector. Listeners your scripts add
+  with `AddListener` still run, but are not listed. It explains the left mouse button, a
+  pen tip or a touch; other buttons are not watched.
 - Tested on Unity 6000.3.11f1 (Windows) with the Built-in Render Pipeline.
 
 ---
 
-## 11. Support
+## 12. Support
 
 Made by NomadStudios — NomadStudios47@outlook.com
 
