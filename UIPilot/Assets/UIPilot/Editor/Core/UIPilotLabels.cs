@@ -64,6 +64,26 @@ namespace UIPilot.Editor.Core
             internal const string ConsoleRestored = "UIPilot: Restored default theme(s): {0}";
         }
 
+        // The Build card's "Play loads" row: which scene the main menu's Play button
+        // loads. Shown once the scene has a main menu and its UIPilot_GameManager.
+        internal static class PlayScene
+        {
+            internal const string FieldLabel   = "Play loads";
+            internal const string FieldTooltip =
+                "What the main menu's Play button does: load a scene from the scene list in File > Build Profiles, or hide the menu so the game starts in this scene. Kept on UIPilot_GameManager as Game Scene.";
+            internal const string ThisScene    = "This scene (hides the menu)";
+            internal const string NotInList    = "{0} (not in the scene list)";
+            internal const string NoScenesHint =
+                "To load your game scene instead, add it to the scene list in File > Build Profiles.";
+            internal const string MissingHint  =
+                "Play can't load that scene: add it to the scene list in File > Build Profiles, or pick another.";
+
+            // Popup menus treat '/' as a submenu; a path shown to tell two same-named
+            // scenes apart uses a look-alike slash instead.
+            internal const char PathSlash    = '/';
+            internal const char ShownSlash   = '∕';
+        }
+
         internal static class Health
         {
             internal const string Section          = "UI Health";

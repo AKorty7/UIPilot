@@ -71,9 +71,12 @@ and edit.
    - **Settings** opens a Settings menu that already works: **Volume**, **Fullscreen**
      and **Quality** change the real settings and are remembered the next time the game runs.
      **Back** returns to where you came from.
-   - **Quit** stops Play mode in the Editor, and quits the application in a build.
-   - **Play** writes a message to the Console. It does nothing else until you add
-     your own code (see section 5.1).
+   - **Play** hides the menu, and the game carries on in this scene. To load another
+     scene instead, pick it under **Play loads** in the Build section (section 5.1).
+   - **Esc**, or **Start** on a gamepad, opens the pause menu while the game runs.
+     **Esc** or gamepad **B** goes back out of any menu (section 5.2).
+   - **Quit** asks first: its label changes to *Press again to quit*. Press it again to
+     stop Play mode in the Editor, or to quit the application in a build.
 
 That is the whole workflow. The rest of this guide explains what was created and
 how to make it yours.
@@ -115,7 +118,7 @@ on `UIPilot_GameManager`: `UIPilot_Btn_Play` calls `OnPlayPressed`, and so on.
 
 | File | Purpose |
 |---|---|
-| `Assets/UIPilot_GameManager.cs` | **Your script.** One method per button, plus the code that shows and hides the panels. Edit it freely. |
+| `Assets/UIPilot_GameManager.cs` | **Your script.** One method per button, plus the code that shows and hides the panels, pauses the game and reads **Esc** and the gamepad. Edit it freely. |
 | `Assets/UIPilot/Themes/` | **The looks you can choose from**: Soft Club, Soft Club Night, Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD, Military Shooter and Survival Horror. Duplicate one to make your own (section 5.4). Editor-only; not part of your build. |
 | `Assets/UIPilot/Art/` | **The menus' artwork**: sprites, icons, fonts, the scenes and their shader. The generated menus use these files, so keep this folder in your project (you may move it). The Soft Club sprites are white, so you recolour them in the Inspector instead of repainting. The genre themes' artwork is in `Art/Themes` and carries its own colours; each scene's layers and materials are in a folder of their own there. |
 
@@ -132,63 +135,53 @@ unticked panels, and the script turns the right panel on when the game runs.
 
 ## 5. Making it yours
 
-### 5.1 Add your game logic
+### 5.1 Choose what Play does
 
-Open `Assets/UIPilot_GameManager.cs`. Each button has a method. Replace the
-placeholder in `OnPlayPressed` with your own code, for example:
+After the first **Build UI**, the Build section shows **Play loads** under the Theme field.
+
+- **This scene (hides the menu)**, the default: Play hides the menu, and the game carries
+  on in the scene the menu is in.
+- **A scene from the list**: Play loads that scene. The list is your project's scene list
+  in **File > Build Profiles**. If your game scene is not in it, add it there first.
+
+The choice is kept on the `UIPilot_GameManager` object as **Game Scene**, so you can
+also type a scene's name or path there in the Inspector. If Play can't load that scene,
+it writes a warning to the Console instead, and the UIPilot window marks the scene
+*not in the scene list*.
+
+To do more when Play is pressed, for example show a loading screen, edit
+`OnPlayPressed` in `Assets/UIPilot_GameManager.cs`. It is your script.
+
+### 5.2 Pause and going back
+
+The pause menu works as soon as it is built. Nothing needs wiring or coding.
+
+| Press | While the game runs | In a menu |
+|---|---|---|
+| **Esc**, or **Start** on a gamepad | Opens the pause menu | Goes back one step |
+| **B** on an Xbox pad (**Circle** on a PlayStation pad) | Nothing: it stays your game's button | Goes back one step |
+
+Going back one step means: Settings returns to the menu it was opened from, and the pause
+menu resumes the game. The main menu has nowhere to go back to, so there it does nothing.
+
+While the pause menu is open, `Time.timeScale` is 0 and the mouse cursor is free and
+visible, even if your game had locked it. **Resume** puts the time and the cursor back
+as they were.
+
+To open the pause menu from your own code, for example when the game window loses
+focus, call `OpenPauseMenu()`:
 
 ```csharp
-using UnityEngine.SceneManagement;   // add at the top of the file
-
-public void OnPlayPressed()
-{
-    SceneManager.LoadScene("GameScene");
-}
+FindAnyObjectByType<UIPilot_GameManager>().OpenPauseMenu();
 ```
 
-If the game runs in the same scene as the menu, hide the menu instead:
-
-```csharp
-public void OnPlayPressed()
-{
-    ShowPanel(string.Empty);   // an empty name hides every panel
-}
-```
-
-### 5.2 Open the pause menu
-
-UIPilot builds the pause menu and wires its buttons, but it does not decide which
-key pauses your game. Add this small script to any GameObject in the scene:
-
-```csharp
-using UnityEngine;
-
-public class PauseInput : MonoBehaviour
-{
-    [SerializeField] private UIPilot_GameManager gameManager;
-
-    private void Update()
-    {
-        if (!PausePressed()) return;
-
-        Time.timeScale = 0f;
-        gameManager.ShowPanel("UIPilot_PauseMenu_Panel");
-    }
-
-    private static bool PausePressed()
-    {
-#if ENABLE_INPUT_SYSTEM
-        var keyboard = UnityEngine.InputSystem.Keyboard.current;
-        return keyboard != null && keyboard.escapeKey.wasPressedThisFrame;
-#else
-        return Input.GetKeyDown(KeyCode.Escape);
-#endif
-    }
-}
-```
-
-Drag the `UIPilot_GameManager` object onto the **Game Manager** field. The generated
-**Resume** button already sets `Time.timeScale` back to 1 and hides the menu.
+- A scene with a pause menu but no main menu, such as a game level, starts in play:
+  the first **Esc** pauses it.
+- The keys are read with the Input System package when your project uses it
+  (**Project Settings > Player > Active Input Handling** set to *Input System Package*
+  or *Both*). With the old Input Manager only, **Esc** and joystick button 1 (B on an
+  Xbox pad) work, but **Start** does not.
+- To use other keys, edit `PausePressed()` and `BackPressed()` in `UIPilot_GameManager.cs`.
 
 ### 5.3 The Settings menu
 
@@ -437,7 +430,8 @@ The second section. Everything in it is described in section 7.
 |---|---|
 | Menu checkboxes | Choose which menus **Build UI** creates. |
 | **Theme** | The look **Build UI** generates (section 5.4). Empty means the built-in Soft Club look. Your choice is remembered. |
-| **Restore Default Themes** | Only shown when one of the seven default themes is missing from the project. Recreates the missing ones, exactly as shipped. Themes that still exist are never changed. |
+| **Restore Default Themes** | Only shown when one of the nine default themes is missing from the project. Recreates the missing ones, exactly as shipped. Themes that still exist are never changed. |
+| **Play loads** | Shown once the scene has a main menu and its `UIPilot_GameManager`. The scene the Play button loads, from the scene list in **File > Build Profiles**, or *This scene*, which hides the menu (section 5.1). Undo is supported. |
 | **Build UI** | Creates the canvas, the ticked menus, an EventSystem if the scene has none, the `UIPilot_GameManager` script and GameObject, and connects every button. Anything that already exists and is complete is left alone. The button is greyed out while Unity is compiling a build in progress, and the result appears in a status row beneath it. |
 | **Apply Theme to Existing Menus** | Restyles the menus already in the scene with the selected theme. Layout, names and wiring are untouched. Undo is supported. |
 | **Quick Clear** | After you confirm, removes `UIPilot_Canvas` and the `UIPilot_GameManager` GameObject from the scene. Your `UIPilot_GameManager.cs` file is **not** deleted. |
@@ -490,9 +484,11 @@ Use these only when you want to do one step by hand. Build UI does all of them f
   in your open scenes, but it changes an object that is not UIPilot's own only when you
   click **Fix** on that object's row. Each Fix is one step that **Ctrl+Z** undoes.
 - **Your script is protected.** UIPilot rewrites `UIPilot_GameManager.cs` only when
-  the script or the `UIPilot_GameManager` GameObject is missing. If you have edited
-  any of the `On...Pressed` methods, it shows a confirmation dialog first, and
-  **Cancel** leaves your file untouched.
+  the script or the `UIPilot_GameManager` GameObject is missing. If you have changed
+  anything in the file, it shows a confirmation dialog first, and **Cancel** leaves
+  your file untouched. When you build a menu later, for example the Pause Menu after
+  the Main Menu, UIPilot only adds the methods for its buttons at the end of the class
+  and changes nothing else.
 - **Scene changes can be undone** with Ctrl+Z. Writing the script file cannot.
 - **The Console is cleared** when you click Build UI, Scan Scene or Repair Scene, and
   when you confirm Quick Clear, so that UIPilot's messages are easy to read.
@@ -516,7 +512,9 @@ Use these only when you want to do one step by hand. Build UI does all of them f
 | The UI Health lamp is not on the main toolbar | Unity hides toolbar items that packages add, until they are switched on. | Click **Show on Toolbar** in the UI Health section, or tick **Lamp on Unity's main toolbar** under **Checks**. If neither is there, a later Unity version has changed its toolbar: right-click an empty part of the main toolbar (or click its **⋮** menu) and tick **UIPilot > UI Health**. |
 | UI Health reports something you did on purpose | Every check follows common practice, and some projects differ. | Switch that check off under **Checks** in the UI Health section. |
 | Clicking **Settings** only logs a warning | The scene has no Settings panel. | Tick **Settings Menu** and click **Build UI**. |
-| The pause menu never appears | Nothing opens it yet. This is by design. | Add the script from section 5.2. |
+| **Esc** does not open the pause menu | The main menu is showing (Esc pauses a game that is running), or the scene has no pause menu. | Press **Play** first. If there is no pause menu, tick **Pause Menu** and click **Build UI**. |
+| Gamepad **Start** does not pause | The project uses the old Input Manager only. | Install the Input System package and set **Active Input Handling** to *Both* or *Input System Package* (section 5.2). |
+| **Play** only writes a warning | The scene chosen under **Play loads** is not in the scene list. | Add it to the scene list in **File > Build Profiles**, or pick another scene (section 5.1). |
 | The scene behind the menu is dark, or stuck at night, in a build | The hour is set by `UIPilot_GameManager` when the game starts, and nothing else set it. | Keep the GameManager in the scene, or set `_UIPilotTimeOfDay` yourself (section 5.4). |
 | A theme's scene does not appear on my menus | The menus were built with an older UIPilot and have no `_Scene` object. | **Quick Clear**, then **Build UI**. |
 | Scan Scene shows a *Button Listeners* warning | A button lost its connection, for example after the GameManager was deleted. | Click **Repair Scene**. |

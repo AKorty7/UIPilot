@@ -61,27 +61,45 @@ Dated so a later reader knows what was current.
 
 ## Where we left off
 
-Updated 2026-09-23. Replace this section, don't append to it, when the state changes.
+Updated 2026-09-23 (evening). Replace this section, don't append to it, when the state changes.
+
+**Built and committed 2026-09-23: a working front end** (idea #1 of three the user approved
+2026-09-23; #2 is screen-shape checks in UI Health with one-click anchor fixes, #3 more
+certain checks: missing glyphs, text overflow, Constant Pixel Size, lost gamepad focus).
+- Generated GameManager (template in `ScriptSetupContent`, repo copy regenerated): a
+  `gameScene` field; Play loads it (`CanStreamedLevelBeLoaded`, else a Console warning),
+  or hides the menu when empty; Esc/Start opens Pause in play (time 0, cursor freed and
+  put back on Resume), Esc/B goes back one step; Quit asks once ("Press again to quit",
+  3 s, cancelled when focus moves on) then quits; `OpenPauseMenu()` is public; a scene
+  with no main menu starts in play; `OnDestroy` resets time if paused. Input System
+  when `ENABLE_INPUT_SYSTEM`, else Esc and joystick button 1.
+- Window: "Play loads" popup under Theme, once the scene has a main menu and a
+  GameManager with the field; lists the build's scenes (active Build Profile), flags a
+  scene not in the list, hints when there are none. Logic in `ScriptSetupModule`.
+- Guide 5.1/5.2 rewritten, Quick start bullets, window table; `Window_Build.png` recaptured;
+  PDF rebuilt (v22) and copied in.
+- Verified: compile both input paths (legacy by recompiling without the define);
+  a GUI Play-mode harness, 30/30 (keys via Input System virtual devices, needs
+  `editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView` and Enter Play
+  Mode without domain reload, both restored); the asking label rendered in all nine
+  themes (fits, widest Pixel Retro 334/440 px); the row's four states rendered.
+- Two older gaps, fixed with it (user asked): a menu built after the others now gets its
+  `On…Pressed` methods appended to the existing script (nothing else in it changes; a
+  file declaring two types gets a Console warning instead), and Build UI / Repair wait
+  for the compile before wiring (`BeginWaitingForCompile`); `WriteScript` skips an
+  identical file so nothing waits for a compile that never comes. The overwrite guard
+  now compares the whole file with `BuildScript` of the labels it declares, so any edit
+  counts. Verified: a GUI run through two domain reloads (Main built, then Build UI with
+  only Pause: Resume added and wired) and 21 pure-function checks run outside Unity by
+  loading the compiled editor DLL in Windows PowerShell 5.1 (it targets the 4.8 API).
+  `BuildScript` now writes '\n' only (it mixed in CRLF between methods).
 
 **Waiting on the user**
 
-- **Apply Theme "does nothing visible"** (reported 2026-09-22, with "I can't add
-  the themes yet"). Diagnosis: the Theme field never took the pick. The field saves
-  the chosen theme's GUID to EditorPrefs `UIPilot_ThemeGuid` the moment it changes,
-  and that pref did not exist on the user's machine; the log showed
-  `Theme "Soft Club" applied to 3 menu(s)` on menus already built as Soft Club. Most
-  likely they clicked the field itself (which only highlights the asset in the Project
-  window) and chose a theme there. Shipped in `ae872e4`: Apply reports its outcome
-  under the button (theme name and menu count, or "no menus yet"), the Game view is
-  repainted, a hint under the field points at the picker button, and the guide says
-  the same. On 2026-09-23 the pref held Ink's GUID, so the picker now takes the pick;
-  the user has not yet said whether their menus changed. Ask.
-  - Rendered 2026-09-23 (harness: Ink picked, Apply with no menus, Apply on Soft Club
-    menus, Undo): Apply restyles to Ink and Undo restores Soft Club with its scene.
-    Fixed from that render: the hint's ○ glyph drew as the letter O
-    (now "the small circle", as in the guide); "menu(s)" is a real plural; "Ctrl+Z"
-    became "Undo" (Mac); the row sat closer to Quick Clear than to Apply (now 7 px
-    above, 13 px below); Undo clears the row, which otherwise kept saying Ink applied.
+- **Apply Theme** (reported 2026-09-22 as "does nothing visible"): the Theme field
+  never took the pick. Fixed in `ae872e4` and `c7d4616` (status row under Apply,
+  picker hint, Undo clears the row), rendered and checked. On 2026-09-23 the pref held
+  Ink's GUID, so the picker works; the user has not said whether their menus changed.
   - If the field ever fails to take a pick from the picker window, its
     `ObjectSelectorUpdated` command is reaching another control: replace the field with
     a button that calls `EditorGUIUtility.ShowObjectPicker<UIPilotTheme>` under its own
@@ -89,15 +107,17 @@ Updated 2026-09-23. Replace this section, don't append to it, when the state cha
   - Proposed, not approved: replace the object field with a dropdown of every
     `UIPilotTheme` in the project, by name.
 - **"We need to anchor all the UI elements"** (2026-09-22). Unclear what moved: the
-  user was asked which resolution or aspect and which elements, with no answer yet.
-  Ask before changing layout. Current layout, for reference: Canvas Scaler Scale With
+  user was asked which resolution or aspect and which elements, and whether idea #2
+  is what they meant, with no answer yet. Ask before changing layout. Current layout, for reference: Canvas Scaler Scale With
   Screen Size 1920 × 1080, match 0.5; the panel floats 64 px from the left, top and
   bottom, 640 wide, with a 480 column inside, title at the top and actions at the
   bottom by design (`design-system/uipilot/pages/generated-menus.md`, "Layout");
   scene layers cover the panel with an AspectRatioFitter (Envelope Parent, 16:9).
 
-**Next, once those are answered**
+**Next**
 
+- The demo scene rebuild and the rest of the Asset Store list below (agreed order:
+  cleanup before new features), then #2, #3.
 - More genres, one theme each: racing/arcade, cosy/casual, clean-modern. Ask for 2–3
   reference screenshots first and look up the genre's title screens on the Game UI
   Database.
@@ -105,7 +125,8 @@ Updated 2026-09-23. Replace this section, don't append to it, when the state cha
 
 **Not tested by hand yet:** the day cycle in Play mode (`dayLengthSeconds`,
 `SetTimeOfDay`), Click Debugger clicks made by hand in the Game view, the legacy Input
-Manager path, the light editor skin.
+Manager path (the new pause keys only compile-checked there), a real gamepad, the light
+editor skin.
 
 **Before resubmitting to the Asset Store** (think clean project): the demo scene
 `Assets/UIPilot/Demo/UIPilot_Full.unity` was last saved 2026-06-18, so it still has the

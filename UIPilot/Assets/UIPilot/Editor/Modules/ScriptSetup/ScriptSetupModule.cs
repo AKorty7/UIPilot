@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.UIGenerator;
 
@@ -13,24 +14,177 @@ namespace UIPilot.Editor.Modules.ScriptSetup
     {
         // ── Public entry point ───────────────────────────────────────────────
 
-        internal static void GenerateGameManager(MenuType[] selectedMenus)
+        // Returns true when it wrote the script. Unity compiles it first, and new
+        // methods exist only after that, so the caller wires the buttons once it has.
+        internal static bool GenerateGameManager(MenuType[] selectedMenus)
         {
+            var labels = CollectUniqueLabels(selectedMenus);
+
             if (IsGameManagerIntact())
-            {
-                Debug.Log(ScriptSetupContent.Messages.GameManagerIntact);
-                return;
-            }
+                return AddMissingMethods(labels);
 
             if (HasCustomizedGameManagerScript() && !ConfirmOverwriteCustomizedGameManager())
             {
                 Debug.Log(ScriptSetupContent.Messages.RegenerationCancelled);
-                return;
+                return false;
             }
 
-            var labels = CollectUniqueLabels(selectedMenus);
-            var script = BuildScript(labels);
-            WriteScript(script);
+            var written = WriteScript(BuildScript(labels));
             CreateGameObject();
+            return written;
+        }
+
+        // A menu built after the others needs its buttons' methods in the script that
+        // is already there. They are added before the class's closing brace, and
+        // nothing already in the file changes, edited or not.
+        private static bool AddMissingMethods(List<string> labels)
+        {
+            var content = File.ReadAllText(GetFullOutputPath());
+            var missing = MissingLabels(content, labels);
+            if (missing.Count == 0)
+            {
+                Debug.Log(ScriptSetupContent.Messages.GameManagerIntact);
+                return false;
+            }
+
+            var updated = AppendMethods(content, missing);
+            if (updated == null)
+            {
+                Debug.LogWarning(string.Format(ScriptSetupContent.Messages.MethodsNotAdded, MethodList(missing)));
+                return false;
+            }
+
+            Debug.Log(string.Format(ScriptSetupContent.Messages.MethodsAdded, MethodList(missing)));
+            return WriteScript(updated);
+        }
+
+        private static List<string> MissingLabels(string content, List<string> labels)
+        {
+            var declared = DeclaredLabels(content);
+            var missing  = new List<string>();
+            foreach (var label in labels)
+                if (!declared.Contains(label))
+                    missing.Add(label);
+
+            return missing;
+        }
+
+        // The methods go before the file's last closing brace, which is the class's
+        // only while the file declares one type. Otherwise nothing is added (null).
+        private static string AppendMethods(string content, List<string> labels)
+        {
+            var close = content.LastIndexOf('}');
+            if (close < 0 || TypeDeclaration.Matches(content).Count != 1) return null;
+
+            var script = new StringBuilder(content, 0, close, content.Length + 1024);
+            foreach (var label in labels)
+            {
+                script.Append('\n');
+                script.Append(BuildMethod(label));
+            }
+
+            script.Append(content, close, content.Length - close);
+            return script.ToString();
+        }
+
+        private static string MethodList(List<string> labels)
+        {
+            var methods = new List<string>();
+            foreach (var label in labels)
+                methods.Add(string.Format(ScriptSetupContent.Messages.MethodFormat, label));
+
+            return string.Join(ScriptSetupContent.Messages.ListSeparator, methods);
+        }
+
+        // ── Play scene ───────────────────────────────────────────────────────
+        // The main menu's Play button loads the GameManager's Game Scene. The
+        // component is the developer's own type, so the field is reached by its
+        // serialized name, like the Time Of Day field.
+
+        // False when there is nothing to set here: no main menu (so no Play button),
+        // or no GameManager with the field (not built yet, or an older script).
+        internal static bool TryGetGameScene(out string scene)
+        {
+            scene = null;
+            var mainMenu = UIGeneratorContent.GameObjects.MainMenuPrefix + UIGeneratorContent.GameObjects.PanelSuffix;
+            if (UIPilotSceneQuery.FindInCanvas(UIGeneratorContent.GameObjects.Canvas, mainMenu) == null) return false;
+
+            var property = FindGameSceneProperty();
+            if (property == null) return false;
+
+            scene = property.stringValue;
+            return true;
+        }
+
+        // Undoable, and marks the scene dirty, like any Inspector edit.
+        internal static void SetGameScene(string scenePath)
+        {
+            var property = FindGameSceneProperty();
+            if (property == null || property.stringValue == scenePath) return;
+
+            property.stringValue = scenePath;
+            property.serializedObject.ApplyModifiedProperties();
+        }
+
+        // The scenes Play can load. selected is the one the field names, -1 for
+        // none (Play stays in this scene); missing is true when the field names a
+        // scene not in the list, which is then added at the end so the row can
+        // still show it.
+        internal static List<string> GameSceneChoices(string current, out int selected, out bool missing)
+        {
+            var choices = OtherBuildScenes();
+            selected = IndexOfScene(choices, current);
+            missing  = !string.IsNullOrEmpty(current) && selected < 0;
+
+            if (missing)
+            {
+                choices.Add(current);
+                selected = choices.Count - 1;
+            }
+
+            return choices;
+        }
+
+        // Every enabled scene in the build's scene list (the active Build
+        // Profile's, when it has its own) except this one.
+        private static List<string> OtherBuildScenes()
+        {
+            var active = SceneManager.GetActiveScene().path;
+            var scenes = new List<string>();
+            foreach (var scene in EditorBuildSettings.scenes)
+                if (scene.enabled && !string.IsNullOrEmpty(scene.path) && scene.path != active)
+                    scenes.Add(scene.path);
+
+            return scenes;
+        }
+
+        // The field may hold a path (the window writes one) or a name typed by hand.
+        // -1 when it is empty or names no scene in the list.
+        private static int IndexOfScene(List<string> scenes, string scene)
+        {
+            if (string.IsNullOrEmpty(scene)) return -1;
+
+            for (var i = 0; i < scenes.Count; i++)
+                if (scenes[i] == scene || Path.GetFileNameWithoutExtension(scenes[i]) == scene)
+                    return i;
+
+            return -1;
+        }
+
+        private static SerializedProperty FindGameSceneProperty()
+        {
+            var manager = GameObject.Find(ScriptSetupContent.GameObjects.ManagerName);
+            if (manager == null) return null;
+
+            foreach (var component in manager.GetComponents<MonoBehaviour>())
+            {
+                if (component == null) continue;   // a missing-script slot
+
+                var property = new SerializedObject(component).FindProperty(ScriptSetupContent.GameObjects.GameSceneField);
+                if (property != null && property.propertyType == SerializedPropertyType.String) return property;
+            }
+
+            return null;
         }
 
         // ── Label collection ─────────────────────────────────────────────────
@@ -94,46 +248,36 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 ScriptSetupContent.Dialogs.CustomGameManagerCancel);
         }
 
-        // Compares every On{Label}Pressed method body against the exact body
-        // BuildMethod() would generate for that label. Any mismatch — extra
-        // statements, edited logic, even a method that no longer parses as
-        // expected — means the file has been customized beyond the stub.
+        // The file is exactly what UIPilot would write for the buttons it has methods
+        // for, or it is the developer's: any edit counts, to a method, a field or a
+        // comment. Line endings and blank space around the file do not.
         private static bool IsGameManagerCustomized(string fileContent)
         {
-            var content = NormalizeLineEndings(fileContent);
-            var declarations = Regex.Matches(content, @"public\s+void\s+On(\w+)Pressed\s*\(\s*\)");
-
-            foreach (Match declaration in declarations)
-            {
-                var label = declaration.Groups[1].Value;
-
-                var actualBody = ExtractMethodBody(content, declaration.Index + declaration.Length);
-                if (actualBody == null)
-                    return true; // Malformed/unexpected structure — protect rather than guess.
-
-                var expectedMethod = NormalizeLineEndings(BuildMethod(label));
-                var expectedBody   = ExtractMethodBody(expectedMethod, 0);
-
-                if (actualBody.Trim() != expectedBody.Trim())
-                    return true;
-            }
-
-            return false;
+            var expected = BuildScript(DeclaredLabels(fileContent));
+            return Canonical(fileContent) != Canonical(expected);
         }
 
-        // Given text and a search start index, finds the next method body —
-        // the text between the first '{' at/after startIndex and the closing
-        // '}' that lines up at the method's own 4-space indent level.
-        private static string ExtractMethodBody(string content, int searchFromIndex)
+        private static readonly Regex MethodDeclaration =
+            new Regex(@"public\s+void\s+On(\w+)Pressed\s*\(\s*\)");
+
+        // A type declared at the start of a line, so a comment mentioning one is not.
+        private static readonly Regex TypeDeclaration = new Regex(
+            @"^\s*(?:(?:public|internal|private|protected|sealed|static|abstract|partial)\s+)*(?:class|struct|interface|enum|record)\s+\w",
+            RegexOptions.Multiline);
+
+        // The labels whose On{Label}Pressed methods the file declares, in file order.
+        private static List<string> DeclaredLabels(string content)
         {
-            var openBraceIndex = content.IndexOf('{', searchFromIndex);
-            if (openBraceIndex < 0) return null;
+            var labels = new List<string>();
+            foreach (Match declaration in MethodDeclaration.Matches(content))
+                labels.Add(declaration.Groups[1].Value);
 
-            var bodyStart  = openBraceIndex + 1;
-            var closeIndex = content.IndexOf("\n    }", bodyStart);
-            if (closeIndex < 0) return null;
+            return labels;
+        }
 
-            return content.Substring(bodyStart, closeIndex - bodyStart);
+        private static string Canonical(string text)
+        {
+            return NormalizeLineEndings(text).Trim();
         }
 
         private static string NormalizeLineEndings(string text)
@@ -147,9 +291,11 @@ namespace UIPilot.Editor.Modules.ScriptSetup
             sb.Append(ScriptSetupContent.Script.GeneratedHeader);
             sb.Append(BuildHeader());
 
+            // '\n', not AppendLine: the template's own line endings are '\n', and one
+            // file should not mix them.
             for (var i = 0; i < labels.Count; i++)
             {
-                if (i > 0) sb.AppendLine();
+                if (i > 0) sb.Append('\n');
                 sb.Append(BuildMethod(labels[i]));
             }
 
@@ -176,7 +322,10 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 UIGeneratorContent.Settings.On,
                 UIGeneratorContent.Settings.Off,
                 UIPilotLabels.Scene.TimeOfDayProperty,
-                ScriptSetupContent.GameObjects.TimeOfDayField);
+                ScriptSetupContent.GameObjects.TimeOfDayField,
+                ScriptSetupContent.GameObjects.GameSceneField,
+                UIGeneratorContent.GameObjects.ButtonPrefix + UIGeneratorContent.Buttons.Quit,
+                UIGeneratorContent.Confirm.Quit);
         }
 
         private static string GetPanelName(string prefix)
@@ -227,12 +376,19 @@ namespace UIPilot.Editor.Modules.ScriptSetup
                 ScriptSetupContent.Paths.OutputAssetPath);
         }
 
-        private static void WriteScript(string contents)
+        // False when the file already says exactly this: Unity would not recompile
+        // it, and a build waiting for that compile would wait for nothing.
+        private static bool WriteScript(string contents)
         {
-            File.WriteAllText(GetFullOutputPath(), contents, Encoding.UTF8);
+            var path = GetFullOutputPath();
+            if (File.Exists(path) && NormalizeLineEndings(File.ReadAllText(path)) == NormalizeLineEndings(contents))
+                return false;
+
+            File.WriteAllText(path, contents, Encoding.UTF8);
             Debug.Log(ScriptSetupContent.Messages.FileWritten);
 
             AssetDatabase.Refresh();
+            return true;
         }
 
         // ── Scene object ─────────────────────────────────────────────────────

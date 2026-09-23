@@ -26,7 +26,7 @@ const quickStartFigure = `
 <figure class="pair">
   <div class="pair-a"><img class="shot" src="${img('Window_Build.png')}" alt="The Build section of the UIPilot window">
     <figcaption><strong>The UIPilot window.</strong> UI Health (section 6) is on top. Under Build, tick the menus, click <strong>Build UI</strong>,
-      and the row beneath the buttons reports the result.</figcaption>
+      and the row beneath the buttons reports the result. After the first build, <strong>Play loads</strong> sets what the Play button does (section 5.1).</figcaption>
   </div>
   <div class="pair-b"><img src="${img('UIPilot_MainMenu_Panel.png')}" alt="Generated main menu">
     <figcaption><strong>What Build UI creates</strong>: the main menu, rendered in Unity 6000.3.11f1.

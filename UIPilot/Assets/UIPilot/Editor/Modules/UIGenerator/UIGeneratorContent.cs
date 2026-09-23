@@ -184,6 +184,13 @@ namespace UIPilot.Editor.Modules.UIGenerator
             internal const string VersionFormat   = "Version {0}";
         }
 
+        // What the Quit button says after one press; the generated GameManager
+        // quits on the second and puts the label back if the player moves on.
+        internal static class Confirm
+        {
+            internal const string Quit = "Press again to quit";
+        }
+
         // A button's label is also its object-name suffix and the stem of the
         // method it calls: UIPilot_Btn_VolumeUp calls OnVolumeUpPressed().
         internal static class Buttons

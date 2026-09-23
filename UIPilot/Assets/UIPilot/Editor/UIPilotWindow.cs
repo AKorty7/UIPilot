@@ -53,6 +53,15 @@ namespace UIPilot.Editor
         [NonSerialized] private string _applyDetail;
         [NonSerialized] private bool   _applyOk;
 
+        // The "Play loads" row: one entry per scene Play can load, the first being
+        // this scene. Null while the scene has no main menu and GameManager to set.
+        // Rebuilt when the hierarchy or the build's scene list changes, not per repaint.
+        [NonSerialized] private GUIContent[] _playOptions;
+        [NonSerialized] private string[]     _playPaths;
+        [NonSerialized] private int          _playIndex;
+        [NonSerialized] private bool         _playMissing;
+        [NonSerialized] private bool         _playNoScenes;
+
         // ── Scan & Repair state ──────────────────────────────────────────────
         private bool                                    _scanRepairFoldout = false;
         private List<SceneAuditResult>                  _auditResults      = null;
@@ -102,6 +111,7 @@ namespace UIPilot.Editor
         private static readonly GUIContent ContentBuildUI     = new GUIContent(UIPilotLabels.QuickBuild.BuildButton,   UIPilotLabels.QuickBuild.TooltipBuild);
         private static readonly GUIContent ContentTheme       = new GUIContent(UIPilotLabels.Theme.FieldLabel,         UIPilotLabels.Theme.FieldTooltip);
         private static readonly GUIContent ContentApplyTheme  = new GUIContent(UIPilotLabels.Theme.ApplyButton,        UIPilotLabels.Theme.ApplyTooltip);
+        private static readonly GUIContent ContentPlayLoads   = new GUIContent(UIPilotLabels.PlayScene.FieldLabel,     UIPilotLabels.PlayScene.FieldTooltip);
         private static readonly GUIContent ContentRestoreThemes = new GUIContent(UIPilotLabels.Theme.RestoreButton,    UIPilotLabels.Theme.RestoreTooltip);
         private static readonly GUIContent ContentClearQuick  = new GUIContent(UIPilotLabels.QuickBuild.ClearButton,   UIPilotLabels.QuickBuild.TooltipClear);
 
@@ -127,9 +137,11 @@ namespace UIPilot.Editor
             _clickFoldout        = EditorPrefs.GetBool(UIPilotLabels.ClickDebug.EditorPrefsOpen,   true);
             _theme             = LoadSavedTheme();
             RefreshMissingPresets();
+            RefreshPlayScene();
             UIPilotHealthMonitor.Changed += Repaint;
             UIPilotClickMonitor.Changed  += Repaint;
-            Undo.undoRedoPerformed       += ClearApplyStatus;
+            Undo.undoRedoPerformed       += OnUndoRedo;
+            EditorBuildSettings.sceneListChanged += OnSceneListChanged;
 
             // A Quick Build that had to wait for script compilation resumes here:
             // OnEnable runs again after the domain reload, delayCall does not survive it.
@@ -144,13 +156,40 @@ namespace UIPilot.Editor
         {
             UIPilotHealthMonitor.Changed -= Repaint;
             UIPilotClickMonitor.Changed  -= Repaint;
-            Undo.undoRedoPerformed       -= ClearApplyStatus;
+            Undo.undoRedoPerformed       -= OnUndoRedo;
+            EditorBuildSettings.sceneListChanged -= OnSceneListChanged;
         }
 
         // A preset deleted or restored in the Project window shows up here at once.
         private void OnProjectChange()
         {
             RefreshMissingPresets();
+            Repaint();
+        }
+
+        // A built or cleared GameManager, or another scene opened.
+        private void OnHierarchyChange()
+        {
+            RefreshPlayScene();
+            Repaint();
+        }
+
+        // Game Scene may have been edited in the Inspector meanwhile.
+        private void OnFocus()
+        {
+            RefreshPlayScene();
+        }
+
+        private void OnSceneListChanged()
+        {
+            RefreshPlayScene();
+            Repaint();
+        }
+
+        private void OnUndoRedo()
+        {
+            ClearApplyStatus();
+            RefreshPlayScene();
             Repaint();
         }
 
@@ -294,6 +333,7 @@ namespace UIPilot.Editor
 
                 EditorGUILayout.Space(8f);
                 DrawThemeField();
+                DrawPlayScene();
                 EditorGUILayout.Space(8f);
 
                 // The one primary action in the window: taller, bold, accent-tinted.
@@ -476,6 +516,65 @@ namespace UIPilot.Editor
             Repaint();
         }
 
+        // ── Play scene ───────────────────────────────────────────────────────
+
+        // Under the theme: both say what the built menus do. Only there once the
+        // scene has a main menu and its GameManager, since the choice lives on them.
+        private void DrawPlayScene()
+        {
+            if (_playOptions == null) return;
+
+            EditorGUILayout.Space(8f);
+            EditorGUI.BeginChangeCheck();
+            var picked = EditorGUILayout.Popup(ContentPlayLoads, _playIndex, _playOptions);
+            if (EditorGUI.EndChangeCheck())
+            {
+                ScriptSetupModule.SetGameScene(_playPaths[picked]);
+                RefreshPlayScene();
+            }
+
+            if (_playMissing)
+                GUILayout.Label(UIPilotLabels.PlayScene.MissingHint, UIPilotStyles.Description);
+            else if (_playNoScenes)
+                GUILayout.Label(UIPilotLabels.PlayScene.NoScenesHint, UIPilotStyles.Description);
+        }
+
+        private void RefreshPlayScene()
+        {
+            _playOptions = null;
+            if (!ScriptSetupModule.TryGetGameScene(out var current)) return;
+
+            var scenes = ScriptSetupModule.GameSceneChoices(current, out var selected, out _playMissing);
+            _playNoScenes = scenes.Count == 0;
+            _playIndex    = selected + 1;
+
+            _playPaths   = new string[scenes.Count + 1];
+            _playOptions = new GUIContent[scenes.Count + 1];
+            _playPaths[0]   = string.Empty;
+            _playOptions[0] = new GUIContent(UIPilotLabels.PlayScene.ThisScene);
+
+            for (var i = 0; i < scenes.Count; i++)
+            {
+                var shown = SceneDisplayName(scenes, i);
+                if (_playMissing && i == scenes.Count - 1)
+                    shown = string.Format(UIPilotLabels.PlayScene.NotInList, shown);
+
+                _playPaths[i + 1]   = scenes[i];
+                _playOptions[i + 1] = new GUIContent(shown);
+            }
+        }
+
+        // A scene's name, or its whole path when another scene in the list shares the name.
+        private static string SceneDisplayName(List<string> scenes, int index)
+        {
+            var name = System.IO.Path.GetFileNameWithoutExtension(scenes[index]);
+            for (var i = 0; i < scenes.Count; i++)
+                if (i != index && System.IO.Path.GetFileNameWithoutExtension(scenes[i]) == name)
+                    return scenes[index].Replace(UIPilotLabels.PlayScene.PathSlash, UIPilotLabels.PlayScene.ShownSlash);
+
+            return name;
+        }
+
         // Build UI finishes on a later editor tick — after a recompile, the first
         // time — so its outcome is reported here, not only in the Console. The
         // state lives in SessionState because the window's fields do not survive
@@ -563,9 +662,20 @@ namespace UIPilot.Editor
             foreach (var menu in selectedMenus)
                 UIGeneratorModule.Generate(menu, _theme);
 
-            ScriptSetupModule.GenerateGameManager(selectedMenus);
+            if (ScriptSetupModule.GenerateGameManager(selectedMenus))
+                BeginWaitingForCompile();
+            else
+                EditorApplication.delayCall += QuickBuildDelayedWire;
+        }
 
-            EditorApplication.delayCall += QuickBuildDelayedWire;
+        // The script was just written: its methods exist only once Unity has compiled
+        // it and reloaded, so the wiring waits for OnEnable, as on a first build.
+        private static void BeginWaitingForCompile()
+        {
+            SessionState.SetBool(UIPilotLabels.QuickBuild.SessionPendingWire, true);
+            SessionState.SetFloat(UIPilotLabels.QuickBuild.SessionPendingSince,
+                (float)EditorApplication.timeSinceStartup);
+            Debug.Log(UIPilotLabels.QuickBuild.ConsoleWaitingForCompile);
         }
 
         private MenuType[] BuildSelectedMenuArray()
@@ -606,10 +716,7 @@ namespace UIPilot.Editor
             // compiles it and reloads the domain — hand over to OnEnable.
             if (canWaitForCompile && (managerType == null || EditorApplication.isCompiling))
             {
-                SessionState.SetBool(UIPilotLabels.QuickBuild.SessionPendingWire, true);
-                SessionState.SetFloat(UIPilotLabels.QuickBuild.SessionPendingSince,
-                    (float)EditorApplication.timeSinceStartup);
-                Debug.Log(UIPilotLabels.QuickBuild.ConsoleWaitingForCompile);
+                BeginWaitingForCompile();
                 return true;
             }
 
@@ -868,8 +975,10 @@ namespace UIPilot.Editor
                             // ScriptSetup only restores the script and a bare GameObject.
                             // The old listeners pointed at the destroyed component, so
                             // attach a new one and rebind every button to it.
-                            ScriptSetupModule.GenerateGameManager(followUp.Menus);
-                            success = TryQuickBuildWire(true);
+                            if (ScriptSetupModule.GenerateGameManager(followUp.Menus))
+                                BeginWaitingForCompile();
+                            else
+                                success = TryQuickBuildWire(true);
                             break;
                         }
 
