@@ -234,8 +234,10 @@ on. UIPilot ships nine, in `Assets/UIPilot/Themes`:
 | **Military Shooter** | The modern shooter's menu: a near-black slab with one amber edge, condensed capitals, hazard stripes under the title, a tactical overlay over a grey valley with a radar station and a helicopter. The scene changes with the time of day. |
 | **Survival Horror** | Quiet dread: a black that thins into the dark instead of a slab, a thin serif spaced wide, small typewriter items, one rough red mark on the chosen line, and a scene of dead trees, fog and a house with one lit window, the dark closing in at night. Its scene changes with the time of day too. |
 
-**To choose a theme:** in the **Build** section, drop it into the **Theme** field (or click
-the circle beside the field and pick one), then click **Build UI**.
+**To choose a theme:** in the **Build** section, drag it from `Assets/UIPilot/Themes` into
+the **Theme** field, or click the small circle at the right end of the field and pick one,
+then click **Build UI**. Clicking the field itself only highlights the current theme in the
+Project window; it does not change it.
 
 **To change the theme of menus you have already built:** pick the theme, then click
 **Apply Theme to Existing Menus**. A line under the button says which theme was applied

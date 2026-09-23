@@ -59,6 +59,57 @@ Dated so a later reader knows what was current.
   dawn, noon and dusk, and the harness must set the hour after building (the
   build shows the theme's own hour).
 
+## Where we left off
+
+Updated 2026-09-23. Replace this section, don't append to it, when the state changes.
+
+**Waiting on the user**
+
+- **Apply Theme "does nothing visible"** (reported 2026-09-22, with "I can't add
+  the themes yet"). Diagnosis: the Theme field never took the pick. The field saves
+  the chosen theme's GUID to EditorPrefs `UIPilot_ThemeGuid` the moment it changes,
+  and that pref did not exist on the user's machine; the log showed
+  `Theme "Soft Club" applied to 3 menu(s)` on menus already built as Soft Club. Most
+  likely they clicked the field itself (which only highlights the asset in the Project
+  window) and chose a theme there. Shipped in `ae872e4`: Apply reports its outcome
+  under the button (theme name and menu count, or "no menus yet"), the Game view is
+  repainted, a hint under the field points at the ○ picker button, and the guide says
+  the same. The user has been asked to retry with the ○ button.
+  - If the field still reads Soft Club after a pick in the picker window, the picker's
+    `ObjectSelectorUpdated` command is reaching another control: replace the field with
+    a button that calls `EditorGUIUtility.ShowObjectPicker<UIPilotTheme>` under its own
+    control ID and read `EditorGUIUtility.GetObjectPickerObject()` on that command.
+  - Proposed, not approved: replace the object field with a dropdown of every
+    `UIPilotTheme` in the project, by name.
+  - Not yet rendered in Unity (the user's editor was open): the new status row and
+    hint. Render them the next time the editor can be closed.
+- **"We need to anchor all the UI elements"** (2026-09-22). Unclear what moved: the
+  user was asked which resolution or aspect and which elements, with no answer yet.
+  Ask before changing layout. Current layout, for reference: Canvas Scaler Scale With
+  Screen Size 1920 × 1080, match 0.5; the panel floats 64 px from the left, top and
+  bottom, 640 wide, with a 480 column inside, title at the top and actions at the
+  bottom by design (`design-system/uipilot/pages/generated-menus.md`, "Layout");
+  scene layers cover the panel with an AspectRatioFitter (Envelope Parent, 16:9).
+
+**Next, once those are answered**
+
+- More genres, one theme each: racing/arcade, cosy/casual, clean-modern. Ask for 2–3
+  reference screenshots first and look up the genre's title screens on the Game UI
+  Database.
+- The Military Shooter's subtle scanning motion was part of the brief and is not built.
+
+**Not tested by hand yet:** the day cycle in Play mode (`dayLengthSeconds`,
+`SetTimeOfDay`), Click Debugger clicks made by hand in the Game view, the legacy Input
+Manager path, the light editor skin.
+
+**Before resubmitting to the Asset Store** (think clean project): the demo scene
+`Assets/UIPilot/Demo/UIPilot_Full.unity` was last saved 2026-06-18, so it still has the
+old look and two unwired buttons: rebuild and save it. The package must include
+`Assets/UIPilot_GameManager.cs`, which the demo scene uses. There is no asmdef and there
+are no tests. Settle the version string (`.cursorrules` says v0.1.0-alpha, Player
+Settings 0.1, a June commit said v0.6.0-alpha; the target is 1.0.0). The store
+tagline is unconfirmed.
+
 ## References
 
 - **Game UI Database** (gameuidatabase.com): filter Genres, Aesthetic or UI Style
@@ -84,6 +135,24 @@ Dated so a later reader knows what was current.
   scene) before relaunching.
 - A visual change is not done until it has been rendered in Unity and looked at.
   Render, crop, read the image; measure contrast on the pixels.
+- The guide PDF: edit the Markdown, then build with `../tools/docs` (its README; it
+  needs `marked@12`, which is not installed in the repo) and read the rendered pages.
+- When the user reports a bug from their open editor: the Console is in
+  `%LOCALAPPDATA%\Unity\Editor\Editor.log` (`Editor-prev.log` is the session before).
+  EditorPrefs are in the registry under `HKCU\Software\Unity Technologies\Unity Editor 5.x`;
+  each name gets an `_h<hash>` suffix, strings are stored as UTF-8 bytes, and a write
+  lands at once. Unity's own C# for this version is on GitHub,
+  `Unity-Technologies/UnityCsReference`, branch `6000.3` (the IMGUI object field is
+  `Editor/Mono/GUI/ObjectField.cs`, its picker `Editor/Mono/ObjectSelector.cs`).
+
+## Git
+
+- Work on `Dev`; never commit broken code to `main`. Commit only when the user asks.
+- Write the message to a file and commit with `git commit -F <file>`. Leave
+  `UIPilot/.claude/` untracked.
+- Unity runs append kerning records to TMP font assets (`Art/Fonts/* SDF.asset`) and
+  rewrite line endings in `ProjectSettings/*.asset`. `git checkout` those before
+  committing unless the change was meant.
 
 ## Skills to use here
 
