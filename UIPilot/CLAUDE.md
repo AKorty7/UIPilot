@@ -73,16 +73,21 @@ Updated 2026-09-23. Replace this section, don't append to it, when the state cha
   likely they clicked the field itself (which only highlights the asset in the Project
   window) and chose a theme there. Shipped in `ae872e4`: Apply reports its outcome
   under the button (theme name and menu count, or "no menus yet"), the Game view is
-  repainted, a hint under the field points at the ○ picker button, and the guide says
-  the same. The user has been asked to retry with the ○ button.
-  - If the field still reads Soft Club after a pick in the picker window, the picker's
+  repainted, a hint under the field points at the picker button, and the guide says
+  the same. On 2026-09-23 the pref held Ink's GUID, so the picker now takes the pick;
+  the user has not yet said whether their menus changed. Ask.
+  - Rendered 2026-09-23 (harness: Ink picked, Apply with no menus, Apply on Soft Club
+    menus, Undo): Apply restyles to Ink and Undo restores Soft Club with its scene.
+    Fixed from that render: the hint's ○ glyph drew as the letter O
+    (now "the small circle", as in the guide); "menu(s)" is a real plural; "Ctrl+Z"
+    became "Undo" (Mac); the row sat closer to Quick Clear than to Apply (now 7 px
+    above, 13 px below); Undo clears the row, which otherwise kept saying Ink applied.
+  - If the field ever fails to take a pick from the picker window, its
     `ObjectSelectorUpdated` command is reaching another control: replace the field with
     a button that calls `EditorGUIUtility.ShowObjectPicker<UIPilotTheme>` under its own
     control ID and read `EditorGUIUtility.GetObjectPickerObject()` on that command.
   - Proposed, not approved: replace the object field with a dropdown of every
     `UIPilotTheme` in the project, by name.
-  - Not yet rendered in Unity (the user's editor was open): the new status row and
-    hint. Render them the next time the editor can be closed.
 - **"We need to anchor all the UI elements"** (2026-09-22). Unclear what moved: the
   user was asked which resolution or aspect and which elements, with no answer yet.
   Ask before changing layout. Current layout, for reference: Canvas Scaler Scale With

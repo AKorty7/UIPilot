@@ -129,6 +129,7 @@ namespace UIPilot.Editor
             RefreshMissingPresets();
             UIPilotHealthMonitor.Changed += Repaint;
             UIPilotClickMonitor.Changed  += Repaint;
+            Undo.undoRedoPerformed       += ClearApplyStatus;
 
             // A Quick Build that had to wait for script compilation resumes here:
             // OnEnable runs again after the domain reload, delayCall does not survive it.
@@ -143,6 +144,7 @@ namespace UIPilot.Editor
         {
             UIPilotHealthMonitor.Changed -= Repaint;
             UIPilotClickMonitor.Changed  -= Repaint;
+            Undo.undoRedoPerformed       -= ClearApplyStatus;
         }
 
         // A preset deleted or restored in the Project window shows up here at once.
@@ -440,7 +442,8 @@ namespace UIPilot.Editor
             EditorApplication.QueuePlayerLoopUpdate();
 
             var themeName = _theme != null ? _theme.name : UIPilotLabels.Theme.BuiltInName;
-            SetApplyStatus(true, string.Format(UIPilotLabels.Theme.StatusApplied, themeName, restyled),
+            var status    = restyled == 1 ? UIPilotLabels.Theme.StatusAppliedOne : UIPilotLabels.Theme.StatusApplied;
+            SetApplyStatus(true, string.Format(status, themeName, restyled),
                 UIPilotLabels.Theme.StatusAppliedDetail);
             Debug.Log(string.Format(UIPilotLabels.Theme.ConsoleApplied, themeName, restyled));
         }
@@ -452,15 +455,25 @@ namespace UIPilot.Editor
             _applyDetail = detail;
         }
 
+        // Tucked under the Apply button, with the extra space below it, so the row
+        // reads as Apply's outcome and not as a note on Quick Clear.
         private void DrawApplyStatus()
         {
             if (string.IsNullOrEmpty(_applyStatus)) return;
 
-            EditorGUILayout.Space(4f);
             DrawStatusRow(
                 _applyOk ? UIPilotStyles.LampOk : UIPilotStyles.LampCaution,
                 _applyOk ? UIPilotLabels.Status.Ready : UIPilotLabels.Status.Warning,
                 _applyStatus, _applyDetail);
+            EditorGUILayout.Space(4f);
+        }
+
+        // The row says Undo puts the old look back; once it has, the row would be wrong.
+        private void ClearApplyStatus()
+        {
+            if (string.IsNullOrEmpty(_applyStatus)) return;
+            _applyStatus = null;
+            Repaint();
         }
 
         // Build UI finishes on a later editor tick — after a recompile, the first
