@@ -116,6 +116,18 @@ certain checks: missing glyphs, text overflow, Constant Pixel Size, lost gamepad
 
 **Next**
 
+- **Theme direction agreed, 2026-09-25:** use Claude's earlier menus as the
+  foundation, selectively adopt improved controls/theme details from the
+  revised studies, and make 3D loading visuals optional. Keep custom visuals
+  lightweight: Theme default / Custom model / None, one automatically fitted
+  model/prefab slot, and animation on/off. The user approved this direction;
+  it does not approve every experimental design. Read
+  `design-system/uipilot/pages/theme-collections-handoff.md` before theme work.
+  Both collections remain preserved; the earlier 20-preset target was not
+  explicitly cancelled, and a blending engine remains deferred. The 3D work
+  remains browser studies, not Unity-ready assets or verified runtime code.
+  Gen X Soft Club's next refinement remains to be discussed.
+
 - The demo scene rebuild and the rest of the Asset Store list below (agreed order:
   cleanup before new features), then #2, #3.
 - More genres, one theme each: racing/arcade, cosy/casual, clean-modern. Ask for 2–3
