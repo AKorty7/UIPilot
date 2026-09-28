@@ -96,19 +96,20 @@ certain checks: missing glyphs, text overflow, Constant Pixel Size, lost gamepad
 
 **Waiting on the user**
 
-- **Apply Theme** (reported 2026-09-22 as "does nothing visible"): the Theme field
-  never took the pick. Fixed in `ae872e4` and `c7d4616` (status row under Apply,
-  picker hint, Undo clears the row), rendered and checked. On 2026-09-23 the pref held
-  Ink's GUID, so the picker works; the user has not said whether their menus changed.
-  - If the field ever fails to take a pick from the picker window, its
-    `ObjectSelectorUpdated` command is reaching another control: replace the field with
-    a button that calls `EditorGUIUtility.ShowObjectPicker<UIPilotTheme>` under its own
-    control ID and read `EditorGUIUtility.GetObjectPickerObject()` on that command.
-  - Proposed, not approved: replace the object field with a dropdown of every
-    `UIPilotTheme` in the project, by name.
-- **"We need to anchor all the UI elements"** (2026-09-22). Unclear what moved: the
-  user was asked which resolution or aspect and which elements, and whether idea #2
-  is what they meant, with no answer yet. Ask before changing layout. Current layout, for reference: Canvas Scaler Scale With
+- **Apply Theme:** fixed in `ae872e4` and `c7d4616`; on 2026-09-28 the user said "all
+  the themes were in" (read as: applying works). If a pick ever fails to land again, see
+  those commits' notes on `ObjectSelectorUpdated` / `ShowObjectPicker`.
+- **"Everything went out of place when the screen size changed, the whole menu"**
+  (2026-09-28, clarifying the 2026-09-22 "anchor all the UI elements"). Not reproduced:
+  a batch harness built all menus at 1920 × 1080 in Soft Club, Fantasy RPG and Military
+  Shooter, re-rendered them at 1280×720, 2560×1080, 1280×800, 1024×768, 1080×1920,
+  1600×500 and 800×450 without rebuilding, and matched a fresh build at each size
+  (only text anti-aliasing differs); the panel stays pinned left, title top, actions
+  bottom. So the user's menus are likely not a fresh build (the June demo scene, an
+  older build, a hand-edited canvas) or the Game view's Scale slider is zoomed.
+  Asked for a screenshot, the scene name and the Game view size. Ask before changing
+  layout. Weak spot seen in the renders: portrait (1080 × 1920) gives a very tall empty
+  panel. Current layout, for reference: Canvas Scaler Scale With
   Screen Size 1920 × 1080, match 0.5; the panel floats 64 px from the left, top and
   bottom, 640 wide, with a 480 column inside, title at the top and actions at the
   bottom by design (`design-system/uipilot/pages/generated-menus.md`, "Layout");

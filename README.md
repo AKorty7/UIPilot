@@ -44,6 +44,13 @@ UIPilot does all of it in one click.
 - **Quick Build** — generates MainMenu, PauseMenu, and SettingsMenu
   panels with correctly configured Canvas, CanvasScaler, EventSystem,
   buttons, and a wired GameManager script. One click.
+- **A working front end** — the menus behave like a shipped game's
+  out of the box. Play loads the scene you pick in the window (or hides
+  the menu if you pick none). Esc or Start opens Pause during play,
+  freezes time and frees the cursor. Esc or B goes back one step. Quit
+  asks once before it quits. Keyboard, mouse and gamepad, with either
+  input system. Build another menu later and its methods are added to
+  your existing script, leaving your code alone.
 - **Themes** — the look is one asset. Pick Soft Club, Soft Club Night,
   Ink, Fantasy RPG, JRPG Window, Pixel Retro, Sci-Fi HUD, Military
   Shooter or Survival Horror, or duplicate one and make your own. **Apply Theme to Existing
@@ -78,7 +85,8 @@ UIPilot does all of it in one click.
 4. Tick the menus you want under **Build**, then click **Build UI**
 5. The first time, wait a few seconds while Unity compiles the new
    script — the buttons are wired automatically when it finishes
-6. Hit Play — your buttons are wired and ready
+6. Under **Play loads**, pick the scene your Play button should open
+7. Hit Play — your buttons are wired and ready
 
 That's it. CanvasScaler is configured. EventSystem is there.
 Listeners are persistent. GameManager stubs are written.
@@ -108,9 +116,10 @@ is never touched. This means you can drop UIPilot into an existing
 project and it will coexist cleanly with whatever UI you already have.
 
 The generated GameManager (`UIPilot_GameManager.cs`) contains method
-stubs for every button — `OnPlayPressed()`, `OnQuitPressed()`, and so
-on. Fill them in with your own logic. Once you have edited any of those
-methods, UIPilot asks before it ever overwrites the file.
+a method for every button — `OnPlayPressed()`, `OnQuitPressed()`, and so
+on — already doing the standard job, plus a public `OpenPauseMenu()`.
+Add your own logic to them. Once you have edited the file in any way,
+UIPilot asks before it ever overwrites it.
 
 ---
 
