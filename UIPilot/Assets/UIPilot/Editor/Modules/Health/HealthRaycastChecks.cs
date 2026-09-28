@@ -98,16 +98,70 @@ namespace UIPilot.Editor.Modules.Health
             }
 
             foreach (var blocker in found)
+            {
+                var leftover = IsLeftover(blocker);
                 issues.Add(new HealthIssue(HealthCheck.BlockedButtons, HealthSeverity.Warning, blocker.name,
-                    string.Format(HealthContent.Messages.Blocking, blocker.GetType().Name,
-                        HealthScope.NameList(blocked[blocker])),
-                    new Object[] { blocker.gameObject }, () => TurnOffRaycastTarget(blocker)));
+                    string.Format(leftover ? HealthContent.Messages.BlockingLeftover : HealthContent.Messages.Blocking,
+                        blocker.GetType().Name, HealthScope.NameList(blocked[blocker])),
+                    new Object[] { blocker.gameObject }, () => TurnOffRaycastTarget(blocker), LetClicksThrough,
+                    leftover ? () => Undo.DestroyObjectImmediate(blocker.gameObject) : (System.Action)null));
+            }
         }
+
+        private static readonly GUIContent LetClicksThrough =
+            new GUIContent(HealthContent.Fixes.LetClicksThrough, HealthContent.Fixes.LetClicksThroughTip);
 
         private static void TurnOffRaycastTarget(Graphic graphic)
         {
             Undo.RecordObject(graphic, HealthContent.Undo.Fix);
             graphic.raycastTarget = false;
+        }
+
+        // ── Leftovers ────────────────────────────────────────────────────────
+        // Deleting someone else's object is offered only when it can do nothing
+        // but block: fully transparent, no children, no component besides its
+        // graphic, not animated, not part of a prefab, and nothing in its scene
+        // points at it. A fade a script brings in later fails the last test.
+
+        private static bool IsLeftover(Graphic graphic)
+        {
+            var go = graphic.gameObject;
+            if (graphic.color.a > 0f || go.transform.childCount > 0) return false;
+            if (PrefabUtility.IsPartOfPrefabInstance(go)) return false;
+            if (go.GetComponentInParent<Animator>(true) != null || go.GetComponentInParent<Animation>(true) != null)
+                return false;
+
+            foreach (var component in go.GetComponents<Component>())
+                if (!(component is Transform) && !(component is CanvasRenderer) && component != graphic)
+                    return false; // includes a missing script, which is null
+
+            return !IsReferenced(go);
+        }
+
+        // Any serialized reference to the object or its components, from anything
+        // else in its scene: a script field, an event target, a Timeline binding.
+        // Transforms are skipped: every parent lists its children.
+        private static bool IsReferenced(GameObject go)
+        {
+            var own = new HashSet<Object>(go.GetComponents<Component>()) { go };
+
+            foreach (var root in go.scene.GetRootGameObjects())
+            foreach (var component in root.GetComponentsInChildren<Component>(true))
+            {
+                if (component == null || component is Transform || component.gameObject == go) continue;
+
+                using (var serialized = new SerializedObject(component))
+                {
+                    var property = serialized.GetIterator();
+                    while (property.Next(true))
+                        if (property.propertyType == SerializedPropertyType.ObjectReference
+                            && property.objectReferenceValue != null
+                            && own.Contains(property.objectReferenceValue))
+                            return true;
+                }
+            }
+
+            return false;
         }
 
         // Hits are sorted top first, so everything before the control's own graphic

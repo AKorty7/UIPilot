@@ -34,7 +34,8 @@ namespace UIPilot.Editor.Modules.Health
             internal const string NoRaycaster       = "Has buttons but no Graphic Raycaster, so none of them can be clicked or tapped.";
             internal const string NestedNoRaycaster = "Nested canvas with buttons but no Graphic Raycaster of its own, so they cannot be clicked. The parent canvas's raycaster does not reach them.";
 
-            internal const string Blocking = "{0} with Raycast Target on, drawn over {1}, so clicks there hit it instead.";
+            internal const string Blocking         = "{0} with Raycast Target on, drawn over {1}, so clicks there hit it instead. Let Clicks Through turns its Raycast Target off; the object stays.";
+            internal const string BlockingLeftover = "Invisible {0} with Raycast Target on, drawn over {1}, so clicks there hit it instead. Nothing uses it: Remove deletes it, or Let Clicks Through keeps it and turns its Raycast Target off.";
 
             internal const string NavigationNone  = "Navigation is None, so a gamepad or the arrow keys can never reach it.";
             internal const string NavigationStuck = "Explicit navigation with no neighbours set, so a gamepad that reaches it is stuck there.";
@@ -46,6 +47,13 @@ namespace UIPilot.Editor.Modules.Health
             internal const string ListSeparator = ", ";
             internal const string ListLastJoin  = " and ";
             internal const string ListMore      = "{0} and {1} more";
+        }
+
+        // Fix buttons that say what they do, for fixes a plain "Fix" would hide.
+        internal static class Fixes
+        {
+            internal const string LetClicksThrough    = "Let Clicks Through";
+            internal const string LetClicksThroughTip = "Turns off Raycast Target on the object in the way, so clicks reach what is under it. The object stays. Ctrl+Z undoes it.";
         }
 
         internal static class Undo

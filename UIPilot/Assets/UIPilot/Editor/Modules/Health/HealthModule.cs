@@ -46,18 +46,23 @@ namespace UIPilot.Editor.Modules.Health
             return Check(new[] { scene }, includeEventSystem: false);
         }
 
-        internal static void RunFix(HealthIssue issue)
+        // The row's Fix or its Remove, as one undoable step.
+        internal static void RunFix(HealthIssue issue, Action change)
         {
-            if (issue.Fix == null) return;
+            if (change == null) return;
+
+            // Read before the change: a Remove leaves the targets destroyed.
+            var scenes = ScenesOf(issue);
 
             Undo.IncrementCurrentGroup();
             var group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName(HealthContent.Undo.Fix);
 
-            issue.Fix();
+            change();
 
             Undo.CollapseUndoOperations(group);
-            MarkScenesDirty(issue);
+            foreach (var scene in scenes)
+                EditorSceneManager.MarkSceneDirty(scene);
         }
 
         // "- Play: On Click calls Hud.Resume, which no longer exists." one per line,
@@ -93,17 +98,20 @@ namespace UIPilot.Editor.Modules.Health
             return issues.OrderByDescending(issue => issue.Severity).ToList();
         }
 
-        private static void MarkScenesDirty(HealthIssue issue)
+        private static List<Scene> ScenesOf(HealthIssue issue)
         {
+            var scenes = new List<Scene>();
             if (issue.Targets.Length == 0)
             {
-                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-                return;
+                scenes.Add(SceneManager.GetActiveScene());
+                return scenes;
             }
 
             foreach (var target in issue.Targets)
-                if (target is GameObject go && go != null && go.scene.IsValid())
-                    EditorSceneManager.MarkSceneDirty(go.scene);
+                if (target is GameObject go && go != null && go.scene.IsValid() && !scenes.Contains(go.scene))
+                    scenes.Add(go.scene);
+
+            return scenes;
         }
     }
 }

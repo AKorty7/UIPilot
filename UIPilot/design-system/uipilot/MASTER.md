@@ -124,7 +124,7 @@ invents a new colour.
 
 | Component | Anatomy | Notes |
 |---|---|---|
-| **Issue row** (window) | lamp · name as a link (selects the targets, accent on hover) / muted detail · mini **Fix** · status word | Fix appears only when the change is safe to make and undoable. The word is *Broken* or *Warning*, never colour alone. |
+| **Issue row** (window) | lamp · name as a link (selects the targets, accent on hover) / muted detail / mini fix buttons under the detail, left-aligned · status word | Fix appears only when the change is safe to make and undoable. It is labelled **Fix** unless that would hide what happens; then it names the change (*Let Clicks Through*). **Remove** sits beside it only when deleting the object is certain to be safe (invisible, childless, nothing uses it). The word is *Broken* or *Warning*, never colour alone. |
 | **Summary row** | lamp · bold "All clear" or "N issues to look at in: scenes" / muted detail · mini **Check Now** | Idle grey lamp in Play mode ("Not checked yet"). |
 | **Toolbar lamp** | 16 px icon (8 px lamp centred) + "UI" or "UI  N" | Unity hides package toolbar items by default. While it is hidden, the window shows a tip with **Show on Toolbar** (primary) and **Not now**. **Lamp on Unity's main toolbar** under Checks is the lasting switch. If Unity's internals change, both fall back to written instructions. Tooltip carries the words. |
 | **Hierarchy lamp** | 8 px lamp on the object, 4 px lamp on each ancestor, 30 px from the row's right edge | The small lamp keeps a folded Hierarchy honest. Tooltip gives name and detail. Clear of the prefab arrow. |

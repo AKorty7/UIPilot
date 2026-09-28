@@ -94,6 +94,16 @@ certain checks: missing glyphs, text overflow, Constant Pixel Size, lost gamepad
   loading the compiled editor DLL in Windows PowerShell 5.1 (it targets the 4.8 API).
   `BuildScript` now writes '\n' only (it mixed in CRLF between methods).
 
+**Built 2026-09-28, not committed yet:** UI Health's blocked-button row says
+**Let Clicks Through** (not "Fix"), and offers **Remove** beside it when the blocker is
+a certain leftover (alpha 0, no children, no other component, no Animator above it,
+not a prefab instance, no serialized reference to it in its scene). Fix buttons now sit
+under each row's detail (MASTER "Issue row" updated); guide Markdown updated, PDF not
+rebuilt. Verified: GUI harness 20/20 (which blockers get Remove, Remove and Let Clicks
+Through each with Undo) and the window rendered. For the user's GitHub video: a test
+blocker must be a child of UIPilot_Canvas below the panel, not of the panel, whose
+Vertical Layout Group would lay it out as a column item.
+
 **Waiting on the user**
 
 - **Apply Theme:** fixed in `ae872e4` and `c7d4616`; on 2026-09-28 the user said "all

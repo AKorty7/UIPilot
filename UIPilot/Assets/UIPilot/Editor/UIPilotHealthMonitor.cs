@@ -82,7 +82,13 @@ namespace UIPilot.Editor
         // Fixes go through here so every view updates the moment one is applied.
         internal static void Fix(HealthIssue issue)
         {
-            HealthModule.RunFix(issue);
+            HealthModule.RunFix(issue, issue.Fix);
+            CheckNow();
+        }
+
+        internal static void Remove(HealthIssue issue)
+        {
+            HealthModule.RunFix(issue, issue.Remove);
             CheckNow();
         }
 
