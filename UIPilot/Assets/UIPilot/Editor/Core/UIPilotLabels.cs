@@ -91,6 +91,8 @@ namespace UIPilot.Editor.Core
             internal const string CheckNowTooltip  = "Check every UI in the open scenes again. UIPilot also checks by itself after you edit, save, open a scene or press Play.";
             internal const string FixButton        = "Fix";
             internal const string FixTooltip       = "Make the change described, as one step you can undo with Ctrl+Z.";
+            internal const string RemoveButton     = "Remove";
+            internal const string RemoveTooltip    = "Delete the object: it is invisible and nothing uses it. Ctrl+Z brings it back.";
             internal const string RowTooltip       = "Click to select it in the Hierarchy.";
             internal const string LampTooltip      = "{0}: {1}";
 

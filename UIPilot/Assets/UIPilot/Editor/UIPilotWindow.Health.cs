@@ -16,6 +16,7 @@ namespace UIPilot.Editor
 
         private static readonly GUIContent ContentCheckNow    = new GUIContent(UIPilotLabels.Health.CheckNowButton, UIPilotLabels.Health.CheckNowTooltip);
         private static readonly GUIContent ContentHealthFix   = new GUIContent(UIPilotLabels.Health.FixButton,      UIPilotLabels.Health.FixTooltip);
+        private static readonly GUIContent ContentHealthRemove = new GUIContent(UIPilotLabels.Health.RemoveButton,  UIPilotLabels.Health.RemoveTooltip);
         private static readonly GUIContent ContentWarnOnPlay  = new GUIContent(UIPilotLabels.Health.WarnOnPlay,     UIPilotLabels.Health.WarnOnPlayTip);
         private static readonly GUIContent ContentWarnOnBuild = new GUIContent(UIPilotLabels.Health.WarnOnBuild,    UIPilotLabels.Health.WarnOnBuildTip);
         private static readonly GUIContent ContentShowLamp    = new GUIContent(UIPilotLabels.Health.ShowOnToolbar,  UIPilotLabels.Health.ShowOnToolbarTip);
@@ -165,7 +166,8 @@ namespace UIPilot.Editor
             detail = null;
         }
 
-        // Lamp, what and where (click to select it), the fix, and the status in words.
+        // Lamp, what and where (click to select it), the status in words, and under
+        // the detail the fixes: buttons that name what they do need the room.
         private static void DrawHealthRow(HealthIssue issue)
         {
             var broken = issue.Severity == HealthSeverity.Broken;
@@ -178,17 +180,36 @@ namespace UIPilot.Editor
                 {
                     DrawIssueLabel(issue);
                     GUILayout.Label(issue.Detail, UIPilotStyles.RowDetail);
+                    DrawHealthFixes(issue);
                 }
 
+                GUILayout.Label(broken ? UIPilotLabels.Status.Broken : UIPilotLabels.Status.Warning,
+                    UIPilotStyles.StatusWord, UIPilotStyles.StatusWordSize);
+            }
+        }
+
+        // The Fix first, then Remove when deleting is safe.
+        private static void DrawHealthFixes(HealthIssue issue)
+        {
+            if (issue.Fix == null && issue.Remove == null) return;
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
                 if (issue.Fix != null
-                    && GUILayout.Button(ContentHealthFix, EditorStyles.miniButton, UIPilotStyles.FixButtonSize))
+                    && GUILayout.Button(issue.FixButton ?? ContentHealthFix, EditorStyles.miniButton, UIPilotStyles.FitWidth))
                 {
                     UIPilotHealthMonitor.Fix(issue);
                     GUIUtility.ExitGUI();
                 }
 
-                GUILayout.Label(broken ? UIPilotLabels.Status.Broken : UIPilotLabels.Status.Warning,
-                    UIPilotStyles.StatusWord, UIPilotStyles.StatusWordSize);
+                if (issue.Remove != null
+                    && GUILayout.Button(ContentHealthRemove, EditorStyles.miniButton, UIPilotStyles.FitWidth))
+                {
+                    UIPilotHealthMonitor.Remove(issue);
+                    GUIUtility.ExitGUI();
+                }
+
+                GUILayout.FlexibleSpace();
             }
         }
 
