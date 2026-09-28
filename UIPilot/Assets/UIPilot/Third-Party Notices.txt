@@ -1,0 +1,119 @@
+UIPilot — Third-Party Notices
+=============================
+
+UIPilot includes the following third-party typefaces. Each licence applies to that
+typeface only; everything else in this package is covered by the Unity Asset Store EULA.
+
+
+Michroma (typeface)
+-------------------
+Files:     Art/Fonts/Michroma-Regular.ttf
+           Art/Fonts/Michroma SDF.asset          (TextMeshPro font asset built from it)
+           Art/Fonts/Michroma SDF Glow.mat       (material preset for that font asset)
+Copyright: Copyright 2011 The Michroma Project Authors
+           (https://github.com/googlefonts/Michroma-font)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Michroma-OFL.txt, and https://openfontlicense.org
+
+The font is used for the lettering of the menus UIPilot generates. Under the OFL you may
+use it in your own games, commercial or not, and redistribute it with them. You may not
+sell the font by itself. If you modify the font, the modified version must stay under the
+OFL and may not use the name "Michroma".
+
+To use a different typeface: select any generated text object and change
+TextMeshPro > Font Asset. UIPilot does not depend on Michroma being present; if the font
+asset is removed, newly generated menus fall back to TextMeshPro's default font.
+
+
+Young Serif (typeface)
+----------------------
+Files:     Art/Fonts/YoungSerif-Regular.ttf
+           Art/Fonts/Young Serif SDF.asset       (TextMeshPro font asset built from it)
+Copyright: Copyright 2023 The Young Serif Project Authors
+           (https://github.com/noirblancrouge/YoungSerif)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/YoungSerif-OFL.txt, and https://openfontlicense.org
+Used by:   Fantasy RPG theme: titles.
+
+Crimson Pro (typeface)
+----------------------
+Files:     Art/Fonts/CrimsonPro-Bold.ttf
+           Art/Fonts/Crimson Pro Bold SDF.asset  (TextMeshPro font asset built from it)
+Copyright: Copyright 2018 The Crimson Pro Project Authors
+           (https://github.com/Fonthausen/CrimsonPro)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/CrimsonPro-OFL.txt, and https://openfontlicense.org
+Used by:   Fantasy RPG theme: menu items and values.
+
+Work Sans (typeface)
+--------------------
+Files:     Art/Fonts/WorkSans-Bold.ttf
+           Art/Fonts/Work Sans Bold SDF.asset    (TextMeshPro font asset built from it)
+           Art/Fonts/Work Sans Bold SDF Shadow.mat (material preset for that font asset)
+Copyright: Copyright 2019 The Work Sans Project Authors
+           (https://github.com/weiweihuanghuang/Work-Sans)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/WorkSans-OFL.txt, and https://openfontlicense.org
+Used by:   JRPG Window theme.
+
+Silkscreen (typeface)
+---------------------
+Files:     Art/Fonts/Silkscreen-Regular.ttf
+           Art/Fonts/Silkscreen SDF.asset        (TextMeshPro font asset built from it)
+           Art/Fonts/Silkscreen SDF Shadow.mat   (material preset for that font asset)
+Copyright: Copyright 2001 The Silkscreen Project Authors
+           (https://github.com/googlefonts/silkscreen)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Silkscreen-OFL.txt, and https://openfontlicense.org
+Used by:   Pixel Retro theme.
+
+Tektur (typeface)
+-----------------
+Files:     Art/Fonts/Tektur-Medium.ttf
+           Art/Fonts/Tektur SDF.asset            (TextMeshPro font asset built from it)
+           Art/Fonts/Tektur SDF Glow.mat         (material preset for that font asset)
+Copyright: Copyright 2023 The Tektur Project Authors
+           (https://www.github.com/hyvyys/Tektur)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Tektur-OFL.txt, and https://openfontlicense.org
+Used by:   Sci-Fi HUD theme.
+
+Big Shoulders (typeface)
+------------------------
+Files:     Art/Fonts/BigShoulders-Bold.ttf
+           Art/Fonts/Big Shoulders Bold SDF.asset       (TextMeshPro font asset built from it)
+Copyright: Copyright 2019 The Big Shoulders Project Authors
+           (https://github.com/xotypeco/big_shoulders)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/BigShoulders-OFL.txt, and https://openfontlicense.org
+Used by:   Military Shooter theme.
+
+Italiana (typeface)
+-------------------
+Files:     Art/Fonts/Italiana-Regular.ttf
+           Art/Fonts/Italiana SDF.asset                (TextMeshPro font asset built from it)
+Copyright: Copyright (c) 2011, Santiago Orozco (hi@typemade.mx),
+           with Reserved Font Name "Italiana"
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/Italiana-OFL.txt, and https://openfontlicense.org
+Used by:   Survival Horror theme: titles.
+
+DM Mono (typeface)
+------------------
+Files:     Art/Fonts/DMMono-Regular.ttf
+           Art/Fonts/DM Mono SDF.asset                 (TextMeshPro font asset built from it)
+Copyright: Copyright 2020 The DM Mono Project Authors
+           (https://www.github.com/googlefonts/dm-mono)
+Licence:   SIL Open Font License, Version 1.1
+           Full text: Art/Fonts/DMMono-OFL.txt, and https://openfontlicense.org
+Used by:   Survival Horror theme: menu items and values.
+
+The same terms apply to each of these: use them in your own games, commercial or not, and
+redistribute them with them; do not sell a font by itself; a modified font stays under the
+OFL and may not use the font's name. Any font asset can be removed: menus built with a
+theme whose font is missing fall back to TextMeshPro's default font.
+
+
+Everything else in Art/ (sprites, icons, the genre theme artwork and scene layers in
+Art/Themes, and the scene shader in Art/Shaders) was created for UIPilot and is
+original work.

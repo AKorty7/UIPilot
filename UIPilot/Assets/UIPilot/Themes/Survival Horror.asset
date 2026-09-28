@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: Survival Horror
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers:
+  - sprite: {fileID: 21300000, guid: 153c056120b941eebb396339080c19b7, type: 3}
+    material: {fileID: 2100000, guid: 0f3c02648b104060bfa85f887683f320, type: 2}
+  - sprite: {fileID: 21300000, guid: 498a0e0fe1b347f9b9939d3f2e50ff07, type: 3}
+    material: {fileID: 2100000, guid: 02e0d481b0ac4dcbbe7336b5cad1eeae, type: 2}
+  - sprite: {fileID: 21300000, guid: 3f00bbfefd3f47c3870fef724b69d71e, type: 3}
+    material: {fileID: 2100000, guid: 6dcdd848bcc64db7b4e93adb137ec8ce, type: 2}
+  - sprite: {fileID: 21300000, guid: 52c66576d325495f82d5ea086f3815d9, type: 3}
+    material: {fileID: 2100000, guid: 56be363af120486e8b5eead888f6b702, type: 2}
+  - sprite: {fileID: 21300000, guid: ef62d02348f44d478976930f6e59581e, type: 3}
+    material: {fileID: 2100000, guid: 528eb0d1ab13419b9e2c628ab9516c91, type: 2}
+  - sprite: {fileID: 21300000, guid: 04c2984cd1fe430e9287d639fe8f31d2, type: 3}
+    material: {fileID: 2100000, guid: fcef929f4732434baea4c069e3a92e30, type: 2}
+  - sprite: {fileID: 21300000, guid: a9cd7ae4500a4395a1203a271d28c041, type: 3}
+    material: {fileID: 2100000, guid: 167752598b144f47bc2f87f7baaca1f9, type: 2}
+  - sprite: {fileID: 21300000, guid: 11fcaf9ca31f44f0a369da6e635c49f4, type: 3}
+    material: {fileID: 2100000, guid: c13288f4109b4c95b0ff183fcd97a5f5, type: 2}
+  - sprite: {fileID: 21300000, guid: 04fa703f0a164418a996ab58e0ea5e51, type: 3}
+    material: {fileID: 2100000, guid: d96be2dcec014b3dbf106bb84a128eec, type: 2}
+  - sprite: {fileID: 21300000, guid: b9715679ea41426fa65a066cf17ae2a5, type: 3}
+    material: {fileID: 2100000, guid: f0713c5c4a864ea2bdd3b132a38f8b6a, type: 2}
+  timeOfDay: 0
+  wash: {r: 0, g: 0, b: 0, a: 0.4}
+  blooms: 0
+  bloomTopLeft: {r: 0.7019608, g: 0.6509804, b: 0.96862745, a: 0.54901963}
+  bloomBottomRight: {r: 0.47843137, g: 0.84313726, b: 0.9254902, a: 0.6}
+  bloomTopRight: {r: 0.8235294, g: 0.96862745, b: 0.9254902, a: 0.5019608}
+  bloomCentre: {r: 1, g: 1, b: 1, a: 0.34901962}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 0
+  sceneFrameColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  sceneScanlines: 0
+  sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: c5a7b090af1a45a78dd635c85e8800cc, type: 3}
+  panelArtScale: 1
+  panelScanlines: 0
+  panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.050980393}
+  panelFrame: 0
+  panelFrameColor: {r: 1, g: 1, b: 1, a: 0.8509804}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 0
+  font: {fileID: 11400000, guid: cb92924fe5eb3b1428ea90324422b445, type: 2}
+  titleFont: {fileID: 11400000, guid: 19e0692f7514d4f4ea5459a4e5ebb400, type: 2}
+  titleMaterial: {fileID: 0}
+  textMaterial: {fileID: 0}
+  text: {r: 0.8509804, g: 0.83137256, b: 0.8, a: 1}
+  textSoft: {r: 0.5411765, g: 0.5176471, b: 0.47843137, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 14
+  titleSize: 58
+  icons: 0
+  itemCase: 2
+  itemTracking: 4
+  itemSize: 24
+  valueSize: 20
+  smallSize: 14
+  focusStyle: 2
+  focusArt: {fileID: 21300000, guid: dc87df49eeb64c259f3619da5e736428, type: 3}
+  focusReach: 24
+  markerSize: {x: 22, y: 22}
+  focusIdle: {r: 0.7058824, g: 0.08627451, b: 0.105882354, a: 0}
+  focusHover: {r: 0.8509804, g: 0.83137256, b: 0.8, a: 0.4509804}
+  focusSelected: {r: 0.7058824, g: 0.08627451, b: 0.105882354, a: 1}
+  focusPressed: {r: 0.47843137, g: 0.05882353, b: 0.07058824, a: 1}
+  focusDisabled: {r: 0.8509804, g: 0.83137256, b: 0.8, a: 0.12156863}
+  rule: {r: 1, g: 1, b: 1, a: 1}
+  ruleArt: {fileID: 21300000, guid: 2d4709e5d435411e81292407a66588e7, type: 3}
+  ruleHeight: 10
+  meterTrack: {r: 0.8509804, g: 0.83137256, b: 0.8, a: 0.2}
+  meterFill: {r: 0.7058824, g: 0.08627451, b: 0.105882354, a: 1}

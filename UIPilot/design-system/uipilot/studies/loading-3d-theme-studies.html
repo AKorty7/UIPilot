@@ -1,0 +1,719 @@
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Work+Sans:wght@400;500;600&family=Crimson+Pro:wght@400;500&family=Silkscreen&family=Tektur:wght@400;500&family=Big+Shoulders+Display:wght@500&family=Italiana&family=DM+Mono&display=swap" rel="stylesheet">
+<div id="uip-depth" aria-label="UIPilot theme preview">
+  <header class="study-bar">
+    <div class="study-brand">UIPILOT <span>3D LOADING STUDIES / 12</span></div>
+    <label class="theme-picker">Theme <select id="uip-theme" class="cursor-interaction" aria-label="Theme"></select></label>
+    <label class="theme-picker">Backdrop <select id="uip-backdrop" class="cursor-interaction" aria-label="Backdrop"><option value="reflections">Theme canvas</option><option value="plain">Dark canvas</option><option value="bright">Light canvas</option></select></label>
+  </header>
+  <nav class="study-nav" aria-label="Preview screens">
+    <button class="cursor-interaction" data-screen="main" aria-pressed="true">Main menu</button>
+    <button class="cursor-interaction" data-screen="settings" aria-pressed="false">Settings</button>
+    <button class="cursor-interaction" data-screen="pause" aria-pressed="false">Pause</button>
+    <button class="cursor-interaction" data-screen="loading" aria-pressed="false">Loading</button>
+    <button class="cursor-interaction" data-screen="states" aria-pressed="false">Control states</button>
+    <button type="button" id="uip-advance" class="cursor-interaction" hidden>Advance loading preview</button>
+    <label id="uip-motion-control" class="motion-picker" hidden>Motion <select id="uip-motion" class="cursor-interaction" aria-label="Motion"><option value="auto">Follow system</option><option value="play">Play animation</option><option value="reduced">Reduced motion</option><option value="paused">Paused</option></select><span id="uip-motion-status" role="status"></span></label>
+  </nav>
+  <section class="game-stage" data-theme="soft" aria-label="Theme surfaces">
+    <div class="scene" aria-hidden="true"></div>
+    <div class="game-content"></div>
+    <footer class="game-footer"><span class="footer-theme">SOFT CLUB</span><span>UIPILOT · DESIGN PREVIEW</span></footer>
+  </section>
+  <div class="study-caption"><span id="uip-material">Graphite · brushed silver · smoke blue</span><span id="uip-status" role="status" aria-live="polite">Main menu</span></div>
+</div>
+<style>
+#uip-depth{--studio-bg:#111315;--studio-ink:#f1f2ee;--studio-muted:#b1b4b4;--studio-line:#363a3d;font:14px/1.45 'Work Sans',sans-serif;color:var(--studio-ink);background:var(--studio-bg);color-scheme:dark;width:100%;box-sizing:border-box}
+#uip-depth *{box-sizing:border-box}
+#uip-depth button,#uip-depth input,#uip-depth select{font:inherit}
+#uip-depth button,#uip-depth select{color:inherit}
+#uip-depth button{cursor:var(--cursor-interaction,pointer)}
+#uip-depth .study-bar{padding:19px 26px;display:flex;flex-wrap:wrap;gap:14px 18px;justify-content:space-between;align-items:center;border-bottom:1px solid var(--studio-line)}
+#uip-depth .study-brand{font-weight:600;letter-spacing:.15em;font-size:13px;white-space:nowrap}
+#uip-depth .study-brand span{display:block;margin-top:4px;color:var(--studio-muted);font-size:10px;font-weight:400;letter-spacing:.16em}
+#uip-depth .theme-picker{display:flex;gap:12px;align-items:center;color:var(--studio-muted);font-size:12px}
+#uip-depth .theme-picker select{background:#202326;border:1px solid #52575b;border-radius:3px;padding:9px 30px 9px 12px;min-width:185px;color:var(--studio-ink)}
+#uip-depth .study-nav{display:flex;flex-wrap:wrap;gap:3px;padding:0 19px;border-bottom:1px solid var(--studio-line)}
+#uip-depth .study-nav button{background:transparent;border:0;border-bottom:2px solid transparent;padding:15px 13px 13px;font-size:12px;color:var(--studio-muted)}
+#uip-depth .study-nav button[aria-pressed="true"]{color:var(--studio-ink);border-bottom-color:var(--studio-ink)}
+#uip-depth .study-nav button:hover{background:#23272a;color:var(--studio-ink)}
+#uip-depth .game-stage{--ground:#171a1c;--surface:#24282b;--well:#1b1e21;--ink:#f0f1ed;--muted:#b8c0c4;--edge:#535b61;--accent:#b3ccd8;--heading:'Michroma',sans-serif;--body:'Work Sans',sans-serif;--radius:5px;--lift:5px 6px 13px #0e1012,-3px -3px 8px #343b4080;position:relative;isolation:isolate;min-height:610px;background:var(--ground);color:var(--ink);overflow:hidden;font-family:var(--body)}
+#uip-depth .scene{position:absolute;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(110deg,var(--ground) 5%,transparent 75%),radial-gradient(ellipse at 85% 35%,#45494c38,transparent 68%)}
+#uip-depth .scene:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,#ffffff05 3px 4px);opacity:.25;pointer-events:none}
+#uip-depth .game-content{padding:47px 6.25% 34px;min-height:556px;display:flex;align-items:stretch;position:relative}
+#uip-depth .menu-panel{width:390px;max-width:100%;min-height:466px;display:flex;flex-direction:column;padding:27px 31px 28px;background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);box-shadow:14px 24px 46px #00000055,inset 0 1px 0 #ffffff0c;position:relative}
+#uip-depth .menu-panel:before{content:'';position:absolute;left:30px;right:30px;top:-1px;height:1px;background:linear-gradient(90deg,transparent,#e0e4e69c,transparent)}
+#uip-depth .eyebrow{margin:0 0 19px;color:var(--muted);font:11px/1.4 'Work Sans',sans-serif;letter-spacing:.18em;text-transform:uppercase}
+#uip-depth h1{font:400 47px/1.25 var(--heading);letter-spacing:-.055em;margin:0 0 25px;text-wrap:balance;color:var(--ink)}
+#uip-depth h1 span{display:block}
+#uip-depth .panel-rule{height:1px;background:var(--edge);position:relative;margin-bottom:26px}
+#uip-depth .panel-rule:before{content:'';position:absolute;left:0;width:35px;height:2px;background:var(--accent)}
+#uip-depth .menu-actions{display:grid;gap:11px;margin-top:auto}
+#uip-depth .game-button{display:flex;align-items:center;justify-content:space-between;text-align:left;gap:14px;min-height:48px;padding:12px 17px;color:var(--ink);background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);box-shadow:var(--lift);transition:background 130ms,box-shadow 130ms;position:relative;font-size:15px;font-weight:400}
+#uip-depth .game-button:after{content:'';display:block;width:5px;height:5px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg);opacity:0}
+#uip-depth .game-button:hover,#uip-depth .game-button.is-hover{background:color-mix(in srgb,var(--surface),var(--accent) 10%);border-color:var(--accent)}
+#uip-depth .game-button:hover:after,#uip-depth .game-button.is-hover:after{opacity:1}
+#uip-depth .game-button.primary{border-left:3px solid var(--accent);padding-left:15px;background:color-mix(in srgb,var(--surface),var(--accent) 8%)}
+#uip-depth .game-button.primary:after{opacity:1}
+#uip-depth .game-button:active,#uip-depth .game-button.is-pressed{background:var(--well);box-shadow:inset 3px 3px 6px #00000099,inset -1px -1px 3px #ffffff19}
+#uip-depth .game-button.is-focus{outline:2px solid var(--ink);outline-offset:4px}
+#uip-depth .game-button:focus-visible,#uip-depth input:focus-visible,#uip-depth select:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+#uip-depth .game-button:disabled{color:var(--muted);opacity:.55;box-shadow:none;cursor:not-allowed;background:var(--well);border-style:dashed}
+#uip-depth .game-button.quiet{box-shadow:none;background:transparent;border-color:transparent;color:var(--muted)}
+#uip-depth .game-button.quiet:hover{border-color:var(--edge);color:var(--ink)}
+#uip-depth .save-note{font-size:12px;color:var(--muted);margin:0 0 18px}
+#uip-depth .game-footer{padding:15px 6.25% 23px;display:flex;justify-content:space-between;gap:20px;background:var(--ground);color:var(--muted);font:10px/1.4 'Work Sans',sans-serif;letter-spacing:.15em}
+#uip-depth .study-caption{padding:14px 26px;display:flex;justify-content:space-between;gap:16px;color:var(--studio-muted);font-size:12px;border-top:1px solid var(--studio-line)}
+#uip-depth .settings-panel{width:630px;min-height:466px}
+#uip-depth .settings-panel h1,#uip-depth .states-panel h1{font-size:34px;letter-spacing:-.035em;margin-bottom:20px}
+#uip-depth .setting-group{margin-bottom:22px}
+#uip-depth .setting-group h2{font:500 11px/1.4 'Work Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+#uip-depth .setting-row{display:grid;grid-template-columns:1fr 210px;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid color-mix(in srgb,var(--edge),transparent 45%);font-size:14px}
+#uip-depth .range-control{display:flex;gap:15px;align-items:center}
+#uip-depth .range-control output{width:30px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+#uip-depth input[type="range"]{width:100%;min-width:0;height:28px;accent-color:var(--accent);cursor:var(--cursor-interaction,pointer)}
+#uip-depth .setting-row select{min-height:42px;width:100%;padding:7px 12px;border:1px solid var(--edge);border-radius:var(--radius);background:var(--well);color:var(--ink);box-shadow:inset 2px 2px 4px #00000055}
+#uip-depth .check-row{display:flex;gap:12px;justify-content:flex-end;align-items:center}
+#uip-depth input[type="checkbox"]{width:22px;height:22px;accent-color:var(--accent);cursor:var(--cursor-interaction,pointer)}
+#uip-depth .settings-back{width:180px;margin-top:auto}
+#uip-depth .loading-panel{margin:auto;width:100%;min-height:466px;display:flex;flex-direction:column;justify-content:flex-end;padding:32px 0}
+#uip-depth .loading-inner{background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:25px 30px;width:510px;max-width:100%;box-shadow:14px 24px 46px #00000055}
+#uip-depth .loading-inner h1{font-size:32px;margin-bottom:24px}
+#uip-depth .progress-label{display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px;color:var(--muted)}
+#uip-depth progress{appearance:none;width:100%;height:5px;background:var(--well);border:0;display:block;accent-color:var(--accent)}
+#uip-depth progress::-webkit-progress-bar{background:var(--well)}
+#uip-depth progress::-webkit-progress-value{background:var(--accent)}
+#uip-depth .loading-inner p{font-size:12px;line-height:1.6;color:var(--muted);margin:24px 0 0;max-width:370px}
+#uip-depth .loading-inner .game-button{margin-top:22px;width:100%}
+#uip-depth .states-panel{width:100%;min-height:466px}
+#uip-depth .state-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 20px;margin:6px 0 25px}
+#uip-depth .state-sample{min-width:0}
+#uip-depth .state-sample>span{display:block;font:11px/1.4 'Work Sans',sans-serif;color:var(--muted);margin-bottom:12px}
+#uip-depth .state-sample .game-button{width:100%;font-size:13px}
+#uip-depth .state-swatches{display:flex;flex-wrap:wrap;gap:18px;border-top:1px solid var(--edge);padding-top:19px}
+#uip-depth .swatch{display:flex;align-items:center;gap:8px;color:var(--muted);font:11px 'Work Sans',sans-serif}
+#uip-depth .swatch i{width:20px;height:20px;border:1px solid var(--edge);border-radius:2px}
+/* Soft Club: material, type and controls; no scene imagery. */
+#uip-depth [data-theme="soft"]{--ground:#d1dade;--surface:#e7eef0;--well:#c7d8e0;--ink:#163652;--muted:#425c70;--edge:#889eaf;--accent:#224e9d;--heading:'Michroma',sans-serif;--radius:3px;--lift:none;color-scheme:light}
+#uip-depth [data-theme="soft"] .scene{background:var(--ground)}
+#uip-depth [data-theme="soft"] .scene:after,#uip-depth [data-theme="soft"] .reflection,#uip-depth [data-theme="soft"] .horizon{display:none}
+#uip-depth [data-theme="soft"] .game-content{justify-content:center}
+#uip-depth [data-theme="soft"] .menu-panel,#uip-depth [data-theme="soft"] .loading-inner{background:#e7eef0;border:1px solid #8da4b4;border-radius:3px 26px 3px 3px;box-shadow:inset 0 0 0 4px #f5fafb,0 10px 24px #324b641c;padding:32px}
+#uip-depth [data-theme="soft"] .menu-panel:not(.settings-panel):not(.states-panel){width:470px}
+#uip-depth [data-theme="soft"] .menu-panel:before{top:6px;left:6px;right:29px;height:6px;background:linear-gradient(90deg,#bddfdf,#c8cfea 57%,#f7ffff);border-bottom:1px solid #c2d3dc}
+#uip-depth [data-theme="soft"] h1{font-size:48px;line-height:1.15;letter-spacing:-.075em;color:#244b91;margin-bottom:25px}
+#uip-depth [data-theme="soft"] h1 span{display:inline}
+#uip-depth [data-theme="soft"] h1 span+span:before{content:' '}
+#uip-depth [data-theme="soft"] .eyebrow{font-size:11px;letter-spacing:.08em;text-transform:lowercase;font-style:italic;color:#435d73;margin:0 0 19px}
+#uip-depth [data-theme="soft"] .panel-rule{height:3px;background:linear-gradient(90deg,#92babd,#b6bfdc 55%,#d3e2e4);border-top:1px solid #91a8bc;border-bottom:1px solid #fff;margin-bottom:34px}
+#uip-depth [data-theme="soft"] .panel-rule:before{display:none}
+#uip-depth [data-theme="soft"] .menu-actions{gap:12px}
+#uip-depth [data-theme="soft"] .game-button{min-height:48px;border:1px solid #839db4;border-radius:3px 15px 3px 15px;background:linear-gradient(#f5fafc 0%,#e3edf2 46%,#d2e1e8 49%,#e5edef 100%);box-shadow:inset 0 0 0 1px #ffffffb0,0 2px 0 #819ba63b;padding:12px 18px;color:#244265;letter-spacing:.015em;text-transform:lowercase;font-size:16px}
+#uip-depth [data-theme="soft"] .game-button.primary{background:linear-gradient(#5274b7,#3a5d9e 46%,#284b8a 49%,#355d99);border:1px solid #234883;box-shadow:inset 0 1px 0 #a9c8f0,inset 0 -1px 0 #1c3e6e;color:#f7ffff;padding-left:18px}
+#uip-depth [data-theme="soft"] .game-button:hover,#uip-depth [data-theme="soft"] .game-button.is-hover{background:linear-gradient(#f0fffb,#c0e5df);color:#143950;border-color:#467f93}
+#uip-depth [data-theme="soft"] .game-button:active,#uip-depth [data-theme="soft"] .game-button.is-pressed{background:#bdd2df;box-shadow:inset 0 2px 4px #385d6c40;color:#183b58;border-color:#577e95}
+#uip-depth [data-theme="soft"] .game-button:focus-visible,#uip-depth [data-theme="soft"] .game-button.is-focus{outline:2px solid #224e9d;outline-offset:4px}
+#uip-depth [data-theme="soft"] .game-button:disabled{background:#dce4e7;color:#5e707d;border:1px dashed #8b9dab;box-shadow:none;opacity:.7}
+#uip-depth [data-theme="soft"] .game-button.quiet{background:#e7eef0;box-shadow:none;border-color:#a0b4c2;color:#3d5870}
+#uip-depth [data-theme="soft"] .setting-group h2{font-size:12px;letter-spacing:.035em;text-transform:none}
+#uip-depth [data-theme="soft"] .setting-row select{background:#f0f6f7;box-shadow:inset 0 1px 3px #385d6c30;border:1px solid #91a7b6;border-radius:3px 10px 3px 3px}
+#uip-depth [data-theme="soft"] input[type="range"]{accent-color:#315ea5}
+#uip-depth [data-theme="soft"] input[type="checkbox"]{accent-color:#287c71}
+#uip-depth [data-theme="soft"] .game-footer{background:transparent;color:#3c5669;text-transform:lowercase;letter-spacing:.06em}
+#uip-depth [data-theme="soft"] .settings-panel h1,#uip-depth [data-theme="soft"] .states-panel h1,#uip-depth [data-theme="soft"] .loading-inner h1{font-size:32px;letter-spacing:-.06em}
+#uip-depth [data-theme="soft"][data-backdrop="plain"] .scene{background:#18222b}
+#uip-depth [data-theme="soft"][data-backdrop="plain"] .game-footer{color:#d0dfec}
+#uip-depth [data-theme="soft"][data-backdrop="bright"] .scene{background:#f1f4f3}
+@media(max-width:600px){#uip-depth [data-theme="soft"] .menu-panel,#uip-depth [data-theme="soft"] .loading-inner{padding:26px 22px}#uip-depth [data-theme="soft"] h1{font-size:clamp(30px,6.8vw,42px)}#uip-depth [data-theme="soft"] .states-panel h1{font-size:27px}#uip-depth [data-theme="soft"] .state-sample .game-button{font-size:13px;padding:10px}}
+/* Shared behaviour for the eight revised component families. */
+#uip-depth [data-revised="true"]{--selected-ink:var(--ink);--focus:var(--accent);--control-shadow:none;--frame-shadow:none;--frame-fill:var(--surface);--button-fill:var(--well);--button-hover:var(--surface);--button-down:var(--well);--button-selected:var(--surface);--button-border:var(--edge);--down-shadow:inset 0 2px 5px #00000050;--heading:'Work Sans',sans-serif;--radius:3px;--lift:none}
+#uip-depth [data-revised="true"] .scene{background:var(--ground)}
+#uip-depth [data-revised="true"] .scene:after{display:none}
+#uip-depth [data-revised="true"] .game-content{justify-content:center}
+#uip-depth [data-revised="true"] .menu-panel,#uip-depth [data-revised="true"] .loading-inner{background:var(--frame-fill);border:1px solid var(--edge);border-radius:var(--radius);box-shadow:var(--frame-shadow);padding:32px;position:relative}
+#uip-depth [data-revised="true"] .menu-panel:not(.settings-panel):not(.states-panel){width:470px}
+#uip-depth [data-revised="true"] .menu-panel:before{display:none}
+#uip-depth [data-revised="true"] h1{font-size:49px;line-height:1.12;letter-spacing:-.04em;margin-bottom:27px}
+#uip-depth [data-revised="true"] h1 span{display:inline}
+#uip-depth [data-revised="true"] h1 span+span:before{content:' '}
+#uip-depth [data-revised="true"] .eyebrow{font:12px/1.45 var(--body);color:var(--muted);text-transform:none;letter-spacing:.035em;margin:0 0 19px}
+#uip-depth [data-revised="true"] .menu-actions{gap:13px}
+#uip-depth [data-revised="true"] .game-button{background:var(--button-fill);color:var(--ink);border:1px solid var(--button-border);border-radius:var(--radius);box-shadow:var(--control-shadow);min-height:48px;font-size:16px;padding:12px 17px}
+#uip-depth [data-revised="true"] .game-button.primary{background:var(--button-selected);color:var(--selected-ink);border-color:var(--accent);border-left-width:3px;padding-left:15px}
+#uip-depth [data-revised="true"] .game-button:hover,#uip-depth [data-revised="true"] .game-button.is-hover{background:var(--button-hover);color:var(--ink);border-color:var(--accent)}
+#uip-depth [data-revised="true"] .game-button:active,#uip-depth [data-revised="true"] .game-button.is-pressed{background:var(--button-down);color:var(--ink);box-shadow:var(--down-shadow);border-color:var(--edge)}
+#uip-depth [data-revised="true"] .game-button:focus-visible,#uip-depth [data-revised="true"] .game-button.is-focus,#uip-depth [data-revised="true"] input:focus-visible,#uip-depth [data-revised="true"] select:focus-visible{outline:2px solid var(--focus);outline-offset:4px}
+#uip-depth [data-revised="true"] .game-button:disabled{background:var(--well);color:var(--muted);border:1px dashed var(--edge);box-shadow:none;opacity:.55}
+#uip-depth [data-revised="true"] .game-button.quiet{background:var(--surface);color:var(--muted);box-shadow:none}
+#uip-depth [data-revised="true"] .setting-row select{background:var(--well);border-color:var(--edge);box-shadow:var(--down-shadow);border-radius:var(--radius)}
+#uip-depth [data-revised="true"] .setting-group h2{font:500 12px/1.5 var(--body);letter-spacing:.04em;text-transform:none;color:var(--muted)}
+#uip-depth [data-revised="true"] .game-footer{background:transparent;color:var(--muted);font-size:11px;letter-spacing:.07em}
+#uip-depth [data-revised="true"] .settings-panel h1,#uip-depth [data-revised="true"] .states-panel h1,#uip-depth [data-revised="true"] .loading-inner h1{font-size:34px}
+#uip-depth [data-revised="true"][data-backdrop="plain"] .scene{background:#14191c}
+#uip-depth [data-revised="true"][data-backdrop="plain"] .game-footer{color:#c2ced1}
+#uip-depth [data-revised="true"][data-backdrop="bright"] .scene{background:#e5e9e8}
+#uip-depth [data-revised="true"][data-backdrop="bright"] .game-footer{color:#3b4b50}
+
+/* Dark Neumorphism: recessed settings and tactile raised controls. */
+#uip-depth [data-theme="neumorphic"]{--ground:#252a2e;--surface:#2d3338;--well:#20262b;--ink:#f0f3f1;--muted:#b9c6cc;--edge:#58666e;--accent:#bed8e1;--radius:13px;--frame-shadow:12px 12px 28px #161b1f,-8px -8px 23px #394249;--button-fill:linear-gradient(145deg,#343d44,#293138);--button-hover:#3b4852;--button-down:#222a30;--button-selected:linear-gradient(135deg,#445967,#34434f);--control-shadow:5px 6px 10px #171d22,-3px -3px 8px #48535a65;--down-shadow:inset 4px 4px 7px #11181e,inset -3px -3px 5px #53616b45}
+#uip-depth [data-theme="neumorphic"] .menu-panel,#uip-depth [data-theme="neumorphic"] .loading-inner{border-radius:24px;border-color:#46525a;padding:35px}
+#uip-depth [data-theme="neumorphic"] h1{font-weight:500;letter-spacing:-.055em}
+#uip-depth [data-theme="neumorphic"] .panel-rule{height:5px;border-radius:4px;background:#20272b;box-shadow:inset 1px 2px 3px #141a1e,0 1px 0 #52606970}
+#uip-depth [data-theme="neumorphic"] .panel-rule:before{display:none}
+#uip-depth [data-theme="neumorphic"] .menu-actions{gap:17px}
+#uip-depth [data-theme="neumorphic"] .game-button.primary{border-left-width:1px;padding-left:17px}
+#uip-depth [data-theme="neumorphic"] .setting-group{background:#242b30;border-radius:12px;padding:17px 18px;box-shadow:inset 2px 3px 6px #161d23,inset -1px -1px 2px #64727c30}
+#uip-depth [data-theme="neumorphic"] .setting-row:last-child{border:0;padding-bottom:0}
+
+/* Soft Club Night: graphite glass, lilac selection and silver edges. */
+#uip-depth [data-theme="night"]{--ground:#171b25;--surface:#262c3b;--well:#191f2d;--ink:#eef0fb;--muted:#bac2db;--edge:#68738c;--accent:#cbc6f0;--heading:'Michroma',sans-serif;--radius:3px 16px 3px 16px;--frame-fill:linear-gradient(125deg,#303747,#202635);--frame-shadow:inset 0 0 0 4px #141b28,0 8px 20px #080c1640;--button-fill:linear-gradient(#394355,#2a3243 48%,#222b3b 51%,#303b4b);--button-hover:#46516b;--button-selected:linear-gradient(#655f87,#4b4b71);--button-down:#181f30;--control-shadow:inset 0 1px 0 #c3d6ee35;--down-shadow:inset 0 2px 5px #080c19}
+#uip-depth [data-theme="night"] .menu-panel,#uip-depth [data-theme="night"] .loading-inner{border-radius:3px 26px 3px 3px;border-top-color:#c8d5ec}
+#uip-depth [data-theme="night"] h1{font-size:39px;letter-spacing:-.07em}
+#uip-depth [data-theme="night"] .eyebrow{text-transform:lowercase;font-style:italic;color:#c5c6e0}
+#uip-depth [data-theme="night"] .panel-rule{height:3px;background:linear-gradient(90deg,#626c91,#bbc5d8,#545e7c);border-bottom:1px solid #111827}
+#uip-depth [data-theme="night"] .panel-rule:before{display:none}
+#uip-depth [data-theme="night"] .game-button{text-transform:lowercase}
+#uip-depth [data-theme="night"] .setting-row select{border-top-color:#929cb5}
+
+/* Ink: uncoated ivory, charcoal ink, rules and a solid selection. */
+#uip-depth [data-theme="ink"]{--ground:#d6d2c7;--surface:#eee9dd;--well:#e0d9c9;--ink:#282923;--muted:#55574c;--edge:#838676;--accent:#31392f;--heading:'Crimson Pro',serif;--radius:0px;--button-fill:#eee9dd;--button-hover:#d5d6c5;--button-selected:#31392f;--selected-ink:#f4f0e4;--button-down:#c4c9b5;--down-shadow:inset 3px 0 0 #31392f;--frame-shadow:5px 6px 0 #b0b0a35c;color-scheme:light}
+#uip-depth [data-theme="ink"] .menu-panel,#uip-depth [data-theme="ink"] .loading-inner{border:0;border-top:4px solid #30392f;border-bottom:1px solid #7b806f;box-shadow:var(--frame-shadow)}
+#uip-depth [data-theme="ink"] h1{font-size:60px;letter-spacing:-.045em}
+#uip-depth [data-theme="ink"] .eyebrow{font-family:'Crimson Pro',serif;font-size:17px;font-style:italic}
+#uip-depth [data-theme="ink"] .panel-rule{background:#9a9e8d;height:1px}
+#uip-depth [data-theme="ink"] .panel-rule:before{height:3px;top:-1px;background:#343d31;width:42px}
+#uip-depth [data-theme="ink"] .game-button{border-width:0 0 1px;border-color:#909481;padding-left:12px}
+#uip-depth [data-theme="ink"] .game-button.primary{border:1px solid #31392f;padding-left:12px}
+#uip-depth [data-theme="ink"] .game-button.quiet{border-color:transparent}
+#uip-depth [data-theme="ink"] .game-button.is-focus,#uip-depth [data-theme="ink"] .game-button:focus-visible{outline-offset:3px}
+#uip-depth [data-theme="ink"] .setting-group h2{font-family:'Crimson Pro',serif;font-size:19px;color:#2e382d}
+#uip-depth [data-theme="ink"] .setting-row select{box-shadow:none;border-width:0 0 1px;background:#e3ddcf}
+
+/* Fantasy RPG: layered gold frames, burgundy insets and serif labels. */
+#uip-depth [data-theme="fantasy"]{--ground:#1b1919;--surface:#29231f;--well:#19181a;--ink:#f4e6cb;--muted:#cdbc9c;--edge:#9b7c47;--accent:#e3c382;--heading:'Crimson Pro',serif;--radius:2px;--frame-fill:linear-gradient(135deg,#362c24,#211d1c);--frame-shadow:inset 0 0 0 5px #141315,0 7px 0 #101012;--button-fill:linear-gradient(#433326,#29221c);--button-hover:linear-gradient(#624732,#3e2e23);--button-selected:linear-gradient(#733b34,#4e2724);--button-down:#211717;--control-shadow:inset 0 0 0 3px #171519,inset 0 4px 0 #cfb27825;--down-shadow:inset 0 3px 7px #080808}
+#uip-depth [data-theme="fantasy"] .menu-panel,#uip-depth [data-theme="fantasy"] .loading-inner{border:3px double #c4a261;outline:1px solid #78613c;outline-offset:4px;padding:35px}
+#uip-depth [data-theme="fantasy"] .menu-panel:before{display:block;content:'';width:20px;height:20px;left:calc(50% - 10px);right:auto;top:-12px;background:#3e2b20;border:3px double #e4c68d;transform:rotate(45deg);box-shadow:0 0 0 3px #1b1919}
+#uip-depth [data-theme="fantasy"] .menu-panel:after,#uip-depth [data-theme="fantasy"] .loading-inner:after{content:'';position:absolute;inset:10px;pointer-events:none;background:linear-gradient(#aa8c54,#aa8c54) left top/22px 1px no-repeat,linear-gradient(#aa8c54,#aa8c54) left top/1px 22px no-repeat,linear-gradient(#aa8c54,#aa8c54) right top/22px 1px no-repeat,linear-gradient(#aa8c54,#aa8c54) right top/1px 22px no-repeat,linear-gradient(#aa8c54,#aa8c54) left bottom/22px 1px no-repeat,linear-gradient(#aa8c54,#aa8c54) left bottom/1px 22px no-repeat,linear-gradient(#aa8c54,#aa8c54) right bottom/22px 1px no-repeat,linear-gradient(#aa8c54,#aa8c54) right bottom/1px 22px no-repeat}
+#uip-depth [data-theme="fantasy"] h1{font-size:58px;text-align:center;font-variant:small-caps;letter-spacing:.015em}
+#uip-depth [data-theme="fantasy"] .eyebrow{text-align:center;font-family:'Crimson Pro',serif;font-size:16px}
+#uip-depth [data-theme="fantasy"] .panel-rule{background:linear-gradient(90deg,transparent,#b99b60,transparent)}
+#uip-depth [data-theme="fantasy"] .panel-rule:before{left:calc(50% - 4px);top:-3px;width:7px;height:7px;border:1px solid #d8b572;background:#31241c;transform:rotate(45deg)}
+#uip-depth [data-theme="fantasy"] .game-button{font:500 21px/1.1 'Crimson Pro',serif;justify-content:center;border:1px solid #a88b51;border-radius:3px 11px 3px 11px}
+#uip-depth [data-theme="fantasy"] .game-button.primary{border-left-width:1px;padding-left:17px}
+#uip-depth [data-theme="fantasy"] .game-button:after{position:absolute;right:14px;width:6px;height:6px;border:1px solid currentColor}
+#uip-depth [data-theme="fantasy"] .setting-group h2{font-family:'Crimson Pro',serif;font-size:20px;color:#e2c88d}
+#uip-depth [data-theme="fantasy"] .setting-row select{border:3px double #997a47;background:#1b1818}
+
+/* JRPG: silver window bevels and blue command selection. */
+#uip-depth [data-theme="jrpg"]{--ground:#141d32;--surface:#223857;--well:#142440;--ink:#f3f2e9;--muted:#c1d1e7;--edge:#9cacc0;--accent:#d2e7ff;--heading:'Crimson Pro',serif;--radius:5px;--frame-fill:linear-gradient(#314c73,#192d4d 70%,#15243d);--frame-shadow:inset 0 0 0 2px #091429,3px 4px 0 #080f20;--button-fill:#233b61;--button-hover:#3c608d;--button-selected:linear-gradient(90deg,#446d9a,#2e517f);--button-down:#142846;--control-shadow:inset 0 1px 0 #abc6e733;--down-shadow:inset 2px 3px 0 #09172c}
+#uip-depth [data-theme="jrpg"] .menu-panel,#uip-depth [data-theme="jrpg"] .loading-inner{border:4px ridge #b5c2d0;border-radius:6px}
+#uip-depth [data-theme="jrpg"] h1{font-size:57px;text-shadow:2px 2px 0 #081426;letter-spacing:-.02em}
+#uip-depth [data-theme="jrpg"] .panel-rule{background:#142844;border-top:1px solid #8b9ebc;height:3px}
+#uip-depth [data-theme="jrpg"] .panel-rule:before{display:none}
+#uip-depth [data-theme="jrpg"] .menu-actions{gap:5px;padding:8px;background:#12213a;border:1px solid #879bb1;border-radius:3px;box-shadow:inset 0 0 0 2px #09182d}
+#uip-depth [data-theme="jrpg"] .game-button{padding-left:30px;border:1px solid #7795b455;border-radius:2px;font-size:18px;text-shadow:1px 1px #071329}
+#uip-depth [data-theme="jrpg"] .game-button.primary{padding-left:30px;border:1px solid #c5def5}
+#uip-depth [data-theme="jrpg"] .game-button:after{display:none}
+#uip-depth [data-theme="jrpg"] .game-button.primary:before,#uip-depth [data-theme="jrpg"] .game-button.is-hover:before,#uip-depth [data-theme="jrpg"] .game-button:hover:before{content:'';position:absolute;left:12px;top:calc(50% - 4px);width:8px;height:8px;background:#eef9ff;transform:rotate(45deg);box-shadow:1px 1px #091529}
+#uip-depth [data-theme="jrpg"] .setting-group{border:1px solid #839cb6;border-radius:3px;background:#152b49;padding:16px}
+#uip-depth [data-theme="jrpg"] .setting-group h2{color:#e0edff;font-size:14px}
+#uip-depth [data-theme="jrpg"] .setting-row:last-child{border:0;padding-bottom:0}
+
+/* Pixel Retro: discrete geometry, stepped bevels and a block cursor. */
+#uip-depth [data-theme="pixel"]{--ground:#171526;--surface:#2c2942;--well:#1b182d;--ink:#f6efd9;--muted:#c3bcda;--edge:#8d84ac;--accent:#e2c781;--heading:'Silkscreen',monospace;--body:'Silkscreen',monospace;--radius:0px;--frame-shadow:0 0 0 4px #0c0b15,6px 6px 0 4px #0c0b15;--button-fill:#38344f;--button-hover:#4b4566;--button-selected:#e2c781;--selected-ink:#272033;--button-down:#242035;--control-shadow:inset 2px 2px 0 #6c6386,inset -2px -2px 0 #151320;--down-shadow:inset 2px 2px 0 #0b0a14}
+#uip-depth [data-theme="pixel"] .menu-panel,#uip-depth [data-theme="pixel"] .loading-inner{border:4px ridge #9c92b8;padding:29px}
+#uip-depth [data-theme="pixel"] h1{font-size:33px;line-height:1.4;letter-spacing:-.07em;text-shadow:3px 3px #0e0c1c}
+#uip-depth [data-theme="pixel"] .eyebrow{font-size:11px;letter-spacing:0}
+#uip-depth [data-theme="pixel"] .panel-rule{height:4px;background:#151224;box-shadow:0 2px #6c6384}
+#uip-depth [data-theme="pixel"] .panel-rule:before{background:#bcb1d3;width:24px;height:4px}
+#uip-depth [data-theme="pixel"] .game-button{font-size:13px;border-width:2px;transition:none;padding:12px 14px}
+#uip-depth [data-theme="pixel"] .game-button.primary{border:2px solid #f5e6b3;padding-left:14px;box-shadow:inset 2px 2px 0 #fff0bb,inset -2px -2px 0 #9c8052}
+#uip-depth [data-theme="pixel"] .game-button:after{width:6px;height:6px;border:0;background:currentColor;transform:none}
+#uip-depth [data-theme="pixel"] .setting-row{font-size:12px}
+#uip-depth [data-theme="pixel"] .setting-group h2{font-size:11px}
+#uip-depth [data-theme="pixel"] .setting-row select{border:2px solid #8d84ac;font-size:12px}
+#uip-depth [data-theme="pixel"] progress{height:8px}
+#uip-depth [data-theme="pixel"] .settings-panel h1,#uip-depth [data-theme="pixel"] .states-panel h1,#uip-depth [data-theme="pixel"] .loading-inner h1{font-size:27px;line-height:1.4}
+
+/* Sci-Fi: observatory instrument panels and precise segmented controls. */
+#uip-depth [data-theme="scifi"]{--ground:#0d1721;--surface:#152736;--well:#091925;--ink:#e7f1f7;--muted:#a8c1d2;--edge:#568097;--accent:#9adce9;--heading:'Tektur',sans-serif;--radius:2px 14px 2px 2px;--button-fill:#112333;--button-hover:#28495e;--button-selected:#254f64;--button-down:#0a1a2a;--control-shadow:inset 0 1px 0 #a0d3e31a;--down-shadow:inset 3px 0 0 #4d819c;--frame-shadow:inset 0 0 0 5px #0c1c29}
+#uip-depth [data-theme="scifi"] .menu-panel,#uip-depth [data-theme="scifi"] .loading-inner{border-top:3px solid #9ccedf;border-bottom:3px solid #43697d;border-radius:2px 24px 2px 2px;padding:34px}
+#uip-depth [data-theme="scifi"] .menu-panel:before{display:block;left:10px;right:10px;top:9px;height:2px;background:repeating-linear-gradient(90deg,#6a8b9c 0 1px,transparent 1px 9px)}
+#uip-depth [data-theme="scifi"] h1{font-size:48px;letter-spacing:.005em}
+#uip-depth [data-theme="scifi"] .eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+#uip-depth [data-theme="scifi"] .panel-rule{background:#537488;height:1px}
+#uip-depth [data-theme="scifi"] .panel-rule:before{height:5px;width:39px;top:-2px;border:1px solid #9adce9;background:#284d62}
+#uip-depth [data-theme="scifi"] .game-button{padding-left:21px;border-left:4px solid #527c91;font-size:15px;letter-spacing:.04em}
+#uip-depth [data-theme="scifi"] .game-button.primary{padding-left:21px;border-left:4px solid #a9eaf2}
+#uip-depth [data-theme="scifi"] .game-button:before{content:'';position:absolute;left:8px;top:12px;bottom:12px;width:1px;background:#78a0b64d}
+#uip-depth [data-theme="scifi"] .setting-group h2{color:#b0d2e5;font-family:'Tektur',sans-serif;font-size:14px;letter-spacing:.04em}
+#uip-depth [data-theme="scifi"] .range-control output{font-family:'DM Mono',monospace;color:#afe2e9}
+#uip-depth [data-theme="scifi"] .setting-row select{border-left:3px solid #6396ad}
+
+/* Survival Horror: worn charcoal, hairline edges and faded red selection. */
+#uip-depth [data-theme="horror"]{--ground:#171817;--surface:#262723;--well:#191b19;--ink:#e9e7dd;--muted:#bdbdaf;--edge:#72766a;--accent:#d6aba0;--heading:'Italiana',serif;--radius:0px;--button-fill:#242622;--button-hover:#3c3b32;--button-selected:#553c36;--button-down:#171915;--control-shadow:none;--down-shadow:inset 3px 0 #99877b;--frame-shadow:inset 0 0 0 4px #151814,4px 7px 0 #10130f}
+#uip-depth [data-theme="horror"] .menu-panel,#uip-depth [data-theme="horror"] .loading-inner{border:1px solid #777d6d;border-left:3px double #bcc0aa;background:#262723}
+#uip-depth [data-theme="horror"] .menu-panel:before{display:block;left:8px;right:8px;top:7px;height:1px;background:linear-gradient(90deg,#c9cdb770 0 17%,transparent 17% 19%,#c9cdb740 19% 55%,transparent 55% 57%,#c9cdb760 57% 100%)}
+#uip-depth [data-theme="horror"] h1{font-size:61px;letter-spacing:-.035em}
+#uip-depth [data-theme="horror"] .eyebrow{font-family:'Crimson Pro',serif;font-style:italic;font-size:17px}
+#uip-depth [data-theme="horror"] .panel-rule{background:#737868;height:1px}
+#uip-depth [data-theme="horror"] .panel-rule:before{background:#bcb5a2;width:19px;height:1px}
+#uip-depth [data-theme="horror"] .game-button{border-width:0 0 1px;padding-left:13px;letter-spacing:.025em}
+#uip-depth [data-theme="horror"] .game-button.primary{border:1px solid #b28d80;border-left:3px solid #d0aaa0;padding-left:13px}
+#uip-depth [data-theme="horror"] .game-button.quiet{border-bottom-color:#596050}
+#uip-depth [data-theme="horror"] .setting-group h2{font:19px 'Crimson Pro',serif;color:#dad9c9}
+#uip-depth [data-theme="horror"] .setting-row select{border-width:0 0 1px;box-shadow:none}
+
+@media(max-width:600px){#uip-depth [data-revised="true"] .menu-panel,#uip-depth [data-revised="true"] .loading-inner{padding:27px 22px}#uip-depth [data-revised="true"] h1{font-size:40px}#uip-depth [data-revised="true"] .states-panel h1{font-size:29px}#uip-depth [data-revised="true"] .state-sample .game-button{font-size:13px;padding:11px 12px}#uip-depth [data-theme="night"] h1{font-size:31px}#uip-depth [data-theme="jrpg"] .state-sample .game-button{padding-left:24px}#uip-depth [data-theme="jrpg"] .game-button.primary:before{left:8px;width:6px;height:6px}#uip-depth [data-theme="fantasy"] .state-sample .game-button{font-size:18px}#uip-depth [data-theme="fantasy"] .game-button:after{right:8px;width:4px;height:4px}#uip-depth [data-theme="pixel"] h1{font-size:27px}#uip-depth [data-theme="pixel"] .settings-panel h1,#uip-depth [data-theme="pixel"] .states-panel h1,#uip-depth [data-theme="pixel"] .loading-inner h1{font-size:23px}#uip-depth [data-theme="pixel"] .state-sample .game-button{font-size:11px;padding:11px 8px}#uip-depth [data-theme="neumorphic"] .setting-group,#uip-depth [data-theme="jrpg"] .setting-group{padding:14px 12px}}
+#uip-depth .settings-panel h1,#uip-depth .states-panel h1{font-size:34px;line-height:1.25}
+#uip-depth .loading-panel h1{font-size:35px;line-height:1.25}
+#uip-depth [data-backdrop="bright"] .scene{background:#abb4b7}
+@media(max-width:700px){#uip-depth .study-brand span{display:none}#uip-depth .study-bar{padding:15px 18px}#uip-depth .game-content{padding:32px 5% 27px}#uip-depth .menu-panel{padding:26px 25px}#uip-depth .state-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#uip-depth .setting-row{grid-template-columns:1fr 180px;gap:15px}#uip-depth .study-caption{padding:12px 18px;flex-wrap:wrap}}
+@media(max-width:430px){#uip-depth .study-bar{align-items:flex-start;flex-wrap:wrap;gap:13px}#uip-depth .theme-picker{width:100%;justify-content:space-between}#uip-depth .theme-picker select{flex:1}#uip-depth .study-nav{padding:0 7px;gap:0}#uip-depth .study-nav button{padding:12px 10px;font-size:11px;min-height:44px}#uip-depth .menu-panel{padding:24px 20px}#uip-depth .game-stage{min-height:580px}#uip-depth .game-content{min-height:535px}#uip-depth h1{font-size:40px}#uip-depth .setting-row{grid-template-columns:1fr;gap:7px;padding:13px 0}#uip-depth .check-row{justify-content:flex-start}#uip-depth .state-grid{gap:24px 14px}#uip-depth .state-sample .game-button{padding:11px 10px;font-size:11px}#uip-depth .game-footer{font-size:9px;letter-spacing:.1em;flex-wrap:wrap;gap:8px}#uip-depth .loading-inner{padding:25px 20px}#uip-depth [data-theme="pixel"] h1{font-size:35px}#uip-depth [data-theme="pixel"] .settings-panel h1,#uip-depth [data-theme="pixel"] .states-panel h1{font-size:25px}}
+@media(prefers-reduced-motion:reduce){#uip-depth *{transition:none!important}}
+
+/* Military: instrument framing applied to real menu controls. */
+#uip-depth [data-theme="military"]{--ground:#080d0f;--surface:#11191c;--well:#080f12;--ink:#e9f1ef;--muted:#a8babd;--edge:#4c6368;--accent:#85d5c0;--heading:'Big Shoulders Display',sans-serif;--radius:0px;--lift:none}
+#uip-depth [data-theme="military"] .scene{background:var(--ground)}
+#uip-depth [data-theme="military"] .scene:after,#uip-depth [data-theme="military"] .reflection,#uip-depth [data-theme="military"] .horizon{display:none}
+#uip-depth [data-theme="military"] .game-content{justify-content:center}
+#uip-depth [data-theme="military"] .menu-panel,#uip-depth [data-theme="military"] .loading-inner{background:var(--surface);border:1px solid #3e5359;border-top:2px solid #bfcecc;border-radius:0;box-shadow:inset 5px 0 0 #091013,inset -5px 0 0 #091013;padding:30px;position:relative}
+#uip-depth [data-theme="military"] .menu-panel:not(.settings-panel):not(.states-panel){width:470px}
+#uip-depth [data-theme="military"] .menu-panel:before{left:15px;right:15px;top:7px;height:2px;background:repeating-linear-gradient(90deg,#8ba9ad 0 22px,transparent 22px 26px);opacity:.5}
+#uip-depth [data-theme="military"] .menu-panel:after,#uip-depth [data-theme="military"] .loading-inner:after{content:'';position:absolute;pointer-events:none;inset:-5px;background:linear-gradient(#d3e2df,#d3e2df) left top/17px 2px no-repeat,linear-gradient(#d3e2df,#d3e2df) left top/2px 17px no-repeat,linear-gradient(#d3e2df,#d3e2df) right top/17px 2px no-repeat,linear-gradient(#d3e2df,#d3e2df) right top/2px 17px no-repeat,linear-gradient(#80bfc2,#80bfc2) left bottom/17px 2px no-repeat,linear-gradient(#80bfc2,#80bfc2) left bottom/2px 17px no-repeat,linear-gradient(#80bfc2,#80bfc2) right bottom/17px 2px no-repeat,linear-gradient(#80bfc2,#80bfc2) right bottom/2px 17px no-repeat}
+#uip-depth [data-theme="military"] h1{font:500 66px/.98 'Big Shoulders Display',sans-serif;text-transform:uppercase;letter-spacing:.02em;margin-bottom:25px}
+#uip-depth [data-theme="military"] h1 span{display:inline}
+#uip-depth [data-theme="military"] h1 span+span:before{content:' '}
+#uip-depth [data-theme="military"] .eyebrow{font:11px/1.4 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.14em;margin:4px 0 18px;color:#8db4b9}
+#uip-depth [data-theme="military"] .panel-rule{background:#3c555b;height:1px;margin-bottom:28px}
+#uip-depth [data-theme="military"] .panel-rule:before{width:54px;height:3px;top:-1px;background:#d7e4df}
+#uip-depth [data-theme="military"] .menu-actions{gap:10px}
+#uip-depth [data-theme="military"] .game-button{min-height:49px;background:#0b1316;border:1px solid #4a666d;border-left:3px solid #577c81;box-shadow:none;border-radius:0;color:#e5eeeb;font:500 15px/1.35 'Work Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:12px 18px}
+#uip-depth [data-theme="military"] .game-button:before{content:'';position:absolute;right:5px;bottom:4px;width:7px;height:1px;background:#73969c;pointer-events:none}
+#uip-depth [data-theme="military"] .game-button.primary{background:#183d38;border-color:#5bab96;border-left:3px solid #a0f1cd;color:#d5ffe9;padding-left:18px;box-shadow:inset 0 1px 0 #71c6b52a}
+#uip-depth [data-theme="military"] .game-button.primary:after{opacity:1;color:#a0f1cd}
+#uip-depth [data-theme="military"] .game-button:hover,#uip-depth [data-theme="military"] .game-button.is-hover{background:#1b3037;border-color:#98dce7;color:#f0ffff}
+#uip-depth [data-theme="military"] .game-button:focus-visible,#uip-depth [data-theme="military"] .game-button.is-focus{outline:2px solid #adeef2;outline-offset:3px}
+#uip-depth [data-theme="military"] .game-button:active,#uip-depth [data-theme="military"] .game-button.is-pressed{background:#050b0d;border-color:#80c0c8;box-shadow:inset 0 0 0 2px #293f44;color:#afccd0}
+#uip-depth [data-theme="military"] .game-button:disabled{background:#0b1113;border:1px dashed #42545a;color:#839398;opacity:.65;box-shadow:none}
+#uip-depth [data-theme="military"] .game-button.quiet{background:transparent;border-color:#42565c;color:#b2c7cc}
+#uip-depth [data-theme="military"] .setting-group h2{font:12px 'DM Mono',monospace;color:#93d6db;letter-spacing:.08em;padding-bottom:7px;border-bottom:1px solid #496369}
+#uip-depth [data-theme="military"] .range-control output{font:13px 'DM Mono',monospace;color:#a0dfce}
+#uip-depth [data-theme="military"] input[type="range"],#uip-depth [data-theme="military"] input[type="checkbox"]{accent-color:#85d5c0}
+#uip-depth [data-theme="military"] .setting-row select{background:#081013;border:1px solid #577a83;border-radius:0;box-shadow:none;color:#dfeeee}
+#uip-depth [data-theme="military"] .settings-panel h1,#uip-depth [data-theme="military"] .states-panel h1,#uip-depth [data-theme="military"] .loading-inner h1{font-size:38px}
+#uip-depth [data-theme="military"] .game-footer{background:transparent;font-family:'DM Mono',monospace;color:#9db8bd}
+#uip-depth [data-theme="military"][data-backdrop="bright"] .scene{background:#e6eceb}
+#uip-depth [data-theme="military"][data-backdrop="bright"] .game-footer{color:#354d51}
+@media(max-width:600px){#uip-depth [data-theme="military"] .menu-panel,#uip-depth [data-theme="military"] .loading-inner{padding:25px 21px}#uip-depth [data-theme="military"] h1{font-size:49px}#uip-depth [data-theme="military"] .state-sample .game-button{font-size:12px;padding:11px 10px}}
+/* Identity refinements: each family has its own frame and selection grammar. */
+#uip-depth [data-theme="soft"] .menu-panel,#uip-depth [data-theme="soft"] .loading-inner{border-radius:3px 34px 3px 3px;box-shadow:inset 0 0 0 4px #f5fafb,inset 0 7px 0 #c5d8e6,0 10px 24px #324b641c}
+#uip-depth [data-theme="soft"] .game-button{border-radius:22px 4px 22px 4px;letter-spacing:.045em;padding-inline:20px}
+#uip-depth [data-theme="soft"] .game-button.primary{padding-left:20px}
+#uip-depth [data-theme="soft"] .game-button:after{width:12px;height:3px;flex-shrink:0;border:0;border-radius:4px;background:currentColor;transform:none}
+#uip-depth [data-theme="soft"] .setting-group h2{font-style:italic;letter-spacing:.08em;border-bottom:1px solid #a0bcc6;padding-bottom:8px}
+#uip-depth [data-theme="soft"] progress{height:6px;border-radius:6px;overflow:hidden}
+
+#uip-depth [data-theme="night"] .menu-panel,#uip-depth [data-theme="night"] .loading-inner{border-radius:28px 3px 28px 3px;box-shadow:inset 0 0 0 4px #141b28,inset 0 5px 0 #9eabc745,0 8px 20px #080c1640}
+#uip-depth [data-theme="night"] .game-button{border-radius:24px;justify-content:center;letter-spacing:.06em;padding-inline:25px}
+#uip-depth [data-theme="night"] .game-button.primary{border-left-width:1px;padding-left:25px}
+#uip-depth [data-theme="night"] .game-button:after{position:absolute;right:12px;width:6px;height:6px;border:1px solid currentColor;border-radius:50%;transform:none;flex-shrink:0}
+#uip-depth [data-theme="night"] .setting-group h2{font-style:italic;letter-spacing:.07em;padding:0 0 8px;border-bottom:1px solid #758199}
+#uip-depth [data-theme="night"] .setting-row select{border-radius:15px 3px 15px 3px}
+
+#uip-depth [data-theme="neumorphic"] .game-button{border-radius:15px;border-color:#485760}
+#uip-depth [data-theme="neumorphic"] .game-button:after{width:6px;height:6px;border:0;border-radius:50%;background:currentColor;transform:none;box-shadow:0 0 0 4px #16232d;flex-shrink:0}
+#uip-depth [data-theme="neumorphic"] .menu-panel{border-radius:30px;box-shadow:12px 12px 28px #161b1f,-8px -8px 23px #394249,inset 0 1px 0 #7b89932b}
+#uip-depth [data-theme="neumorphic"] .eyebrow{letter-spacing:.08em;font-size:11px}
+
+#uip-depth [data-theme="ink"] .menu-panel,#uip-depth [data-theme="ink"] .loading-inner{border-top:1px solid #8d907f;border-left:5px solid #343d31;border-bottom:1px solid #7b806f;box-shadow:3px 0 0 #f6f2e7,4px 0 0 #8b8c7b,7px 0 0 #e3dfd3,8px 0 0 #aaa99b,8px 6px 0 #b0b0a35c}
+#uip-depth [data-theme="ink"] .menu-panel:before{display:block;left:11px;top:0;bottom:0;right:auto;width:1px;height:auto;background:#a5a89370}
+#uip-depth [data-theme="ink"] .menu-actions{gap:2px}
+#uip-depth [data-theme="ink"] .game-button{font-family:'Crimson Pro',serif;font-size:23px;min-height:50px;box-shadow:none}
+#uip-depth [data-theme="ink"] .game-button:after{width:5px;height:5px;border:0;background:currentColor;transform:none;flex-shrink:0}
+#uip-depth [data-theme="ink"] .game-button.primary{box-shadow:inset 0 0 0 3px #31392f,inset 0 0 0 4px #eee9dd65}
+#uip-depth [data-theme="ink"] .setting-group h2{font-style:italic;border-bottom:1px solid #949782;padding-bottom:7px}
+
+#uip-depth [data-theme="fantasy"] .menu-panel,#uip-depth [data-theme="fantasy"] .loading-inner{border-radius:20px 3px 20px 3px;box-shadow:inset 0 0 0 5px #141315,inset 0 0 0 6px #79603b,0 7px 0 #101012}
+#uip-depth [data-theme="fantasy"] .menu-panel:before{width:26px;height:26px;left:calc(50% - 13px);top:-15px;border-radius:4px;box-shadow:0 0 0 3px #1b1919,inset 0 0 0 3px #39291e,inset 0 0 0 4px #b89a5d}
+#uip-depth [data-theme="fantasy"] .game-button{border-radius:16px 3px 16px 3px;padding-inline:30px;box-shadow:inset 0 0 0 3px #171519,inset 0 0 0 4px #a88b513d,0 3px 0 #141113}
+#uip-depth [data-theme="fantasy"] .game-button.primary{padding-left:30px}
+#uip-depth [data-theme="fantasy"] .game-button:before,#uip-depth [data-theme="fantasy"] .game-button:after{content:'';position:absolute;top:calc(50% - 3px);width:6px;height:6px;border:1px solid #b89758;transform:rotate(45deg);opacity:1;pointer-events:none}
+#uip-depth [data-theme="fantasy"] .game-button:before{left:11px}
+#uip-depth [data-theme="fantasy"] .game-button:after{right:11px}
+#uip-depth [data-theme="fantasy"] .game-button.primary:before,#uip-depth [data-theme="fantasy"] .game-button.primary:after{background:#e1bc76;border-color:#e1bc76}
+#uip-depth [data-theme="fantasy"] .game-button:active,#uip-depth [data-theme="fantasy"] .game-button.is-pressed{box-shadow:inset 0 3px 7px #080808}
+#uip-depth [data-theme="fantasy"] .game-button:disabled{box-shadow:none}
+
+#uip-depth [data-theme="jrpg"] .menu-panel h1,#uip-depth [data-theme="jrpg"] .loading-inner h1{font-size:38px;background:#132641;border:1px solid #849ab3;border-top-color:#b5c7d5;border-radius:2px;padding:9px 14px;box-shadow:inset 0 0 0 2px #0d1b31;margin-bottom:18px;line-height:1.15}
+#uip-depth [data-theme="jrpg"] .panel-rule{display:none}
+#uip-depth [data-theme="jrpg"] .menu-actions{padding:7px;gap:0;border:3px ridge #9caec2;background:linear-gradient(#243e67,#172d50)}
+#uip-depth [data-theme="jrpg"] .game-button{background:transparent;border:1px solid transparent;box-shadow:none;border-radius:0;font-size:18px;min-height:48px}
+#uip-depth [data-theme="jrpg"] .game-button.primary{background:linear-gradient(90deg,#446d9a,#2e517f);border-color:#c5def5}
+#uip-depth [data-theme="jrpg"] .game-button.quiet{background:transparent;border-color:transparent}
+#uip-depth [data-theme="jrpg"] .game-button.is-focus{outline-offset:2px}
+#uip-depth [data-theme="jrpg"] .setting-group{border:3px ridge #839cb6;border-radius:3px;box-shadow:inset 0 0 0 2px #102039}
+
+#uip-depth [data-theme="pixel"] .menu-panel,#uip-depth [data-theme="pixel"] .loading-inner{border:3px solid #a097bd;box-shadow:inset 3px 3px 0 #534b6f,inset -3px -3px 0 #151224,0 0 0 3px #0c0b15,6px 6px 0 3px #0c0b15}
+#uip-depth [data-theme="pixel"] .menu-panel:before{content:'';display:block;position:absolute;left:6px;top:6px;right:auto;width:6px;height:6px;background:#cfc3e5;box-shadow:8px 0 #72658f,0 8px #72658f}
+#uip-depth [data-theme="pixel"] .game-button{border:2px solid #807495;border-bottom-width:4px;box-shadow:inset 2px 2px 0 #6c6386,inset -2px -2px 0 #151320;min-height:50px}
+#uip-depth [data-theme="pixel"] .game-button.primary{border:2px solid #f5e6b3;border-bottom:4px solid #9c8052}
+#uip-depth [data-theme="pixel"] .game-button:active,#uip-depth [data-theme="pixel"] .game-button.is-pressed{border-bottom-width:2px;border-top-width:4px;box-shadow:inset 2px 2px 0 #0b0a14}
+#uip-depth [data-theme="pixel"] progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,#e2c781 0 8px,#1b182d 8px 10px)}
+
+#uip-depth [data-theme="scifi"] .menu-panel,#uip-depth [data-theme="scifi"] .loading-inner{border-radius:3px 48px 3px 20px;border-right:3px double #6f9caf;border-top:2px solid #9ccedf;box-shadow:inset 0 0 0 5px #0c1c29,inset 0 -9px 0 #203c4c}
+#uip-depth [data-theme="scifi"] .menu-panel:before{left:14px;right:46px;top:10px;height:3px;background:repeating-linear-gradient(90deg,#6a8b9c 0 1px,transparent 1px 8px)}
+#uip-depth [data-theme="scifi"] .game-button{border-radius:3px 18px 3px 3px;border-left:1px solid #568097;padding-left:26px}
+#uip-depth [data-theme="scifi"] .game-button.primary{border-left:1px solid #9adce9;padding-left:26px}
+#uip-depth [data-theme="scifi"] .game-button:before{left:9px;top:13px;bottom:13px;width:4px;background:repeating-linear-gradient(0deg,#749caf 0 3px,transparent 3px 5px)}
+#uip-depth [data-theme="scifi"] .game-button.primary:before{background:repeating-linear-gradient(0deg,#b5eef7 0 3px,transparent 3px 5px)}
+#uip-depth [data-theme="scifi"] .setting-group h2{border-bottom:1px solid #4e7083;padding-bottom:9px}
+#uip-depth [data-theme="scifi"] .range-control output{padding:4px;background:#0c1b28;border-bottom:1px solid #668fa3;min-width:36px}
+
+#uip-depth [data-theme="military"] .game-button{border-width:1px 0 1px 3px;background:#0b1316}
+#uip-depth [data-theme="military"] .game-button.primary{border-width:1px 0 1px 3px}
+#uip-depth [data-theme="military"] .game-button:after{width:8px;height:9px;border:0;border-top:3px solid currentColor;border-bottom:3px solid currentColor;transform:none;flex-shrink:0}
+#uip-depth [data-theme="military"] .game-button:before{right:0;bottom:0;top:0;width:7px;height:auto;border-top:1px solid #73969c;border-bottom:1px solid #73969c;background:transparent}
+#uip-depth [data-theme="military"] .range-control output{padding:4px;min-width:36px;border-left:2px solid #577c81;background:#090f11}
+
+#uip-depth [data-theme="horror"] .menu-panel,#uip-depth [data-theme="horror"] .loading-inner{border-right-color:#3b4137;border-bottom-color:#464b40;border-left:3px double #bcc0aa;box-shadow:inset 0 0 0 4px #151814,5px 7px 0 #10130f}
+#uip-depth [data-theme="horror"] .menu-panel:after,#uip-depth [data-theme="horror"] .loading-inner:after{content:'';position:absolute;left:10px;right:10px;bottom:8px;height:1px;background:linear-gradient(90deg,#8d918080 0 31%,transparent 31% 34%,#8d91804d 34% 67%,transparent 67% 69%,#8d918070 69%);pointer-events:none}
+#uip-depth [data-theme="horror"] .menu-actions{gap:5px}
+#uip-depth [data-theme="horror"] .game-button{font:400 22px/1.15 'Crimson Pro',serif;letter-spacing:.025em;min-height:50px}
+#uip-depth [data-theme="horror"] .game-button.primary{border-left:4px double #d0aaa0;background:linear-gradient(90deg,#553c36,#352c27)}
+#uip-depth [data-theme="horror"] .game-button:after{width:12px;height:1px;border:0;background:currentColor;transform:none;flex-shrink:0}
+#uip-depth [data-theme="jrpg"] .game-button.primary:hover,#uip-depth [data-theme="horror"] .game-button.primary:hover{background:var(--button-hover);color:var(--ink)}
+#uip-depth [data-theme="jrpg"] .game-button.primary:active,#uip-depth [data-theme="horror"] .game-button.primary:active{background:var(--button-down);color:var(--ink);box-shadow:var(--down-shadow)}
+
+@media(max-width:600px){#uip-depth [data-theme="night"] .state-sample .game-button{padding-inline:14px 23px;font-size:12px}#uip-depth [data-theme="soft"] .state-sample .game-button{padding-inline:12px;font-size:12px;letter-spacing:0}#uip-depth [data-theme="soft"] .state-sample .game-button:after{width:8px}#uip-depth [data-theme="ink"] .state-sample .game-button,#uip-depth [data-theme="horror"] .state-sample .game-button{font-size:18px;padding-inline:10px}#uip-depth [data-theme="fantasy"] .state-sample .game-button{font-size:18px;padding-inline:21px}#uip-depth [data-theme="fantasy"] .state-sample .game-button:before{left:7px;width:4px;height:4px}#uip-depth [data-theme="fantasy"] .state-sample .game-button:after{right:7px;width:4px;height:4px}#uip-depth [data-theme="jrpg"] .menu-panel h1,#uip-depth [data-theme="jrpg"] .loading-inner h1{font-size:29px;padding:8px 10px}#uip-depth [data-theme="jrpg"] .state-sample .game-button{font-size:13px;padding-left:24px}#uip-depth [data-theme="scifi"] .state-sample .game-button{padding-inline:20px 10px;font-size:12px;letter-spacing:0}#uip-depth [data-theme="scifi"] .state-sample .game-button:before{left:7px;width:3px}}
+/* Loading-only visual language: original geometric motifs, not scene art. */
+#uip-depth .study-nav #uip-advance{margin-left:auto;color:#e1e7e5;border-left:1px solid #495157}
+#uip-depth .game-stage[data-screen="loading"] .loading-panel{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr auto;justify-content:stretch;gap:26px;min-height:525px;padding:0}
+#uip-depth .load-visual{display:flex;align-items:center;justify-content:center;min-height:300px;position:relative}
+#uip-depth .load-art{width:min(100%,320px);aspect-ratio:1;position:relative;color:var(--accent);isolation:isolate}
+#uip-depth .load-art i{display:block;position:absolute;box-sizing:border-box;pointer-events:none}
+#uip-depth .game-stage[data-screen="loading"] .loading-inner{width:100%;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:22px 34px;align-items:center;padding:23px 28px}
+#uip-depth .game-stage[data-screen="loading"] .loading-inner h1{margin:0;font-size:33px;line-height:1.15}
+#uip-depth .game-stage[data-screen="loading"] .loading-inner .eyebrow{margin:0 0 8px;font-size:12px}
+#uip-depth .game-stage[data-screen="loading"] .loading-tip{margin:13px 0 0;max-width:none;font-size:12px;line-height:1.5}
+#uip-depth .game-stage[data-screen="loading"] .progress-label{margin-bottom:10px}
+#uip-depth .game-stage[data-screen="loading"] .loading-inner progress{height:6px}
+
+/* Moulded concentric forms and an inset light channel. */
+#uip-depth [data-theme="neumorphic"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#252a2e;background-image:radial-gradient(#b8c9d114 1px,transparent 1px);background-size:19px 19px}
+#uip-depth [data-theme="neumorphic"] .load-art .a{inset:13%;border-radius:50%;background:#2d3338;box-shadow:15px 15px 26px #161b20,-10px -10px 25px #46515b70;border:1px solid #596975}
+#uip-depth [data-theme="neumorphic"] .load-art .b{inset:23%;border-radius:50%;background:#242b31;box-shadow:inset 7px 7px 13px #11191f,inset -5px -5px 9px #59667355}
+#uip-depth [data-theme="neumorphic"] .load-art .c{inset:33%;border-radius:50%;background:linear-gradient(135deg,#455660,#2a353e);border:1px solid #6b818f;box-shadow:6px 6px 10px #17212a}
+#uip-depth [data-theme="neumorphic"] .load-art .d{left:47%;top:47%;width:6%;height:6%;border-radius:50%;background:#c2dce4;box-shadow:0 0 0 6px #1c2a34}
+#uip-depth [data-theme="neumorphic"] .load-art .e{left:22%;right:22%;bottom:4%;height:4px;border-radius:3px;background:#141e25;box-shadow:inset 0 1px 2px #080f15,0 1px #6b7e8d40}
+
+/* Soft Club: off-axis reflective loops over translucent-looking bands. */
+#uip-depth [data-theme="soft"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#d1dade;background-image:linear-gradient(110deg,transparent 0 24%,#e9f2f080 24% 41%,transparent 41% 74%,#bfcbd859 74% 89%,transparent 89%)}
+#uip-depth [data-theme="soft"] .load-art .a{inset:21% 8%;border-radius:50%;border:14px solid #bacddc;border-top-color:#f5ffff;border-bottom-color:#607fa9;transform:rotate(-31deg);box-shadow:0 2px 1px #365e8b60,inset 0 2px 1px #ffffff}
+#uip-depth [data-theme="soft"] .load-art .b{inset:21% 8%;border-radius:50%;border:8px solid #b6d6d7;border-left-color:#eefef5;border-right-color:#708eaf;transform:rotate(31deg);opacity:.84}
+#uip-depth [data-theme="soft"] .load-art .c{left:39%;top:39%;width:22%;height:22%;border-radius:50%;background:radial-gradient(circle at 30% 24%,#f5ffff,#a8c7d9 39%,#4067a0 72%,#244580);box-shadow:2px 5px 10px #294e7525}
+#uip-depth [data-theme="soft"] .load-art .d{left:5%;right:5%;top:14%;height:1px;background:#ffffffa6}
+#uip-depth [data-theme="soft"] .load-art .e{left:5%;right:5%;bottom:14%;height:1px;background:#7898b36b}
+
+/* Night: nested elliptical apertures and a lilac lens. */
+#uip-depth [data-theme="night"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#171b25;background-image:repeating-linear-gradient(90deg,transparent 0 79px,#a6aec711 79px 80px)}
+#uip-depth [data-theme="night"] .load-art .a{inset:15% 7%;border:1px solid #9aaac7;border-radius:50%;transform:rotate(-24deg);box-shadow:inset 0 3px 0 #dbe0f01a}
+#uip-depth [data-theme="night"] .load-art .b{inset:24% 8%;border:8px solid #444d68;border-top-color:#a6b3ce;border-bottom-color:#151a2a;border-radius:50%;transform:rotate(-24deg)}
+#uip-depth [data-theme="night"] .load-art .c{inset:32% 12%;border-radius:50%;transform:rotate(-24deg);background:linear-gradient(#b3b4dc,#54547e 46%,#242d46 51%,#747f9a);box-shadow:inset 0 1px 0 #e0e0f7}
+#uip-depth [data-theme="night"] .load-art .d{left:16%;right:16%;top:50%;height:1px;background:#c2ccec77;transform:rotate(-24deg)}
+
+/* Ink: seal, ruled margin and paper registration. */
+#uip-depth [data-theme="ink"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#d6d2c7;background-image:repeating-linear-gradient(0deg,transparent 0 47px,#56604b0b 47px 48px)}
+#uip-depth [data-theme="ink"] .load-art .a{inset:16%;border:10px solid #343b2f;border-right-width:4px;border-bottom-width:7px;border-radius:47% 53% 48% 52%;transform:rotate(-15deg)}
+#uip-depth [data-theme="ink"] .load-art .b{inset:21%;border:1px solid #777c6a;border-radius:50%;transform:rotate(8deg)}
+#uip-depth [data-theme="ink"] .load-art .c{inset:35%;border:1px solid #656e57;transform:rotate(45deg)}
+#uip-depth [data-theme="ink"] .load-art .d{left:46%;top:46%;width:8%;height:8%;background:#343b2f}
+#uip-depth [data-theme="ink"] .load-art .e{left:5%;top:9%;bottom:9%;width:1px;background:#858a79}
+#uip-depth [data-theme="ink"] .load-art .f{left:5%;right:5%;bottom:9%;height:1px;background:#858a79}
+
+/* Fantasy: a neutral gilded crest, concentric seals and clasp points. */
+#uip-depth [data-theme="fantasy"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#1b1919;background-image:repeating-linear-gradient(45deg,transparent 0 57px,#ceb67f0b 57px 58px),repeating-linear-gradient(-45deg,transparent 0 57px,#ceb67f0b 57px 58px)}
+#uip-depth [data-theme="fantasy"] .load-art .a{inset:14%;border:3px double #a1844b;border-radius:50%}
+#uip-depth [data-theme="fantasy"] .load-art .b{inset:20%;border:1px solid #d0ad66;border-radius:50%}
+#uip-depth [data-theme="fantasy"] .load-art .c{inset:28%;border:3px double #d9b975;transform:rotate(45deg);background:#31251d;box-shadow:0 0 0 6px #1b1919,0 0 0 7px #9b7c47}
+#uip-depth [data-theme="fantasy"] .load-art .d{inset:39%;transform:rotate(45deg);border:1px solid #efcf88;background:linear-gradient(135deg,#c5a76a,#59432b 50%,#ad8b49);box-shadow:inset 0 0 0 4px #2e211a}
+#uip-depth [data-theme="fantasy"] .load-art .e{left:47%;top:9%;width:6%;height:6%;background:#d1ad64;transform:rotate(45deg)}
+#uip-depth [data-theme="fantasy"] .load-art .f{left:47%;bottom:9%;width:6%;height:6%;border:1px solid #d1ad64;transform:rotate(45deg)}
+
+/* JRPG: a faceted crystal over silver-blue concentric window marks. */
+#uip-depth [data-theme="jrpg"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#141d32;background-image:linear-gradient(135deg,#7394c114 25%,transparent 25% 75%,#7394c114 75%),linear-gradient(135deg,#7394c114 25%,transparent 25% 75%,#7394c114 75%);background-size:96px 96px;background-position:0 0,48px 48px}
+#uip-depth [data-theme="jrpg"] .load-art .a{inset:16%;border:1px solid #7292b680;transform:rotate(45deg)}
+#uip-depth [data-theme="jrpg"] .load-art .b{inset:24%;border:1px solid #b8cce055;transform:rotate(45deg)}
+#uip-depth [data-theme="jrpg"] .load-art .c{left:33%;right:33%;top:13%;bottom:13%;clip-path:polygon(50% 0,100% 45%,50% 100%,0 45%);background:linear-gradient(90deg,#3e648b 0 49%,#c5eafa 50% 63%,#749fc6 64%);filter:drop-shadow(0 6px 2px #040b1d)}
+#uip-depth [data-theme="jrpg"] .load-art .d{left:33%;right:33%;top:13%;height:34%;clip-path:polygon(50% 0,100% 100%,0 100%);background:linear-gradient(110deg,#a9d0e4 0 49%,#e5f9ff 50%)}
+#uip-depth [data-theme="jrpg"] .load-art .e{left:17%;top:58%;width:8%;height:8%;background:#afc7e8;transform:rotate(45deg)}
+#uip-depth [data-theme="jrpg"] .load-art .f{right:16%;top:28%;width:5%;height:5%;background:#d8eafa;transform:rotate(45deg)}
+
+/* Pixel: a stepped tile path, discrete blocks and a hard-edged central mark. */
+#uip-depth [data-theme="pixel"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#171526;background-image:linear-gradient(#8d84ac10 1px,transparent 1px),linear-gradient(90deg,#8d84ac10 1px,transparent 1px);background-size:24px 24px}
+#uip-depth [data-theme="pixel"] .load-art .a{inset:20%;border:8px solid #8d84ac;box-shadow:inset 4px 4px 0 #413751,4px 4px 0 #090716}
+#uip-depth [data-theme="pixel"] .load-art .b{inset:33%;background:#e2c781;clip-path:polygon(25% 0,75% 0,75% 25%,100% 25%,100% 75%,75% 75%,75% 100%,25% 100%,25% 75%,0 75%,0 25%,25% 25%)}
+#uip-depth [data-theme="pixel"] .load-art .c{inset:44%;background:#372e49}
+#uip-depth [data-theme="pixel"] .load-art .d{left:11%;top:11%;width:8%;height:8%;background:#c3b8d9;box-shadow:27px 0 #665576,0 27px #665576}
+#uip-depth [data-theme="pixel"] .load-art .e{right:11%;bottom:11%;width:8%;height:8%;background:#c3b8d9;box-shadow:-27px 0 #665576,0 -27px #665576}
+
+/* Sci-Fi: abstract orbital geometry, with no map or telemetry claims. */
+#uip-depth [data-theme="scifi"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#0d1721;background-image:radial-gradient(#91becb21 1px,transparent 1px);background-size:32px 32px}
+#uip-depth [data-theme="scifi"] .load-art .a{inset:12%;border:1px solid #64899f;border-radius:50%}
+#uip-depth [data-theme="scifi"] .load-art .b{inset:30% 8%;border:1px solid #a4dfeb;border-radius:50%;transform:rotate(-34deg)}
+#uip-depth [data-theme="scifi"] .load-art .c{inset:30% 8%;border:1px solid #709caf;border-radius:50%;transform:rotate(34deg)}
+#uip-depth [data-theme="scifi"] .load-art .d{inset:39%;border:3px double #b7e5ed;border-radius:50%;background:#203d51}
+#uip-depth [data-theme="scifi"] .load-art .e{left:18%;right:18%;top:50%;height:1px;background:#65859a55}
+#uip-depth [data-theme="scifi"] .load-art .f{left:71%;top:24%;width:4%;height:4%;border-radius:50%;background:#c0eef2;box-shadow:0 0 0 4px #142b38,0 0 0 5px #6f9ead}
+
+/* Military: alignment brackets, service stripes and stacked chevrons. */
+#uip-depth [data-theme="military"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#080d0f;background-image:repeating-linear-gradient(135deg,transparent 0 54px,#a0c6c10a 54px 55px)}
+#uip-depth [data-theme="military"] .load-art .a{inset:15%;background:linear-gradient(#bed8d1,#bed8d1) left top/28px 2px no-repeat,linear-gradient(#bed8d1,#bed8d1) left top/2px 28px no-repeat,linear-gradient(#bed8d1,#bed8d1) right top/28px 2px no-repeat,linear-gradient(#bed8d1,#bed8d1) right top/2px 28px no-repeat,linear-gradient(#bed8d1,#bed8d1) left bottom/28px 2px no-repeat,linear-gradient(#bed8d1,#bed8d1) left bottom/2px 28px no-repeat,linear-gradient(#bed8d1,#bed8d1) right bottom/28px 2px no-repeat,linear-gradient(#bed8d1,#bed8d1) right bottom/2px 28px no-repeat}
+#uip-depth [data-theme="military"] .load-art .b{left:28%;right:28%;top:28%;height:17%;clip-path:polygon(0 0,50% 45%,100% 0,100% 40%,50% 85%,0 40%);background:#adc6bf}
+#uip-depth [data-theme="military"] .load-art .c{left:28%;right:28%;top:44%;height:17%;clip-path:polygon(0 0,50% 45%,100% 0,100% 40%,50% 85%,0 40%);background:#78b4ad}
+#uip-depth [data-theme="military"] .load-art .d{left:28%;right:28%;top:60%;height:5%;background:repeating-linear-gradient(90deg,#5b837e 0 4px,transparent 4px 8px)}
+#uip-depth [data-theme="military"] .load-art .e{left:15%;right:15%;top:10%;height:3px;background:repeating-linear-gradient(90deg,#77928d 0 19px,transparent 19px 24px)}
+#uip-depth [data-theme="military"] .load-art .f{left:15%;right:15%;bottom:10%;height:3px;background:repeating-linear-gradient(90deg,#77928d 0 19px,transparent 19px 24px)}
+
+/* Horror: interrupted chalk seal and worn vertical registration. */
+#uip-depth [data-theme="horror"][data-screen="loading"][data-backdrop="reflections"] .scene{background-color:#171817;background-image:repeating-linear-gradient(90deg,transparent 0 91px,#c2c0a80b 91px 92px,transparent 92px 97px,#c2c0a805 97px 98px)}
+#uip-depth [data-theme="horror"] .load-art .a{inset:20%;border:1px solid #919380;border-right-color:transparent;border-bottom:3px double #787e6a;border-radius:48% 52% 46% 54%;transform:rotate(-19deg)}
+#uip-depth [data-theme="horror"] .load-art .b{inset:25%;border:1px solid #656e5d;border-top-color:transparent;border-radius:50%;transform:rotate(20deg)}
+#uip-depth [data-theme="horror"] .load-art .c{left:48%;width:3%;top:15%;bottom:18%;background:linear-gradient(#aaa993 0 39%,transparent 39% 42%,#878d76 42% 73%,transparent 73% 76%,#a29e89 76%);transform:rotate(13deg)}
+#uip-depth [data-theme="horror"] .load-art .d{left:18%;right:18%;top:58%;height:1px;background:#b09c8770;transform:rotate(-12deg)}
+#uip-depth [data-theme="horror"] .load-art .e{inset:8% 12%;border-left:1px solid #525b49;border-right:1px solid #525b49}
+
+@media(max-width:640px){#uip-depth .game-stage[data-screen="loading"] .loading-inner{grid-template-columns:1fr;gap:20px;padding:23px 22px}#uip-depth .game-stage[data-screen="loading"] .load-visual{min-height:230px}#uip-depth .game-stage[data-screen="loading"] .loading-panel{gap:18px;min-height:0}#uip-depth .game-stage[data-screen="loading"] .load-art{max-width:260px}#uip-depth .game-stage[data-screen="loading"] .loading-inner h1{font-size:29px}#uip-depth [data-theme="pixel"][data-screen="loading"] .loading-inner h1{font-size:24px}#uip-depth .study-nav #uip-advance{margin-left:0;border-left:0}}
+/* Loading motion: only ornaments move; layout, patterns and text remain still. */
+#uip-depth .motion-picker{display:flex;gap:8px;align-items:center;padding:7px 10px;font-size:12px;color:var(--studio-muted)}
+#uip-depth .motion-picker[hidden]{display:none}
+#uip-depth .motion-picker select{background:#202528;border:1px solid var(--studio-line);border-radius:3px;padding:7px;color:var(--studio-ink);min-height:34px}
+#uip-depth [data-theme="neumorphic"] .load-art .f{inset:19%;border:3px solid transparent;border-top-color:#c2dce4;border-right-color:#6c8c9c;border-radius:50%;transform:rotate(-35deg);}
+#uip-depth [data-theme="neumorphic"] .load-art .f:after{content:'';position:absolute;top:10%;right:10%;width:8px;height:8px;border-radius:50%;background:#e3f4fa;box-shadow:0 0 0 3px #25333e}
+#uip-depth [data-theme="scifi"] .load-art .f{inset:0;width:auto;height:auto;border-radius:0;background:none;box-shadow:none;}
+#uip-depth [data-theme="scifi"] .load-art .f:before{content:'';position:absolute;left:48%;top:12%;width:4%;height:4%;border-radius:50%;background:#c0eef2;box-shadow:0 0 0 4px #142b38,0 0 0 5px #6f9ead}
+#uip-depth .motion-picker{flex-wrap:wrap}
+#uip-depth #uip-motion-status{font-size:11px;color:#becdca}
+@media(pointer:coarse){#uip-depth .motion-picker select{min-height:44px;font-size:16px}}
+#uip-depth .load-canvas{display:block;width:100%;max-width:550px;height:360px}
+#uip-depth .game-stage[data-screen="loading"] .load-visual{min-height:360px}
+@media(max-width:640px){#uip-depth .load-canvas{height:285px}#uip-depth .game-stage[data-screen="loading"] .load-visual{min-height:285px}}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('uip-depth');
+const stage=root.querySelector('.game-stage'),content=root.querySelector('.game-content'),picker=root.querySelector('#uip-theme'),backdropPicker=root.querySelector('#uip-backdrop'),status=root.querySelector('#uip-status');
+const themes={
+neumorphic:{name:'Dark Neumorphism',title:['Main','menu'],material:'Graphite surfaces / raised controls and recessed settings'},
+soft:{name:'Soft Club',title:['soft','club'],material:'Gen X Soft Club / silver, mist blue, mint and cobalt controls'},
+night:{name:'Soft Club Night',title:['Main','menu'],material:'Smoked blue panels / silver edges and lilac selection'},
+ink:{name:'Ink',title:['Main','menu'],material:'Uncoated ivory / charcoal rules and solid ink selection'},
+fantasy:{name:'Fantasy RPG',title:['Main','menu'],material:'Layered gold frames / burgundy insets and serif controls'},
+jrpg:{name:'JRPG Window',title:['Main','menu'],material:'Classic blue windows / silver bevels and diamond selection'},
+pixel:{name:'Pixel Retro',title:['Main','menu'],material:'Stepped bevels / pixel type and a block cursor'},
+scifi:{name:'Sci-Fi HUD',title:['Main','menu'],material:'Observatory instruments / blue steel frames and cyan controls'},
+military:{name:'Military Shooter',title:['MAIN','MENU'],material:'Military / monochrome instrument frames, cyan focus and green selection'},
+horror:{name:'Survival Horror',title:['Main','menu'],material:'Worn charcoal / chalk lettering and faded red selection'}
+};
+const screens={main:'Main menu',settings:'Settings',pause:'Pause',loading:'Loading',states:'Control states'};
+const state={theme:'scifi',screen:'loading',backdrop:'reflections',volume:75,music:45,subtitles:true,quality:'High',progress:38,motion:'auto'};
+function restore(snapshot){const s=snapshot?.privateContent||snapshot?.modelContent;if(!s)return;if(['auto','play','reduced','paused'].includes(s.motion))state.motion=s.motion;const theme=themes[s.theme]?s.theme:Object.keys(themes).find(k=>themes[k].name===s.theme);if(theme)state.theme=theme;const screen=screens[s.screen]?s.screen:Object.keys(screens).find(k=>screens[k]===s.screen);if(screen)state.screen=screen;if(['reflections','plain','bright'].includes(s.backdrop))state.backdrop=s.backdrop;for(const k of ['volume','music','progress'])if(Number.isFinite(s[k]))state[k]=Math.max(0,Math.min(100,s[k]));if(typeof s.subtitles==='boolean')state.subtitles=s.subtitles;if(['Low','Medium','High'].includes(s.quality))state.quality=s.quality;}
+function save(){try{window.openai?.setWidgetState({modelContent:{theme:themes[state.theme].name,screen:screens[state.screen],backdrop:state.backdrop,motion:state.motion},privateContent:{...state}})?.catch(()=>{});}catch{}}
+restore(window.openai?.widgetState);
+picker.innerHTML=Object.entries(themes).map(([id,t])=>`<option value="${id}">${t.name}</option>`).join('');
+const button=(label,action,cls='')=>`<button type="button" class="game-button cursor-interaction ${cls}" data-action="${action}">${label}</button>`;
+// Original, dependency-free 3D geometry study. Embedded in loading-3d-theme-studies.html.
+// Mesh vertices are transformed in 3D, lit, perspective-projected and depth sorted.
+// Original, dependency-free 3D geometry study. Embedded in loading-3d-theme-studies.html.
+// Mesh vertices are transformed in 3D, lit, perspective-projected and depth sorted.
+function createLoadingScene(canvas, theme) {
+  const ctx = canvas.getContext('2d');
+  const TAU = Math.PI * 2, pieces = [];
+  let time = 0, previous = 0, frame = 0, running = false, disposed = false;
+  let width = 480, height = 350;
+  const material = (color, metal = 0) => ({ color: color.match(/\w\w/g).map(x => parseInt(x, 16)), metal });
+  const silver = material('a9c5d4', .9), mint = material('a1c9bd', .65), blue = material('537cae', .8);
+  const graphite = material('384854', .35), gold = material('b89751', .8), chalk = material('ada58d', .12);
+  const ink = material('303830'), violet = material('756c9a', .6), cyan = material('87c9d8', .65);
+  const rotate = (p, r) => {
+    let [x,y,z] = p, c = Math.cos(r[0]), s = Math.sin(r[0]);
+    [y,z] = [y*c-z*s,y*s+z*c]; c=Math.cos(r[1]);s=Math.sin(r[1]);
+    [x,z] = [x*c+z*s,-x*s+z*c];c=Math.cos(r[2]);s=Math.sin(r[2]);
+    return [x*c-y*s,x*s+y*c,z];
+  };
+  function add(mesh, mat, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1], motion=null) {
+    pieces.push({mesh,mat,position,rotation,scale,motion});
+  }
+  function ring(radius, tube, arc=TAU, segments=72, sides=16) {
+    const vertices=[], faces=[];
+    for(let i=0;i<=segments;i++)for(let j=0;j<sides;j++){
+      const u=i/segments*arc,v=j/sides*TAU;
+      vertices.push([(radius+tube*Math.cos(v))*Math.cos(u),(radius+tube*Math.cos(v))*Math.sin(u),tube*Math.sin(v)]);
+    }
+    for(let i=0;i<segments;i++)for(let j=0;j<sides;j++){
+      const a=i*sides+j,b=(i+1)*sides+j,c=(i+1)*sides+(j+1)%sides,d=i*sides+(j+1)%sides;
+      faces.push([a,b,c,d]);
+    }
+    if(arc<TAU){faces.push(Array.from({length:sides},(_,j)=>sides-1-j));faces.push(Array.from({length:sides},(_,j)=>segments*sides+j));}
+    return {vertices,faces};
+  }
+  function sphere(radius, segments=40, rows=20) {
+    const vertices=[],faces=[];
+    for(let i=0;i<=rows;i++)for(let j=0;j<segments;j++){
+      const v=i/rows*Math.PI,u=j/segments*TAU;
+      vertices.push([radius*Math.sin(v)*Math.cos(u),radius*Math.cos(v),radius*Math.sin(v)*Math.sin(u)]);
+    }
+    for(let i=0;i<rows;i++)for(let j=0;j<segments;j++){
+      const a=i*segments+j,b=i*segments+(j+1)%segments,c=(i+1)*segments+(j+1)%segments,d=(i+1)*segments+j;
+      faces.push(i===0?[a,c,d]:i===rows-1?[a,b,c]:[a,b,c,d]);
+    }
+    return {vertices,faces};
+  }
+  function prism(points,depth) {
+    const vertices=points.map(([x,y])=>[x,y,-depth/2]).concat(points.map(([x,y])=>[x,y,depth/2]));
+    const n=points.length,faces=[Array.from({length:n},(_,i)=>n-1-i),Array.from({length:n},(_,i)=>n+i)];
+    for(let i=0;i<n;i++)faces.push([i,(i+1)%n,(i+1)%n+n,i+n]);
+    return {vertices,faces};
+  }
+  const box=prism([[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5]],1);
+  const crystal={vertices:[[0,1.5,0],[.62,0,0],[0,0,.62],[-.62,0,0],[0,0,-.62],[0,-1.3,0]],faces:[[0,2,1],[0,3,2],[0,4,3],[0,1,4],[5,1,2],[5,2,3],[5,3,4],[5,4,1]]};
+  const spin = speed => t=>({rotation:[0,t*speed,0]});
+  const float = (speed=1,amount=.1)=>t=>({position:[0,Math.sin(t*speed)*amount,0]});
+  const diamond=prism([[0,1],[1,0],[0,-1],[-1,0]],.18);
+  if(theme==='neumorphic') {
+    add(ring(1.13,.22),graphite,[0,0,0]);
+    add(ring(.9,.035,TAU*.76),silver,[0,0,.24],[0,0,0],[1,1,1],t=>({rotation:[0,0,-t*.85]}));
+    add(sphere(.7),graphite,[0,0,-.08],[0,0,0],[1,1,.4]);
+    add(sphere(.17),cyan,[0,0,.37]);
+  } else if(theme==='soft') {
+    add(ring(1.08,.115),silver,[0,0,0],[.72,.25,-.5],[1,1,1],t=>({rotation:[0,t*.34,0]}));
+    add(ring(1.03,.09),mint,[0,0,0],[-.65,.6,.55],[1,1,1],t=>({rotation:[0,-t*.28,0]}));
+    add(sphere(.39),blue,[0,0,0],[0,0,0],[1,1,1],float(.9,.11));
+  } else if(theme==='night') {
+    add(ring(1.1,.065,TAU*.86),silver,[0,0,0],[.4,.25,0],[1,1,1],t=>({rotation:[0,0,t*.3]}));
+    add(ring(.88,.12),violet,[0,0,-.04],[.4,.25,0]);
+    add(sphere(.8),violet,[0,0,.02],[.4,.25,0],[1,1,.2],t=>({rotation:[Math.sin(t*.55)*.18,Math.sin(t*.35)*.3,0]}));
+  } else if(theme==='ink') {
+    add(ring(1.02,.12,TAU*.95,48,8),ink,[0,0,0],[0,0,0],[1,1,1],t=>({rotation:[0,0,t*.22]}));
+    add(diamond,ink,[0,0,.04],[0,0,0],[.6,.6,1],spin(.32));
+    add(box,material('d9d4c2'),[0,0,.19],[0,0,0],[.22,.22,.24]);
+  } else if(theme==='fantasy') {
+    add(ring(1.15,.055),gold);
+    add(ring(1.02,.025),gold,[0,0,-.12]);
+    add(diamond,gold,[0,0,0],[0,0,0],[.93,.93,1],spin(.24));
+    add(diamond,material('542b28',.4),[0,0,.14],[0,0,0],[.7,.7,1],spin(.24));
+    add(crystal,gold,[0,0,.25],[0,0,0],[.42,.43,.42],spin(.44));
+    add(sphere(.1,8,4),gold,[0,1.26,0]);add(sphere(.1,8,4),gold,[0,-1.26,0]);
+  } else if(theme==='jrpg') {
+    add(crystal,material('93c7e9',.55),[0,0,0],[0,.25,.07],[.88,.85,.88],t=>({rotation:[0,t*.6,0],position:[0,Math.sin(t)*.08,0]}));
+    add(crystal,silver,[-.95,-.5,0],[.2,.3,-.3],[.24,.24,.24],spin(-.8));
+    add(crystal,silver,[.92,.7,-.2],[0,0,.4],[.17,.17,.17],spin(.8));
+  } else if(theme==='pixel') {
+    const blocks=[[-1,0],[0,-1],[0,0],[0,1],[1,0]];
+    for(const [x,y] of blocks)add(box,x===0&&y===0?gold:violet,[x*.55,y*.55,0],[0,0,0],[.53,.53,.53]);
+    add(box,material('bfb4d9'),[-1.15,.95,0],[0,0,0],[.26,.26,.26],t=>({position:[0,Math.floor((Math.sin(t*1.2)+1)*2)*.05,0]}));
+    add(box,material('bfb4d9'),[1.15,-.95,0],[0,0,0],[.26,.26,.26]);
+  } else if(theme==='scifi') {
+    add(ring(1.24,.025),silver,[0,0,0],[.45,.1,0]);
+    add(ring(1.07,.045),cyan,[0,0,0],[1.15,.6,.25],[1,1,1],t=>({rotation:[0,t*.35,0]}));
+    add(ring(1.07,.035),blue,[0,0,0],[.1,1.3,-.4],[1,1,1],t=>({rotation:[t*.3,0,0]}));
+    add(sphere(.4,20,10),silver,[0,0,0]);
+    add(sphere(.1,12,6),cyan,[0,0,0],[0,0,0],[1,1,1],t=>({position:[Math.cos(t*.8)*1.24,Math.sin(t*.8)*1.24,0]}));
+  } else if(theme==='military') {
+    const chevron=prism([[-.88,.3],[0,-.08],[.88,.3],[.88,.04],[0,-.36],[-.88,.04]],.2);
+    add(chevron,material('9cb7ae',.5),[0,.38,0],[0,0,0],[1,1,1],float(1.4,.045));
+    add(chevron,material('588f89',.45),[0,-.26,0],[0,0,0],[1,1,1],float(1.4,.045));
+    for(const x of [-1.13,1.13])for(const y of [-1.03,1.03]){
+      add(box,silver,[x,y,-.13],[0,0,0],[.35,.035,.09]);
+      add(box,silver,[x+(x<0?-.16:.16),y+(y<0?.16:-.16),-.13],[0,0,0],[.035,.35,.09]);
+    }
+    for(let i=0;i<9;i++)add(box,graphite,[(i-4)*.17,-.9,0],[0,0,0],[.055,.13,.1]);
+  } else {
+    add(ring(1.05,.055,TAU*.72,56,7),chalk,[0,0,-.1],[0,.15,.5]);
+    add(ring(.83,.028,TAU*.68,48,6),material('6c7766'),[0,0,.1],[0,-.15,-1.2]);
+    add(prism([[-.13,-1.2],[.04,-1.15],[.2,1.2],[.03,1.13]],.2),chalk,[0,0,.13],[0,0,-.1], [1,1,1],t=>({rotation:[0,Math.sin(t*.6)*.2,0]}));
+    add(box,material('665044'),[0,-.3,.02],[0,0,.22],[1.7,.035,.06]);
+  }
+  function draw() {
+    const ratio=Math.min(window.devicePixelRatio||1,2);
+    width=canvas.clientWidth||480;height=canvas.clientHeight||350;
+    if(canvas.width!==Math.round(width*ratio)||canvas.height!==Math.round(height*ratio)){canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);}
+    ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);
+    const unit=Math.min(width*.3,height*.34),faces=[];
+    let view=[.24,Math.sin(time*.3)*.2-.25,-.08];
+    if(theme==='pixel')view=[.4,Math.floor(time*1.8)*.16+.45,-.1];
+    if(theme==='jrpg')view=[.08,-.2,0];
+    if(theme==='military')view=[.12,Math.sin(time*.48)*.42-.3,0];
+    if(theme==='horror')view=[.1,Math.sin(time*.28)*.24-.2,-.08];
+    const project=p=>[width/2+p[0]*unit*5.6/(5.6-p[2]),height*.46-p[1]*unit*5.6/(5.6-p[2])];
+    const shadow=ctx.createRadialGradient(width/2,height*.88,1,width/2,height*.88,unit*1.15);
+    shadow.addColorStop(0,theme==='soft'||theme==='ink'?'#23303a26':'#00000065');shadow.addColorStop(1,'#00000000');
+    ctx.save();ctx.translate(0,height*.88);ctx.scale(1,.16);ctx.translate(0,-height*.88);ctx.fillStyle=shadow;ctx.fillRect(0,0,width,height*2);ctx.restore();
+    for(const part of pieces){
+      const motion=part.motion?part.motion(time):{},r=part.rotation.map((v,i)=>v+(motion.rotation?.[i]||0)),pos=part.position.map((v,i)=>v+(motion.position?.[i]||0));
+      const vertices=part.mesh.vertices.map(v=>rotate(rotate(v.map((a,i)=>a*part.scale[i]),r).map((a,i)=>a+pos[i]),view));
+      for(const indices of part.mesh.faces){
+        const points=indices.map(i=>vertices[i]),a=points[0],b=points[1],c=points[2];
+        const u=b.map((v,i)=>v-a[i]),v=c.map((n,i)=>n-a[i]);
+        let normal=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+        const length=Math.hypot(...normal);if(length<.00001)continue;normal=normal.map(n=>n/length);
+        // Double-sided lighting keeps thin crests and inner ring surfaces visible.
+        if(normal[2]<0)normal=normal.map(n=>-n);
+        const diffuse=Math.max(0,normal[0]*-.4+normal[1]*.65+normal[2]*.64);
+        const spec=Math.pow(Math.max(0,normal[0]*-.28+normal[1]*.43+normal[2]*.86),24)*part.mat.metal;
+        const strip=Math.pow(Math.max(0,1-Math.abs(normal[1]-.48)*4),7)*part.mat.metal*.25;
+        const color=part.mat.color.map(n=>Math.round(Math.min(255,n*(.32+diffuse*.69)+spec*105+strip*75)));
+        faces.push({points:points.map(project),depth:points.reduce((n,p)=>n+p[2],0)/points.length,color:'rgb('+color.join(',')+')'});
+      }
+    }
+    faces.sort((a,b)=>a.depth-b.depth);
+    for(const face of faces){ctx.beginPath();face.points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fillStyle=face.color;ctx.fill();ctx.strokeStyle=face.color;ctx.lineWidth=.45;ctx.stroke();}
+  }
+  function tick(now){if(!running||disposed)return;if(!previous)previous=now;if(now-previous>=1000/30){time+=(now-previous)/1000;previous=now;draw();}frame=requestAnimationFrame(tick);}
+  const observer=new ResizeObserver(draw);observer.observe(canvas);draw();
+  return {
+    setMode(mode){cancelAnimationFrame(frame);running=false;previous=0;if(mode==='reduced')time=0;draw();if(mode==='play'){running=true;frame=requestAnimationFrame(tick);}},
+    destroy(){disposed=true;running=false;cancelAnimationFrame(frame);observer.disconnect();}
+  };
+}
+
+const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
+let loadingScene=null;
+function applyPlayback(){
+if(!loadingScene)return;
+const reduced=state.motion==='reduced'||(state.motion==='auto'&&motionPreference.matches);
+loadingScene.setMode(reduced?'reduced':state.motion==='paused'||state.progress===100?'paused':'play');
+}
+function startLoadingMotion(){
+if(state.screen!=='loading')return;
+loadingScene=createLoadingScene(content.querySelector('.load-canvas'),state.theme);
+applyPlayback();
+}
+function syncMotion(){stage.dataset.motion=state.motion;stage.dataset.complete=String(state.progress===100);root.querySelector('#uip-motion').value=state.motion;root.querySelector('#uip-motion-control').hidden=state.screen!=='loading';root.querySelector('#uip-motion-status').textContent=state.progress===100?'Complete':state.motion==='paused'?'Paused':state.motion==='reduced'?'Motion off':state.motion==='auto'&&motionPreference.matches?'System: reduced motion':'Playing';applyPlayback();}
+function render(){
+if(loadingScene){loadingScene.destroy();loadingScene=null;}
+syncMotion();
+backdropPicker.options[0].textContent='Theme canvas';backdropPicker.options[1].textContent='Dark canvas';backdropPicker.options[2].textContent='Light canvas';
+const t=themes[state.theme];stage.dataset.theme=state.theme;stage.dataset.screen=state.screen;stage.dataset.revised=String(!['soft','military'].includes(state.theme));stage.dataset.backdrop=state.backdrop;picker.value=state.theme;backdropPicker.value=state.backdrop;root.querySelector('.footer-theme').textContent=t.name.toUpperCase();root.querySelector('#uip-material').textContent=t.material;status.textContent=screens[state.screen];root.querySelectorAll('.study-nav [data-screen]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.screen===state.screen)));const advance=root.querySelector('#uip-advance');advance.hidden=state.screen!=='loading';advance.textContent=state.progress===100?'Restart loading preview':'Advance loading preview';
+if(state.screen==='main')content.innerHTML=`<section class="menu-panel" aria-label="Main menu"><p class="eyebrow">${state.theme==='military'?'Military':state.theme==='soft'?'Main menu':t.name}</p><h1>${t.title.map(s=>`<span>${s}</span>`).join('')}</h1><div class="panel-rule"></div><div class="menu-actions">${button('Continue','continue','primary')}${button('New game','new')}${button('Settings','settings')}${button('Credits','credits','quiet')}</div></section>`;
+if(state.screen==='pause')content.innerHTML=`<section class="menu-panel" aria-label="Pause menu"><p class="eyebrow">Game paused</p><h1>Take your<br>time.</h1><div class="panel-rule"></div><p class="save-note">Your progress is saved.</p><div class="menu-actions">${button('Resume','resume','primary')}${button('Settings','settings')}${button('Main menu','main','quiet')}</div></section>`;
+if(state.screen==='settings')content.innerHTML=`<section class="menu-panel settings-panel" aria-label="Settings menu"><p class="eyebrow">Preferences</p><h1>Settings</h1><div class="panel-rule"></div><div class="setting-group"><h2>Sound</h2><div class="setting-row"><label for="uip-volume">Master volume</label><div class="range-control"><input id="uip-volume" type="range" min="0" max="100" value="${state.volume}"><output for="uip-volume">${state.volume}</output></div></div><div class="setting-row"><label for="uip-music">Music</label><div class="range-control"><input id="uip-music" type="range" min="0" max="100" value="${state.music}"><output for="uip-music">${state.music}</output></div></div></div><div class="setting-group"><h2>Display</h2><div class="setting-row"><label for="uip-quality">Graphics quality</label><select id="uip-quality" class="cursor-interaction">${['Low','Medium','High'].map(v=>`<option ${v===state.quality?'selected':''}>${v}</option>`).join('')}</select></div><div class="setting-row"><label for="uip-subtitles">Subtitles</label><label class="check-row"><input id="uip-subtitles" type="checkbox" ${state.subtitles?'checked':''}><span>${state.subtitles?'On':'Off'}</span></label></div></div><div class="settings-back">${button('Back','back')}</div></section>`;
+if(state.screen==='loading')content.innerHTML=`<section class="loading-panel" aria-label="${t.name} loading screen"><div class="load-visual" aria-hidden="true"><canvas class="load-canvas">3D theme ornament</canvas></div><div class="loading-inner"><div><p class="eyebrow">${t.name}</p><h1>${state.progress===100?'Ready':'Loading'}</h1></div><div><div class="progress-label"><span>${state.progress===100?'Complete':'Loading your game'}</span><span id="uip-progress-text">${state.progress}%</span></div><progress max="100" value="${state.progress}" aria-label="Example loading progress"></progress><p class="loading-tip">You can adjust sound and display options in Settings.</p></div></div></section>`;
+if(state.screen==='states')content.innerHTML=`<section class="menu-panel states-panel" aria-label="Shared control states"><p class="eyebrow">${t.name} / component study</p><h1>Control states</h1><div class="panel-rule"></div><div class="state-grid">${[['Idle',''],['Hover','is-hover'],['Focus','is-focus'],['Pressed','is-pressed'],['Selected','primary'],['Disabled','disabled']].map(([name,cls])=>`<div class="state-sample"><span>${name}</span><button class="game-button cursor-interaction ${cls==='disabled'?'':cls}" ${cls==='disabled'?'disabled':''} data-action="sample">Continue</button></div>`).join('')}</div><div class="state-swatches">${[['Surface','--surface'],['Text','--ink'],['Secondary','--muted'],['Accent','--accent']].map(([n,v])=>`<span class="swatch"><i style="background:var(${v})" aria-hidden="true"></i>${n}</span>`).join('')}</div></section>`;
+startLoadingMotion();
+}
+let returnScreen='main';
+function show(screen){state.screen=screen;render();save();}
+root.querySelectorAll('.study-nav [data-screen]').forEach(b=>b.addEventListener('click',()=>{returnScreen='main';show(b.dataset.screen);}));
+root.querySelector('#uip-motion').addEventListener('change',e=>{state.motion=e.target.value;syncMotion();save();});
+motionPreference.addEventListener('change',syncMotion);
+picker.addEventListener('change',()=>{state.theme=picker.value;render();save();});
+root.querySelector('#uip-advance').addEventListener('click',()=>{state.progress=state.progress===100?38:Math.min(100,state.progress+31);render();save();});
+backdropPicker.addEventListener('change',()=>{state.backdrop=backdropPicker.value;render();save();});
+content.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action;if(a==='settings'){returnScreen=state.screen;show('settings');}else if(a==='back')show(returnScreen);else if(a==='main')show('main');else if(a==='resume'){show('main');status.textContent='Resume selected · preview only';}else if(a==='continue'||a==='new'){state.progress=38;show('loading');}else if(a==='credits'){status.textContent='UIPilot · theme design study';}else if(a==='sample'){status.textContent='Continue selected · sample control';}});
+content.addEventListener('input',e=>{const k=e.target.id==='uip-volume'?'volume':e.target.id==='uip-music'?'music':null;if(k){state[k]=Number(e.target.value);e.target.nextElementSibling.textContent=state[k];}});
+content.addEventListener('change',e=>{if(e.target.id==='uip-subtitles'){state.subtitles=e.target.checked;e.target.nextElementSibling.textContent=state.subtitles?'On':'Off';}if(e.target.id==='uip-quality')state.quality=e.target.value;save();});
+root.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.screen!=='main'){show(state.screen==='settings'?returnScreen:'main');}});
+window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState){const previous=JSON.stringify(state);restore(e.detail.globals.widgetState);if(JSON.stringify(state)!==previous)render();}});
+render();
+})();
+</script>

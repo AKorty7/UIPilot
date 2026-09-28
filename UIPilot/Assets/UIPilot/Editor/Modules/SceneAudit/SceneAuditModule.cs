@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UIPilot.Editor.Core;
 using UIPilot.Editor.Modules.ScriptSetup;
 using UIPilot.Editor.Modules.UIGenerator;
 
@@ -10,7 +11,7 @@ namespace UIPilot.Editor.Modules.SceneAudit
 {
     internal static class SceneAuditModule
     {
-        private const int CallStatePersistent = 2;
+        private const int CallStateOff = (int)UnityEngine.Events.UnityEventCallState.Off;
 
         // ── Public entry point ───────────────────────────────────────────────
 
@@ -93,7 +94,9 @@ namespace UIPilot.Editor.Modules.SceneAudit
         private static void CheckPanel(List<SceneAuditResult> results,
             string label, string panelName, string[] expectedButtons)
         {
-            var panelGO = GameObject.Find(panelName);
+            // Includes panels the developer has unticked to work on another one.
+            var panelGO = UIPilotSceneQuery.FindInCanvas(
+                UIGeneratorContent.GameObjects.Canvas, panelName);
             if (panelGO == null)
             {
                 results.Add(new SceneAuditResult(
@@ -103,15 +106,16 @@ namespace UIPilot.Editor.Modules.SceneAudit
                 return;
             }
 
+            // Anywhere under the panel: Settings buttons sit inside their rows.
+            var present = new HashSet<string>();
+            foreach (var button in panelGO.GetComponentsInChildren<Button>(true))
+                present.Add(button.name);
+
             foreach (var btnLabel in expectedButtons)
             {
                 var expectedName = UIGeneratorContent.GameObjects.ButtonPrefix + btnLabel;
-                var found        = false;
 
-                foreach (Transform child in panelGO.transform)
-                    if (child.name == expectedName) { found = true; break; }
-
-                if (!found)
+                if (!present.Contains(expectedName))
                 {
                     results.Add(new SceneAuditResult(
                         label,
@@ -138,6 +142,18 @@ namespace UIPilot.Editor.Modules.SceneAudit
                     SceneAuditContent.Labels.GameManagerGO,
                     SceneAuditContent.Details.GameManagerGOMissing,
                     SceneAuditSeverity.Warning));
+                return;
+            }
+
+            // The bare GameObject is not enough — buttons bind to the component
+            // on it. The generated class shares the GameObject's name. A deleted
+            // script ("Missing Script" slot) also reads as null here.
+            if (go.GetComponent(ScriptSetupContent.GameObjects.ManagerName) == null)
+            {
+                results.Add(new SceneAuditResult(
+                    SceneAuditContent.Labels.GameManagerGO,
+                    SceneAuditContent.Details.GameManagerComponentMissing,
+                    SceneAuditSeverity.Broken));
                 return;
             }
 
@@ -214,7 +230,9 @@ namespace UIPilot.Editor.Modules.SceneAudit
                     .FindPropertyRelative("m_CallState")
                     .intValue;
 
-                if (callState == CallStatePersistent) return true;
+                // Off is the only state that never fires. Runtime Only (Unity's
+                // default, and what UIPilot writes) and Editor And Runtime both do.
+                if (callState != CallStateOff) return true;
             }
 
             return false;

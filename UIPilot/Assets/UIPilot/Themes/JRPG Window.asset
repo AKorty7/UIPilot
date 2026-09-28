@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: JRPG Window
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers: []
+  timeOfDay: 0.5
+  wash: {r: 0, g: 0.007843138, b: 0.07058824, a: 0.4509804}
+  blooms: 0
+  bloomTopLeft: {r: 0.7019608, g: 0.6509804, b: 0.96862745, a: 0.54901963}
+  bloomBottomRight: {r: 0.47843137, g: 0.84313726, b: 0.9254902, a: 0.6}
+  bloomTopRight: {r: 0.8235294, g: 0.96862745, b: 0.9254902, a: 0.5019608}
+  bloomCentre: {r: 1, g: 1, b: 1, a: 0.34901962}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 0
+  sceneFrameColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  sceneScanlines: 0
+  sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: c65724c1b82c47a9a46dc01493907e35, type: 3}
+  panelArtScale: 1
+  panelScanlines: 0
+  panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.050980393}
+  panelFrame: 0
+  panelFrameColor: {r: 1, g: 1, b: 1, a: 0.8509804}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 0
+  font: {fileID: 11400000, guid: 00e8ec7a7027e864bb7e6989d2197ae0, type: 2}
+  titleFont: {fileID: 0}
+  titleMaterial: {fileID: 2100000, guid: 6e5ce34f9d3fbd744846b9d062404af3, type: 2}
+  textMaterial: {fileID: 2100000, guid: 6e5ce34f9d3fbd744846b9d062404af3, type: 2}
+  text: {r: 1, g: 1, b: 1, a: 1}
+  textSoft: {r: 0.76862746, g: 0.8117647, b: 1, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 8
+  titleSize: 46
+  icons: 0
+  itemCase: 2
+  itemTracking: 3
+  itemSize: 27
+  valueSize: 23
+  smallSize: 16
+  focusStyle: 2
+  focusArt: {fileID: 21300000, guid: 6bd216cd5e0a429ebd0cf136c72f81a8, type: 3}
+  focusReach: 24
+  markerSize: {x: 38, y: 30}
+  focusIdle: {r: 1, g: 1, b: 1, a: 0}
+  focusHover: {r: 1, g: 1, b: 1, a: 0.45}
+  focusSelected: {r: 1, g: 1, b: 1, a: 1}
+  focusPressed: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  focusDisabled: {r: 1, g: 1, b: 1, a: 0.12}
+  rule: {r: 1, g: 1, b: 1, a: 0.54901963}
+  ruleArt: {fileID: 0}
+  ruleHeight: 2
+  meterTrack: {r: 1, g: 1, b: 1, a: 0.2509804}
+  meterFill: {r: 1, g: 1, b: 1, a: 1}

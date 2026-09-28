@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4838563407c69124e89ca7fbe1d971c9, type: 3}
+  m_Name: Fantasy RPG
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::UIPilot.Editor.Core.UIPilotTheme
+  picture: {fileID: 0}
+  sceneLayers:
+  - sprite: {fileID: 21300000, guid: e499066d048c41439ebe569665680bc1, type: 3}
+    material: {fileID: 2100000, guid: d86d46bf052f4e93b9335caee67131d9, type: 2}
+  - sprite: {fileID: 21300000, guid: ac2698a87b1d4ed0a3e6dd0bd2f9da23, type: 3}
+    material: {fileID: 2100000, guid: 43b8e237e7944e6e8e693461ac08de6f, type: 2}
+  - sprite: {fileID: 21300000, guid: f341fc22ab2c4141bf0d829255ccae9a, type: 3}
+    material: {fileID: 2100000, guid: 3f5c9f53ded5438297623ed48c804a97, type: 2}
+  - sprite: {fileID: 21300000, guid: d21a0f51675b4b6c8dd7895fb7b89097, type: 3}
+    material: {fileID: 2100000, guid: dae182f8611f48868de9587c2ef11f67, type: 2}
+  - sprite: {fileID: 21300000, guid: c7dbfc2fd71e495eb2b22f91e1ce35a7, type: 3}
+    material: {fileID: 2100000, guid: 2201b7b97986480f92d217020619d241, type: 2}
+  - sprite: {fileID: 21300000, guid: 6a09d45d69f7491f9180ec9c3b126f0d, type: 3}
+    material: {fileID: 2100000, guid: 745857a356b04cd9828a8153da876eaf, type: 2}
+  - sprite: {fileID: 21300000, guid: 188cad336aca4b378352c8303c57fd7a, type: 3}
+    material: {fileID: 2100000, guid: 8eb9d6c470e54e5580102c1c6a17b741, type: 2}
+  - sprite: {fileID: 21300000, guid: 290c42cde8ef42b8ab3836e23bde69bc, type: 3}
+    material: {fileID: 2100000, guid: e67d6a1039f74333a123a1a3bd5ce899, type: 2}
+  - sprite: {fileID: 21300000, guid: 7bb436c095ed4cc38f7b6d47ce6972a2, type: 3}
+    material: {fileID: 2100000, guid: d21a42fee74e4d93b5399c8d02ec241e, type: 2}
+  - sprite: {fileID: 21300000, guid: 3d7a47c612174655bf48ec0587326d87, type: 3}
+    material: {fileID: 2100000, guid: 589c5d04b95c401bb28272c0e767133b, type: 2}
+  - sprite: {fileID: 21300000, guid: 5c1273273df94bb1b095b5c3df853a9c, type: 3}
+    material: {fileID: 2100000, guid: 1d55ab0997854293bf197fc586ce2870, type: 2}
+  - sprite: {fileID: 21300000, guid: d4ccc5d63a35426fbb515653c473734d, type: 3}
+    material: {fileID: 2100000, guid: eaf611c504ee429b8dfa9703d40c8eed, type: 2}
+  timeOfDay: 0.75
+  wash: {r: 0.078431375, g: 0.047058824, b: 0.023529412, a: 0.3019608}
+  blooms: 1
+  bloomTopLeft: {r: 1, g: 0.69803923, b: 0.35686275, a: 0.14901961}
+  bloomBottomRight: {r: 1, g: 0.47843137, b: 0.18039216, a: 0.101960786}
+  bloomTopRight: {r: 1, g: 0.8666667, b: 0.61960787, a: 0.1254902}
+  bloomCentre: {r: 1, g: 0.9098039, b: 0.7529412, a: 0}
+  ribbon: 0
+  ribbonColor: {r: 1, g: 1, b: 1, a: 0.6}
+  sceneFrames: 0
+  sceneFrameColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  sceneScanlines: 0
+  sceneScanlineColor: {r: 1, g: 1, b: 1, a: 0.12156863}
+  panel: {r: 1, g: 1, b: 1, a: 1}
+  panelArt: {fileID: 21300000, guid: 36e7b08e72b4447aa2100dfccdb913e2, type: 3}
+  panelArtScale: 1
+  panelScanlines: 0
+  panelScanlineColor: {r: 1, g: 1, b: 1, a: 0.050980393}
+  panelFrame: 0
+  panelFrameColor: {r: 1, g: 1, b: 1, a: 0.8509804}
+  panelFrameEcho: 0
+  panelFrameEchoColor: {r: 1, g: 1, b: 1, a: 0.4}
+  registrationMarks: 0
+  font: {fileID: 11400000, guid: 99d44601e71f5eb4dbb7a1dadfa4c10a, type: 2}
+  titleFont: {fileID: 11400000, guid: 76eaa3ca35f5cae49954dedff35ef4e1, type: 2}
+  titleMaterial: {fileID: 0}
+  textMaterial: {fileID: 0}
+  text: {r: 0.22745098, g: 0.14509805, b: 0.078431375, a: 1}
+  textSoft: {r: 0.33333334, g: 0.22745098, b: 0.1254902, a: 1}
+  titleCase: 2
+  titleBold: 0
+  titleTracking: 6
+  titleSize: 54
+  icons: 0
+  itemCase: 0
+  itemTracking: 1
+  itemSize: 32
+  valueSize: 28
+  smallSize: 17
+  focusStyle: 1
+  focusArt: {fileID: 21300000, guid: 80c5c6fad39145e1813a9bde8334469d, type: 3}
+  focusReach: 24
+  markerSize: {x: 32, y: 32}
+  focusIdle: {r: 1, g: 1, b: 1, a: 0}
+  focusHover: {r: 1, g: 1, b: 1, a: 0.5}
+  focusSelected: {r: 1, g: 1, b: 1, a: 1}
+  focusPressed: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  focusDisabled: {r: 1, g: 1, b: 1, a: 0.12}
+  rule: {r: 1, g: 1, b: 1, a: 1}
+  ruleArt: {fileID: 21300000, guid: 4fd8dd1319684e52a9faac6ab1e6fa62, type: 3}
+  ruleHeight: 28
+  meterTrack: {r: 0.22745098, g: 0.14509805, b: 0.078431375, a: 0.2509804}
+  meterFill: {r: 0.5568628, g: 0.16470589, b: 0.11764706, a: 1}
