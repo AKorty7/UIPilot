@@ -1,16 +1,46 @@
 # UIPilot
 
-![UIPilot demo](https://github.com/user-attachments/assets/70d18979-efea-4770-8092-946efcd60e15)
+**A finished game menu in one click, then a UI that stays healthy.**
 
-Stop setting up Unity UI from scratch every project.
-
-UIPilot is a Unity Editor tool that generates, wires, validates, and
-repairs standard UGUI systems in one click. No runtime footprint.
-No custom frameworks. Just clean, native Unity UI — ready to go.
+UIPilot is a Unity Editor tool that builds your main, pause and settings
+menus, wires every button to a GameManager script it writes for you,
+and styles the lot with one of nine themes. What it builds is plain,
+native UGUI and TextMeshPro that you own and can edit: no runtime
+framework, no custom components.
 
 Then it keeps watching. **UI Health** checks every UI in your scenes,
 not only UIPilot's, for the bugs that make a button silently do nothing,
 and fixes most of them in one click.
+
+---
+
+## See it in action
+
+### 1. Build the menus
+
+Tick the menus you want, pick a theme and click **Build UI**. UIPilot
+creates the canvas, EventSystem, panels and buttons, writes
+`UIPilot_GameManager.cs`, and wires every button once Unity has compiled it.
+
+![Building the main, pause and settings menus with Build UI](media/01-build-ui.gif)
+
+### 2. Change the look in one step
+
+Pick another theme and click **Apply Theme to Existing Menus**. The look
+changes (colours, fonts, frames and the scene behind the menu) while
+the layout and wiring stay exactly as they were. Shown here:
+Soft Club, Sci-Fi HUD, Pixel Retro, then Military Shooter.
+
+![Switching the menus between Soft Club, Sci-Fi HUD, Pixel Retro and Military Shooter](media/02-apply-theme.gif)
+
+### 3. Press Play: it already works
+
+The menus work like a shipped game's front end. Settings opens and goes
+back, the volume, fullscreen and quality controls respond, and
+**Play** loads the scene you picked in the window (or hides the menu
+if you picked none, as it does here).
+
+![Playing the generated menu: settings controls, back, then Play](media/03-play-the-menu.gif)
 
 ---
 
@@ -115,7 +145,7 @@ Everything it generates is prefixed. Everything without the prefix
 is never touched. This means you can drop UIPilot into an existing
 project and it will coexist cleanly with whatever UI you already have.
 
-The generated GameManager (`UIPilot_GameManager.cs`) contains method
+The generated GameManager (`UIPilot_GameManager.cs`) contains
 a method for every button — `OnPlayPressed()`, `OnQuitPressed()`, and so
 on — already doing the standard job, plus a public `OpenPauseMenu()`.
 Add your own logic to them. Once you have edited the file in any way,
